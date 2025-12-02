@@ -1,0 +1,47 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output directories
+comfyui_generated_mesh/
+comfyui_generated_images/
+generated_images/
+generated_meshes/
+models/
+
+# Temporary files
+*.tmp
+*.log
+debug_*.png
+/tmp/
+
+# API Keys (never commit these!)
+.env
+*.key
+secrets.txt
+
+# External dependencies (clone separately)
+external/depthai_blazepose/
+external/TripoSR/
+external/VIBE/
+external/EasyMocap/
