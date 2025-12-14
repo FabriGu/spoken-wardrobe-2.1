@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spoken Wardrobe</title>
+
+    <!-- Three.js from CDN -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+            "three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.9.0/build/index.module.js"
+        }
+    }
+    </script>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Persistent camera background (always visible, updated via WebSocket) -->
+    <img id="camera-background" alt="Live camera feed">
+
+    <!-- Main container -->
+    <div id="app">
+        <!-- Camera feed / Three.js canvas container -->
+        <div id="canvas-container">
+            <canvas id="three-canvas"></canvas>
+            <!-- Legacy camera feed element (kept for compatibility) -->
+            <img id="camera-feed" alt="Camera feed" style="display: none;">
+        </div>
+
+        <!-- Keypoint overlay canvas (renders BlazePose keypoints above 3D mesh) -->
+        <canvas id="keypoint-overlay"></canvas>
+
+        <!-- UI overlay container -->
+        <div id="ui-overlay">
+            <!-- State-specific UI screens -->
+
+            <!-- IDLE State: Welcome screen -->
+            <div id="state-idle" class="state-screen active">
+                <div class="state-content centered">
+                    <h1 class="title-gradient">SPOKEN WARDROBE</h1>
+                    <p class="subtitle">Step in front of the camera to begin</p>
+                    <div class="instruction-box">
+                        <p>Describe the clothing you want to create with your voice.</p>
+                        <p>Our AI will generate a custom 3D garment just for you.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LISTENING State: Loading speech recognition / calibration -->
+            <div id="state-listening" class="state-screen">
+                <div class="state-content">
+                    <div class="listening-indicator">
+                        <div class="mic-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                        </div>
+                        <span class="listening-text">Loading Speech Recognition</span>
+                    </div>
+                    <div class="waveform-container loading-wave">
+                        <div class="wave-loader">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                    </div>
+                    <p class="prompt-text">Get ready to speak!</p>
+                </div>
+            </div>
+
+            <!-- RECORDING State: Recording audio -->
+            <div id="state-recording" class="state-screen">
+                <div class="state-content">
+                    <p class="prompt-text instruction-top">Describe your clothing idea</p>
+                    <div class="recording-indicator">
+                        <div class="recording-dot"></div>
+                        <span class="recording-text">Recording</span>
+                    </div>
+                    <div class="waveform-container">
+                        <div class="waveform-bars" id="waveform-recording">
+                            <!-- Bars generated dynamically -->
+                        </div>
+                    </div>
+                    <div class="live-transcription" id="live-transcription">
+                        <!-- Real-time transcription appears here -->
+                    </div>
+                    <div class="timer" id="recording-timer">10</div>
+                </div>
+            </div>
+
+            <!-- TRANSCRIBING State: Processing audio -->
+            <div id="state-transcribing" class="state-screen">
+                <div class="state-content centered">
+                    <div class="spinner"></div>
+                    <p class="status-text">Analyzing wish...</p>
+                </div>
+            </div>
+
+            <!-- A_POSE State: A-pose capture -->
+            <div id="state-a_pose" class="state-screen">
+                <div class="state-content">
+                    <div class="apose-overlay">
+                        <img src="assets/aPoseMan.svg" alt="A-pose guide" class="apose-silhouette">
+                    </div>
+                    <div class="countdown" id="apose-countdown">3</div>
+                    <p class="instruction-text">Strike an A-Pose</p>
+                    <p class="sub-instruction">Stand with arms slightly away from your body</p>
+                </div>
+            </div>
+
+            <!-- CAPTURING State: Brief flash transition (no visible UI - just flash effect) -->
+            <div id="state-capturing" class="state-screen">
+                <!-- Flash effect handled by overlay, this state transitions quickly -->
+            </div>
+
+            <!-- GENERATING_2D State: 2D generation progress -->
+            <div id="state-generating_2d" class="state-screen">
+                <div class="state-content centered">
+                    <h2 class="title-gradient">Generating Preview</h2>
+                    <div class="fabric-animation">
+                        <div class="fabric-container">
+                            <div class="fabric-wave"></div>
+                            <div class="fabric-wave"></div>
+                            <div class="fabric-wave"></div>
+                            <div class="fabric-shimmer"></div>
+                        </div>
+                    </div>
+                    <div class="did-you-know">
+                        <p><strong>Did you know?</strong></p>
+                        <p id="fun-fact">Our AI uses Stable Diffusion to generate your unique design.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREVIEW State: Show 2D preview (two-stage: full image then cropped) -->
+            <div id="state-preview" class="state-screen">
+                <div class="state-content centered">
+                    <h2 class="preview-title" id="preview-title">Clothing Preview Generated</h2>
+                    <div class="preview-image-wrapper">
+                        <div class="preview-image-container extracting">
+                            <img id="preview-image-full" alt="Generated clothing" src="assets/preview_full.png" class="preview-image active">
+                            <img id="preview-image-cropped" alt="Extracted clothing" src="assets/preview_cropped.png" class="preview-image">
+                        </div>
+                    </div>
+                    <p class="status-text" id="preview-status">Extracting clothing from image...</p>
+                </div>
+            </div>
+
+            <!-- GENERATING_3D State: 3D generation progress -->
+            <div id="state-generating_3d" class="state-screen">
+                <div class="state-content centered">
+                    <h2 class="title-gradient">Building 3D Model</h2>
+                    <div class="mesh-animation-container" id="mesh-animation-container">
+                        <!-- Three.js canvas will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALIBRATING State: Mesh calibration -->
+            <div id="state-calibrating" class="state-screen">
+                <div class="state-content">
+                    <div class="countdown large" id="calibration-countdown">3</div>
+                    <p class="instruction-text">Stand in T-pose</p>
+                    <p class="sub-instruction">Arms stretched out horizontally</p>
+                </div>
+            </div>
+
+            <!-- TRY_ON State: 3D mesh overlay -->
+            <div id="state-try_on" class="state-screen">
+                <div class="state-content try-on-mode">
+                    <div class="try-on-header">
+                        <h3>Virtual Try-On</h3>
+                        <p>Move around to see your clothing</p>
+                    </div>
+                    <div class="try-on-controls">
+                        <button id="btn-restart" class="control-btn">Start Over</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ERROR State: Error message -->
+            <div id="state-error" class="state-screen">
+                <div class="state-content centered">
+                    <div class="error-icon">⚠️</div>
+                    <h2>Something went wrong</h2>
+                    <p class="error-message" id="error-message">An error occurred</p>
+                    <button id="btn-retry" class="control-btn">Try Again</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transcription overlay (shows transcribed text) -->
+        <div id="transcription-overlay" class="hidden">
+            <p id="transcription-text"></p>
+        </div>
+
+        <!-- Connection status indicator -->
+        <div id="connection-status" class="disconnected">
+            <span class="status-dot"></span>
+            <span class="status-text">Disconnected</span>
+        </div>
+
+        <!-- Flash overlay for camera capture effect -->
+        <div id="flash-overlay" class="flash-overlay"></div>
+
+        <!-- Polaroid capture animation container -->
+        <div id="polaroid-container" class="polaroid-container hidden">
+            <div class="polaroid-frame">
+                <img id="polaroid-image" src="" alt="Captured frame">
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript modules -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

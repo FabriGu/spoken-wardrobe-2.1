@@ -1,0 +1,1061 @@
+/* Spoken Wardrobe UI Styles
+ * Dark theme with purple/pink gradient accents
+ * Matches the UI mockups from UI_V1/
+ */
+
+/* CSS Variables */
+:root {
+    --bg-dark: #0a0a0a;
+    --bg-darker: #050505;
+    --bg-card: rgba(20, 20, 20, 0.8);
+
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.5);
+
+    --accent-cyan: #00d4ff;
+    --accent-purple: #8b5cf6;
+    --accent-pink: #ec4899;
+    --accent-green: #22c55e;
+    --accent-red: #ef4444;
+
+    --gradient-title: linear-gradient(90deg, #8b5cf6, #ec4899);
+    --gradient-bg: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 100%);
+
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'SF Mono', 'Consolas', monospace;
+
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    --border-radius: 12px;
+    --border-radius-lg: 20px;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* Camera Background - Persistent fullscreen camera feed */
+#camera-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    background: var(--bg-dark);
+}
+
+/* Main App Container */
+#app {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 1; /* Ensure #app and all children are above #camera-background */
+}
+
+/* Canvas Container (Three.js / Camera feed) */
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#three-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none; /* Allow clicks through to UI */
+}
+
+#camera-feed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* Keypoint Overlay Canvas - Renders BlazePose keypoints above 3D mesh */
+#keypoint-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 18; /* Above canvas (15) but below ui-overlay elements */
+    pointer-events: none; /* Allow clicks through to UI */
+    background: transparent;
+}
+
+/* UI Overlay */
+#ui-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* State Screens - Semi-transparent overlays on camera */
+.state-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+    pointer-events: none;
+    /* Default semi-transparent overlay for most states */
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.state-screen.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* States where camera should be clearly visible - light overlay */
+#state-a_pose,
+#state-capturing,
+#state-calibrating {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* TRY_ON state - minimal overlay, 3D canvas visible above */
+#state-try_on {
+    background: transparent;
+}
+
+/* TRY_ON state - Both canvas AND UI must be visible */
+body.try-on-active #canvas-container {
+    z-index: 15;
+}
+body.try-on-active #ui-overlay {
+    z-index: 25;  /* Raise entire overlay above canvas */
+}
+body.try-on-active #state-try_on {
+    pointer-events: auto;
+}
+
+/* CALIBRATING state - Both canvas AND UI (countdown) must be visible */
+body.calibrating-active #canvas-container {
+    z-index: 15;
+}
+body.calibrating-active #ui-overlay {
+    z-index: 25;  /* Raise entire overlay above canvas */
+}
+body.calibrating-active #state-calibrating {
+    pointer-events: auto;
+}
+
+/* GENERATING_3D state - UI (mesh animation) must be visible, canvas below */
+body.generating-3d-active #canvas-container {
+    z-index: 5;  /* Keep canvas below - mesh animation is in UI overlay */
+}
+body.generating-3d-active #ui-overlay {
+    z-index: 25;  /* UI on top for mesh loading animation */
+}
+body.generating-3d-active #state-generating_3d {
+    pointer-events: auto;
+}
+
+/* Processing states - darker overlay to focus on loading animation */
+#state-generating_2d,
+#state-generating_3d,
+#state-transcribing {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Preview state - very dark, focus on generated preview */
+#state-preview {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+/* IDLE and LISTENING states - darker overlay for text readability */
+#state-idle,
+#state-listening,
+#state-recording {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Flash overlay for capture effect */
+.flash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.flash-overlay.flash {
+    animation: flash-effect 0.6s ease-out forwards;
+}
+
+@keyframes flash-effect {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.state-content {
+    text-align: center;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+}
+
+.state-content.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Typography */
+.title-gradient {
+    font-size: 3.5rem;
+    font-weight: 700;
+    font-style: italic;
+    background: var(--gradient-title);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-top: 1rem;
+}
+
+.instruction-box {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.instruction-box p {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.instruction-box p:last-child {
+    margin-bottom: 0;
+}
+
+/* Listening State */
+#state-listening .state-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.listening-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.mic-icon {
+    color: var(--accent-cyan);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.listening-text {
+    font-size: 1.5rem;
+    color: var(--accent-cyan);
+    font-weight: 500;
+    margin: 0;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+/* Waveform */
+.waveform-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    gap: 4px;
+}
+
+.waveform-bars {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+}
+
+.waveform-bar {
+    width: 6px;
+    background: var(--accent-cyan);
+    border-radius: 3px;
+    transition: height 0.1s ease;
+}
+
+/* Loading wave animation (sides to center) */
+.loading-wave .wave-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 60px;
+}
+
+.loading-wave .wave-bar {
+    width: 6px;
+    height: 20px;
+    background: var(--accent-cyan);
+    border-radius: 3px;
+    animation: waveLoadIn 1.5s ease-in-out infinite;
+}
+
+.loading-wave .wave-bar:nth-child(1) { animation-delay: 0s; }
+.loading-wave .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+.loading-wave .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+.loading-wave .wave-bar:nth-child(4) { animation-delay: 0.15s; }
+.loading-wave .wave-bar:nth-child(5) { animation-delay: 0s; }
+
+@keyframes waveLoadIn {
+    0%, 100% {
+        height: 10px;
+        opacity: 0.3;
+    }
+    50% {
+        height: 50px;
+        opacity: 1;
+    }
+}
+
+.prompt-text {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Recording State */
+#state-recording .state-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.recording-indicator {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.recording-dot {
+    width: 16px;
+    height: 16px;
+    background: var(--accent-red);
+    border-radius: 50%;
+    animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.recording-text {
+    font-size: 1.5rem;
+    color: var(--accent-red);
+    font-weight: 500;
+    margin: 0;
+}
+
+.timer {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    margin: 0;
+}
+
+/* Instruction text at top */
+.instruction-top {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+/* Live transcription display */
+.live-transcription {
+    min-height: 60px;
+    max-width: 500px;
+    padding: 1rem;
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-size: 1.125rem;
+    text-align: center;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.live-transcription:empty {
+    display: none;
+}
+
+/* A-Pose State */
+#state-a_pose .state-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    z-index: 2;
+}
+
+.apose-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 90vh;
+    width: auto;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.apose-silhouette {
+    height: 100%;
+    width: auto;
+    opacity: 0.4;
+    filter: drop-shadow(0 0 40px rgba(86, 56, 103, 0.5))
+            drop-shadow(0 0 80px rgba(139, 92, 246, 0.25));
+}
+
+.countdown {
+    font-size: 8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+    animation: countdownPulse 1s ease-in-out infinite;
+    position: relative;
+    z-index: 3;
+}
+
+.countdown.large {
+    font-size: 12rem;
+}
+
+@keyframes countdownPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.instruction-text {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 2rem;
+    position: relative;
+    z-index: 3;
+}
+
+.sub-instruction {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    position: relative;
+    z-index: 3;
+}
+
+/* Spinner */
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--bg-card);
+    border-top-color: var(--accent-purple);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Flowing Fabric Animation */
+.fabric-animation {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fabric-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+}
+
+.fabric-wave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    transform: translate(-50%, -50%);
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(139, 92, 246, 0.4) 60deg,
+        rgba(236, 72, 153, 0.3) 120deg,
+        transparent 180deg,
+        rgba(139, 92, 246, 0.3) 240deg,
+        rgba(236, 72, 153, 0.4) 300deg,
+        transparent 360deg
+    );
+    border-radius: 50%;
+    animation: fabric-rotate 4s linear infinite;
+    filter: blur(8px);
+}
+
+.fabric-wave:nth-child(2) {
+    animation-duration: 6s;
+    animation-direction: reverse;
+    opacity: 0.7;
+    filter: blur(12px);
+}
+
+.fabric-wave:nth-child(3) {
+    animation-duration: 8s;
+    opacity: 0.5;
+    filter: blur(16px);
+}
+
+@keyframes fabric-rotate {
+    0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+    50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.1); }
+    100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+}
+
+.fabric-shimmer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60%;
+    height: 60%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(139, 92, 246, 0.1) 40%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    animation: fabric-pulse 2s ease-in-out infinite;
+}
+
+@keyframes fabric-pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+    }
+}
+
+.status-text {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+/* 3D Mesh Animation Container */
+.mesh-animation-container {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    z-index: 1;  /* Ensure visibility within state screen */
+    border-radius: 50%;
+    overflow: hidden;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.05) 0%, transparent 70%);
+}
+
+.mesh-animation-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+/* Did You Know */
+.did-you-know {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    margin-top: 2rem;
+    text-align: left;
+    backdrop-filter: blur(10px);
+}
+
+.did-you-know p:first-child {
+    color: var(--accent-pink);
+    margin-bottom: 0.5rem;
+}
+
+.did-you-know p:last-child {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Preview State */
+.preview-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    transition: opacity 0.5s ease;
+}
+
+.preview-image-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+}
+
+.preview-image-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    background: transparent;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3),
+                0 0 60px rgba(139, 92, 246, 0.15),
+                inset 0 0 1px rgba(139, 92, 246, 0.5);
+    transition: box-shadow 0.5s ease;
+}
+
+/* Pulsing glow during extraction phase */
+.preview-image-container.extracting {
+    animation: frameGlowPulse 2s ease-in-out infinite;
+}
+
+/* Constant glow when preview is complete */
+.preview-image-container.complete {
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.4),
+                0 0 80px rgba(139, 92, 246, 0.2),
+                inset 0 0 2px rgba(139, 92, 246, 0.6);
+    animation: none;
+}
+
+@keyframes frameGlowPulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.2),
+                    0 0 40px rgba(139, 92, 246, 0.1),
+                    inset 0 0 1px rgba(139, 92, 246, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 50px rgba(139, 92, 246, 0.5),
+                    0 0 100px rgba(139, 92, 246, 0.25),
+                    inset 0 0 2px rgba(139, 92, 246, 0.7);
+    }
+}
+
+.preview-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.preview-image.active {
+    opacity: 1;
+}
+
+/* Loading indicator hidden - using frame glow instead */
+.preview-loading-indicator {
+    display: none;
+}
+
+/* Capture Flash */
+.capture-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    opacity: 0;
+    animation: flash 0.5s ease-out;
+    pointer-events: none;
+}
+
+@keyframes flash {
+    0% { opacity: 0.8; }
+    100% { opacity: 0; }
+}
+
+/* Try-On Mode */
+.try-on-mode {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2rem;
+}
+
+.try-on-header {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    /* Default: centered on screen and content centered */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2rem 3rem;
+    text-align: center;
+    z-index: 30;  /* Above everything when fixed */
+    /* No transition initially - will be added by JS */
+}
+
+.try-on-header.animate {
+    transition: top 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                left 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Corner state (after animation) */
+.try-on-header.in-corner {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    transform: none;
+    padding: 1rem 1.5rem;
+    text-align: left;
+}
+
+.try-on-header h3 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    transition: font-size 0.8s ease;
+    /* text-align can't animate, so it will snap when class changes */
+}
+
+.try-on-header.in-corner h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.try-on-header p {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    transition: font-size 0.8s ease;
+    margin: 0;
+    /* text-align can't animate, so it will snap when class changes */
+}
+
+.try-on-header.in-corner p {
+    font-size: 0.875rem;
+}
+
+.try-on-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Control Buttons */
+.control-btn {
+    background: var(--accent-purple);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    pointer-events: auto;
+}
+
+.control-btn:hover {
+    background: var(--accent-pink);
+    transform: translateY(-2px);
+}
+
+.control-btn:active {
+    transform: translateY(0);
+}
+
+/* Error State */
+.error-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.error-message {
+    color: var(--accent-red);
+    margin-bottom: 1.5rem;
+}
+
+/* Transcription Overlay */
+#transcription-overlay {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius);
+    max-width: 80%;
+    z-index: 20;
+    transition: opacity var(--transition-normal);
+}
+
+#transcription-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#transcription-text {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+/* Connection Status */
+#connection-status {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    z-index: 100;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-red);
+}
+
+#connection-status.connected .status-dot {
+    background: var(--accent-green);
+}
+
+#connection-status.connected .status-text {
+    color: var(--accent-green);
+}
+
+#connection-status.disconnected .status-text {
+    color: var(--accent-red);
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .title-gradient {
+        font-size: 2.5rem;
+    }
+
+    .countdown {
+        font-size: 6rem;
+    }
+
+    .countdown.large {
+        font-size: 8rem;
+    }
+
+    .instruction-text {
+        font-size: 1.5rem;
+    }
+
+    .state-content {
+        padding: 1rem;
+    }
+}
+
+/* Dark mode scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-card);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Polaroid Capture Animation */
+.polaroid-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    pointer-events: none;
+}
+
+.polaroid-container.hidden {
+    display: none;
+}
+
+.polaroid-frame {
+    background: white;
+    padding: 10px 10px 40px 10px;
+    border-radius: 4px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transform: scale(1);
+    opacity: 1;
+}
+
+.polaroid-frame img {
+    width: 100%;
+    max-width: 80vw;
+    max-height: 70vh;
+    object-fit: contain;
+    display: block;
+}
+
+/* Polaroid animation sequence */
+.polaroid-container.animate-shrink .polaroid-frame {
+    animation: polaroid-shrink 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes polaroid-shrink {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    30% {
+        transform: scale(0.95) rotate(-2deg);
+        opacity: 1;
+    }
+    70% {
+        transform: scale(0.3) rotate(5deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0.1) rotate(0deg);
+        opacity: 0;
+    }
+}
+
+/* Polaroid with spinning loader morph effect */
+.polaroid-container.animate-morph .polaroid-frame {
+    animation: polaroid-morph 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes polaroid-morph {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        border-radius: 4px;
+    }
+    40% {
+        transform: scale(0.4) rotate(-5deg);
+        opacity: 1;
+    }
+    70% {
+        transform: scale(0.15) rotate(180deg);
+        opacity: 0.7;
+        border-radius: 50%;
+    }
+    100% {
+        transform: scale(0.1) rotate(360deg);
+        opacity: 0;
+        border-radius: 50%;
+    }
+}

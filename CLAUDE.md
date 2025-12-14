@@ -51,8 +51,20 @@ python src/modules/speech_to_clothing_with_rodin_api.py
 # Run with debug viewer
 python src/modules/speech_to_clothing_with_rodin_api.py --viewer
 
+# Run with browser UI (Three.js)
+python src/modules/speech_to_clothing_with_rodin_api.py --ui
+# Then open http://localhost:8080 in browser
+
 # Skip 3D generation (2D only)
 python src/modules/speech_to_clothing_with_rodin_api.py --skip-3d
+```
+
+### Test UI Only (Development)
+
+```bash
+# Test UI without camera/pipeline (cycles through states)
+python test_ui_server.py
+# Then open http://localhost:8080 in browser
 ```
 
 ### Verify Installation
@@ -99,7 +111,55 @@ The main orchestrator is `SpeechToClothingPipeline` in `speech_to_clothing_with_
 - `SpeechToClothingPipeline`: Orchestrates entire workflow
 - Rodin API integration (direct HTTP requests, not via ComfyUI)
 - State machine for pipeline stages
+- WebSocket UI integration (optional, enabled with `--ui` flag)
 - Output saving with metadata
+
+### UI Module (`src/ui/`)
+
+**`websocket_server.py`** - WebSocket server for pipeline-UI communication
+- `PipelineWebSocketServer`: Async WebSocket server (runs in daemon thread)
+- `run_server_in_thread()`: Helper to start server in background
+- Broadcasts state changes, camera frames (30 FPS), audio levels, and mesh data
+- Thread-safe message queue for sync pipeline → async WebSocket
+
+**`state_manager.py`** - Pipeline state machine with UI sync
+- `StateManager`: Manages state transitions and emits to WebSocket
+- States: IDLE, LISTENING, RECORDING, TRANSCRIBING, A_POSE, CAPTURING, GENERATING_2D, GENERATING_3D, PREVIEW, CALIBRATING, TRY_ON, ERROR
+- Tracks transition history for debugging
+
+**`mesh_calibrator.py`** - BlazePose-based mesh positioning
+- `MeshCalibrator`: Computes mesh position/scale/rotation from body landmarks
+- Uses shoulders (11, 12) and hips (23, 24) for body center and scale
+- `validate_a_pose()`: Checks if user has arms extended correctly
+- `calibrate_offset()`: Sets reference position during A-pose capture
+- Exponential smoothing for jitter reduction
+
+### Frontend (`static/`)
+
+**`index.html`** - Main HTML with Three.js imports
+- All UI state screens as div elements (hidden/shown via CSS)
+- Three.js canvas for 3D mesh rendering
+
+**`css/style.css`** - Dark theme styling
+- Purple/pink gradient accents matching mockups
+- CSS animations for countdowns, waveforms, progress rings
+
+**`js/app.js`** - Main application entry
+- Initializes WebSocket client, state manager, Three.js scene
+- Connects WebSocket handlers to UI updates
+
+**`js/websocket.js`** - WebSocket client
+- Handles connection, reconnection, heartbeat
+- Dispatches messages to appropriate handlers
+
+**`js/state_manager.js`** - Frontend state machine
+- Shows/hides state screens
+- Updates waveforms, progress rings, countdowns
+
+**`js/three_scene.js`** - Three.js scene setup
+- Loads GLB mesh from base64
+- Updates mesh transform from calibration data
+- Smooth interpolation using lerp
 
 ### External Dependencies
 
@@ -257,9 +317,12 @@ Checks all imports and dependencies without running full pipeline.
 This minimal pipeline excludes:
 - Cage deformation system (chumpy, scipy)
 - 3D mesh processing utilities (trimesh, pyglet, networkx)
-- WebSocket viewer for real-time streaming
 - TripoSR (alternative 3D generation, superseded by Rodin API)
 - Linear Blend Skinning (gpytoolbox)
 - Local Stable Diffusion (diffusers, accelerate)
 
 Focus is on the core speech-to-3D-clothing pipeline with external services (ComfyUI, Rodin API).
+
+**Re-added in this version:**
+- WebSocket UI for browser-based Three.js interface (`--ui` flag)
+- Mesh calibration using BlazePose landmarks
