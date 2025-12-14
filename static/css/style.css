@@ -103,14 +103,14 @@ body {
     z-index: 0;
 }
 
-/* Keypoint Overlay Canvas - Renders BlazePose keypoints above 3D mesh */
+/* Keypoint Overlay Canvas - Renders BlazePose keypoints above camera but below UI */
 #keypoint-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 18; /* Above canvas (15) but below ui-overlay elements */
+    z-index: 5; /* Below ui-overlay (10) so keypoints don't cover text */
     pointer-events: none; /* Allow clicks through to UI */
     background: transparent;
 }
@@ -467,11 +467,12 @@ body.generating-3d-active #state-generating_3d {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    height: 90vh;
+    transform: translate(-50%, -50%);  /* Default: centered both ways */
+    height: 80vh;
     width: auto;
     pointer-events: none;
     z-index: 1;
+    /* JS will override top/transform/height when keypoints are available */
 }
 
 .apose-silhouette {
@@ -1239,5 +1240,122 @@ body.generating-3d-active #state-generating_3d {
         transform: translateY(-40px) scale(1);
         opacity: 1;
         box-shadow: 0 0 20px var(--accent-purple);
+    }
+}
+
+/* ==========================================================================
+   CALIBRATING STATE - Speech recognition calibration animation
+   ========================================================================== */
+
+#state-calibrating {
+    background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.1), rgba(0, 0, 0, 0.95));
+}
+
+.calibration-animation {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem auto;
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--accent-purple);
+    border-radius: 50%;
+    opacity: 0;
+    animation: pulseExpand 2s ease-out infinite;
+}
+
+.pulse-ring.delay-1 {
+    animation-delay: 0.5s;
+}
+
+.pulse-ring.delay-2 {
+    animation-delay: 1s;
+}
+
+@keyframes pulseExpand {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.mic-icon.calibrating {
+    position: relative;
+    z-index: 1;
+    color: var(--accent-purple);
+    animation: micPulse 1s ease-in-out infinite;
+}
+
+.mic-icon.calibrating svg {
+    filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+}
+
+@keyframes micPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+#state-calibrating .subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   PARTIAL TRANSCRIPTION - Visual distinction for streaming transcription
+   ========================================================================== */
+
+#live-transcription {
+    min-height: 2rem;
+    transition: opacity 0.3s ease;
+}
+
+#live-transcription.partial {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+#live-transcription.partial::after {
+    content: '...';
+    animation: dots 1.5s ease-in-out infinite;
+}
+
+@keyframes dots {
+    0%, 20% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    80%, 100% {
+        opacity: 0;
     }
 }

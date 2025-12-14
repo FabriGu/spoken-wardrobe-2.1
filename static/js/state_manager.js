@@ -165,7 +165,8 @@ export class UIStateManager {
                 break;
 
             case 'CALIBRATING':
-                this._startCountdown('calibration-countdown', data.countdown || 3);
+                // Update title and subtitle for speech calibration
+                this._updateCalibratingText(data);
                 break;
 
             case 'RECORDING':
@@ -575,20 +576,41 @@ export class UIStateManager {
 
         // Update live transcription in recording state
         const liveTranscription = document.getElementById('live-transcription');
-        if (liveTranscription && text) {
-            liveTranscription.textContent = `"${text}"`;
+        if (liveTranscription) {
+            if (text) {
+                liveTranscription.textContent = `"${text}"`;
+                // Add visual distinction for partial (streaming) vs final transcription
+                liveTranscription.classList.toggle('partial', !isFinal);
+            } else {
+                liveTranscription.textContent = '';
+                liveTranscription.classList.remove('partial');
+            }
         }
+
+        console.log(`[StateManager] Transcription ${isFinal ? '(final)' : '(partial)'}: ${text}`);
     }
 
     /**
      * Update the full preview image (uncropped).
+     * Also updates the reveal-full-image for the REVEAL_FULL state.
      * @param {string} base64Image - Base64 encoded image
      */
     updatePreviewImage(base64Image) {
-        const img = document.getElementById('preview-image-full');
-        if (img) {
-            img.src = `data:image/png;base64,${base64Image}`;
+        const imgSrc = `data:image/png;base64,${base64Image}`;
+
+        // Update preview image (PREVIEW state)
+        const previewImg = document.getElementById('preview-image-full');
+        if (previewImg) {
+            previewImg.src = imgSrc;
         }
+
+        // Also update reveal image (REVEAL_FULL state)
+        const revealImg = document.getElementById('reveal-full-image');
+        if (revealImg) {
+            revealImg.src = imgSrc;
+        }
+
+        console.log('[StateManager] Preview image updated');
     }
 
     /**
@@ -683,6 +705,20 @@ export class UIStateManager {
         if (subtitle && data.subtitle) subtitle.textContent = data.subtitle;
 
         console.log('[StateManager] COMPLETE state');
+    }
+
+    /**
+     * Update CALIBRATING state text.
+     * @private
+     */
+    _updateCalibratingText(data) {
+        const title = document.getElementById('calibrating-title');
+        const subtitle = document.getElementById('calibrating-subtitle');
+
+        if (title && data.title) title.textContent = data.title;
+        if (subtitle && data.subtitle) subtitle.textContent = data.subtitle;
+
+        console.log('[StateManager] CALIBRATING state - Speech recognition calibration');
     }
 
     /**

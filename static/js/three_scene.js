@@ -126,14 +126,6 @@ export class ThreeScene {
         // Start animation loop
         this.animate();
 
-        // DEBUG: Add a visible test sphere at camera target to verify rendering
-        const testGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-        const testMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        this.debugSphere = new THREE.Mesh(testGeometry, testMaterial);
-        this.debugSphere.position.set(0, 0.8, 0); // At camera lookAt target
-        this.scene.add(this.debugSphere);
-        console.log('[ThreeScene] DEBUG: Added red test sphere at (0, 0.8, 0)');
-
         // Pre-load the rigged body mesh
         this.loadBodyMesh();
 

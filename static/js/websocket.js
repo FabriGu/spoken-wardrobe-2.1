@@ -137,7 +137,8 @@ export class WebSocketClient {
                             data.landmarks || null,
                             data.calibration || null,
                             data.bone_rotations || null,
-                            data.landmarks_2d || null  // 2D pixel landmarks for keypoint rendering
+                            data.landmarks_2d || null,  // 2D pixel landmarks for keypoint rendering
+                            data.frame_aspect || null   // Frame aspect ratio for proper scaling
                         );
                     }
                     break;

@@ -80,24 +80,29 @@ UI_MESSAGES = {
         'title': 'DREAM WARDROBE',
         'subtitle': 'What impossible garment lives in your imagination?'
     },
+    'CALIBRATING': {
+        'title': 'AWAKENING',
+        'subtitle': 'Tuning into your creative frequency...'
+    },
     'LISTENING': {
-        'prompt': 'Describe something that could never exist in a store...'
+        'title': 'THE MIRROR AWAITS',
+        'subtitle': 'Describe something that could never exist in a store...'
     },
     'RECORDING': {
         'title': 'CAPTURING YOUR VISION',
-        'subtitle': "We're listening to your wildest fashion fantasy..."
+        'subtitle': "We're weaving your wildest fashion fantasy..."
     },
     'TRANSCRIBING': {
-        'title': 'WEAVING IMAGINATION',
-        'subtitle': 'Translating your dream into threads...'
+        'title': 'TRANSLATING DREAMS',
+        'subtitle': 'Converting imagination into threads...'
     },
     'A_POSE': {
-        'title': 'STRIKE A POSE',
-        'subtitle': 'Stand with arms slightly out, like a fashion model'
+        'title': 'BECOME THE CANVAS',
+        'subtitle': 'Strike a pose for your impossible creation'
     },
     'CAPTURING': {
         'title': 'CAPTURING',
-        'subtitle': 'Hold still...'
+        'subtitle': 'Freezing this moment in fabric...'
     },
     'GENERATING_2D': {
         'title': 'MANIFESTING YOUR VISION',
@@ -108,8 +113,8 @@ UI_MESSAGES = {
         'subtitle': ''
     },
     'REVEAL_CLOTHING': {
-        'title': 'YOUR DESIGN',
-        'subtitle': ''
+        'title': 'YOUR IMPOSSIBLE DESIGN',
+        'subtitle': 'Extracted from the realm of dreams'
     },
     'GENERATING_3D': {
         'title': 'BRINGING IT TO LIFE',
@@ -397,6 +402,42 @@ class SpeechTo2DPipeline:
         """Check if a body is detected"""
         return body and hasattr(body, 'landmarks_world')
 
+    def wait_for_user_exit(self, timeout=120):
+        """
+        Wait for user to leave (BlazePose body lost for ~3 seconds).
+
+        Args:
+            timeout: Maximum time to wait in seconds (default 2 minutes)
+
+        Returns:
+            True if user left, False if timeout reached
+        """
+        BODY_LOST_THRESHOLD = 3.0  # seconds without body before considered "left"
+        body_lost_start = None
+        start_time = time.time()
+
+        print(f"\n    Waiting for user to leave (timeout: {timeout}s)...")
+
+        while True:
+            # Check timeout
+            if (time.time() - start_time) >= timeout:
+                print("    Timeout reached, proceeding...")
+                return False
+
+            frame, body = self.get_frame()
+
+            if not self.is_body_detected(body):
+                if body_lost_start is None:
+                    body_lost_start = time.time()
+                elif (time.time() - body_lost_start) >= BODY_LOST_THRESHOLD:
+                    print("    User has left!")
+                    return True
+            else:
+                # Body detected again, reset
+                body_lost_start = None
+
+            time.sleep(0.1)
+
     def get_frame(self):
         """Get frame from camera broadcaster"""
         if self.camera_broadcaster and self.camera_broadcaster.is_running:
@@ -407,8 +448,10 @@ class SpeechTo2DPipeline:
         return None, None
 
     def record_speech(self):
-        """Record speech for fixed duration"""
-        print(f"\n    Recording for {RECORDING_DURATION} seconds...")
+        """Record speech for fixed duration with streaming transcription"""
+        print(f"\n    Recording for {RECORDING_DURATION} seconds (with streaming transcription)...")
+
+        CHUNK_DURATION = 2.0  # Transcribe every 2 seconds for real-time feedback
 
         audio = pyaudio.PyAudio()
 
@@ -422,8 +465,10 @@ class SpeechTo2DPipeline:
                 input_device_index=self.mic_index
             )
 
-            audio_chunks = []
+            all_audio_chunks = []
+            current_chunk = []
             start_time = time.time()
+            chunk_start_time = time.time()
 
             # Ensure Whisper model is loaded
             if not self.speech_recognizer:
@@ -433,12 +478,23 @@ class SpeechTo2DPipeline:
             while (time.time() - start_time) < RECORDING_DURATION:
                 try:
                     audio_data = stream.read(1024, exception_on_overflow=False)
-                    audio_chunks.append(audio_data)
+                    all_audio_chunks.append(audio_data)
+                    current_chunk.append(audio_data)
 
                     # Emit audio level for waveform
                     audio_array = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32)
                     level = np.sqrt(np.mean(audio_array**2))
                     self._emit_audio_level(level)
+
+                    # Every CHUNK_DURATION seconds, transcribe accumulated audio for streaming feedback
+                    if (time.time() - chunk_start_time) >= CHUNK_DURATION:
+                        # Transcribe all audio so far (accumulated) for context
+                        accumulated_audio = b''.join(all_audio_chunks)
+                        partial_text = self._transcribe_chunk(accumulated_audio)
+                        if partial_text and self.ws_server:
+                            self.ws_server.emit_transcription(partial_text, is_final=False)
+                            print(f"    [Streaming] Partial: '{partial_text}'")
+                        chunk_start_time = time.time()
 
                 except Exception:
                     continue
@@ -446,7 +502,7 @@ class SpeechTo2DPipeline:
             stream.stop_stream()
             stream.close()
 
-            return b''.join(audio_chunks)
+            return b''.join(all_audio_chunks)
 
         except Exception as e:
             print(f"    Recording failed: {e}")
@@ -454,6 +510,37 @@ class SpeechTo2DPipeline:
 
         finally:
             audio.terminate()
+
+    def _transcribe_chunk(self, audio_data):
+        """Transcribe audio chunk for streaming feedback (fast, may be partial)"""
+        try:
+            audio_array = np.frombuffer(audio_data, dtype=np.int16)
+            audio_float = audio_array.astype(np.float32) / 32768.0
+
+            inputs = self.speech_recognizer.processor(
+                audio_float,
+                sampling_rate=16000,
+                return_tensors="pt"
+            )
+            inputs = inputs.input_features.to(self.speech_recognizer.device)
+
+            import torch
+            with torch.no_grad():
+                predicted_ids = self.speech_recognizer.model.generate(
+                    inputs,
+                    max_new_tokens=100  # Limit for faster processing
+                )
+
+            transcription = self.speech_recognizer.processor.batch_decode(
+                predicted_ids,
+                skip_special_tokens=True
+            )[0].strip()
+
+            return transcription
+
+        except Exception as e:
+            print(f"    [Streaming] Chunk transcription failed: {e}")
+            return ""
 
     def transcribe_speech(self, audio_data):
         """Transcribe audio using Whisper"""
@@ -518,19 +605,24 @@ class SpeechTo2DPipeline:
         print(f"    Original: '{prompt}'")
         print(f"    Enhanced: '{enhanced_prompt}'")
 
-        # Build final prompt with quality modifiers
+        # Build final prompt with creative fashion modifiers
         final_prompt = (
-            f"{enhanced_prompt}, haute couture fashion photography, "
-            "editorial style, dramatic lighting, high fashion, "
-            "detailed fabric texture, professional fashion shoot, 8k quality"
+            f"{enhanced_prompt}, "
+            "haute couture wearable art, fashion photography, "
+            "intricate details, dramatic studio lighting, "
+            "professional fashion editorial, surrealist fashion, "
+            "Alexander McQueen aesthetic, Iris van Herpen inspired, "
+            "8k quality, sharp focus, masterpiece"
         )
 
-        # Negative prompt for clean results
+        # Strong negative prompt to avoid mundane/problematic results
         negative_prompt = (
-            "sexy, seductive, revealing, provocative, nsfw, nude, naked, "
-            "cleavage, skin, exposed body, tight clothing, form-fitting, "
+            "realistic, mundane, boring, plain, simple, basic, ordinary, "
+            "sexy, revealing, provocative, nsfw, nude, cleavage, "
             "low quality, blurry, distorted, deformed, ugly, bad anatomy, "
-            "watermark, text, amateur, simple, plain, boring, generic"
+            "watermark, text, amateur, cartoon, anime, illustration, "
+            "mannequin, store display, catalog photo, stock photo, "
+            "cheap fabric, wrinkled, poorly lit, overexposed"
         )
 
         try:
@@ -603,9 +695,9 @@ class SpeechTo2DPipeline:
         """
         Run dramatic reveal sequence:
         1. REVEAL_FULL: Show full image (10 seconds)
-        2. REVEAL_CLOTHING: Show cropped clothing only (8 seconds)
+        2. REVEAL_CLOTHING: Show cropped clothing only (until user leaves OR 2 min timeout)
         """
-        print(f"\n    Reveal sequence: {REVEAL_FULL_DURATION}s full + {REVEAL_CLOTHING_DURATION}s cropped")
+        print(f"\n    Reveal sequence: {REVEAL_FULL_DURATION}s full + until user leaves")
 
         # Convert image to base64
         buffer = io.BytesIO()
@@ -626,11 +718,14 @@ class SpeechTo2DPipeline:
         time.sleep(REVEAL_FULL_DURATION)
 
         # Stage 2: REVEAL_CLOTHING - Show cropped clothing only
-        self._emit_state('REVEAL_CLOTHING', duration=REVEAL_CLOTHING_DURATION)
+        # This stage lasts until user leaves or 2-minute timeout
+        self._emit_state('REVEAL_CLOTHING')
         if self.ws_server:
             self.ws_server._message_queue.put({'type': 'preview_mask', 'mask': mask_b64})
-        print(f"    Stage 2: Clothing reveal ({REVEAL_CLOTHING_DURATION}s)")
-        time.sleep(REVEAL_CLOTHING_DURATION)
+        print("    Stage 2: Clothing reveal (until user leaves)")
+
+        # Wait for user to leave (returns when body lost for 3s, or 2min timeout)
+        self.wait_for_user_exit(timeout=120)
 
         return image_b64
 
@@ -765,8 +860,39 @@ class SpeechTo2DPipeline:
 
         return output_dir
 
+    def _background_3d_generation(self, result_image, mask, frame_rgb, transcription):
+        """
+        Generate 3D mesh in background thread (silent, no UI updates).
+
+        This runs after user leaves, generating 3D mesh and saving all outputs.
+        """
+        try:
+            print("\n    [Background] Starting 3D generation...")
+
+            # Crop clothing for 3D
+            cropped = self.crop_clothing_with_mask(result_image, mask)
+            temp_path = Path(f"/tmp/clothing_2d_{int(time.time())}.png")
+            cropped.save(temp_path)
+
+            # Generate 3D (no UI updates)
+            mesh_path = None
+            if self.enable_3d:
+                mesh_path = self.generate_3d_mesh(temp_path)
+
+            # Save all outputs
+            output_dir = self.save_outputs(frame_rgb, mask, result_image, transcription, mesh_path)
+
+            # Cleanup temp file
+            if temp_path.exists():
+                temp_path.unlink()
+
+            print(f"    [Background] Saved to: {output_dir}")
+
+        except Exception as e:
+            print(f"    [Background] Error: {e}")
+
     def run_session(self):
-        """Run a single session: speech -> generate -> reveal -> save"""
+        """Run a single session: speech -> generate -> reveal -> (background 3D)"""
 
         # Wait for body
         self._emit_state('IDLE')
@@ -779,6 +905,11 @@ class SpeechTo2DPipeline:
             time.sleep(0.05)
 
         print("    Body detected!")
+
+        # Calibrate microphone if not already done
+        if self.volume_threshold == 0:
+            self._emit_state('CALIBRATING')
+            self.calibrate_microphone(duration=3.0)
 
         # Wait for speech
         self._emit_state('LISTENING')
@@ -872,35 +1003,23 @@ class SpeechTo2DPipeline:
             self._emit_state('ERROR', error_message='Generation failed')
             return False
 
-        # Dramatic reveal sequence
+        # Dramatic reveal sequence (waits for user to leave)
         self.run_reveal_sequence(result_image, mask)
 
-        # Optional 3D generation
-        mesh_path = None
-        if self.enable_3d:
-            self._emit_state('GENERATING_3D')
-
-            # Crop clothing for 3D
-            cropped = self.crop_clothing_with_mask(result_image, mask)
-            temp_path = Path(f"/tmp/clothing_2d_{int(time.time())}.png")
-            cropped.save(temp_path)
-
-            mesh_path = self.generate_3d_mesh(temp_path)
-
-            if temp_path.exists():
-                temp_path.unlink()
-
-        # Complete
-        self._emit_state('COMPLETE')
+        # User has left - start background 3D generation and save
         print("\n" + "="*70)
-        print("    Creation complete!")
+        print("    Session complete - starting background processing")
         print("="*70)
 
-        # Save outputs
-        output_dir = self.save_outputs(frame_rgb, mask, result_image, self.transcribed_text, mesh_path)
-        print(f"    Saved to: {output_dir}")
+        # Start background thread for 3D generation + saving
+        # This happens silently while the next user can step up
+        bg_thread = threading.Thread(
+            target=self._background_3d_generation,
+            args=(result_image, mask, frame_rgb, self.transcribed_text),
+            daemon=True
+        )
+        bg_thread.start()
 
-        time.sleep(5)  # Show completion screen
         return True
 
     def run(self):

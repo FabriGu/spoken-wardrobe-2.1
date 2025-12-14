@@ -117,6 +117,8 @@ class SpokenWardrobeApp {
         this.audioAnalyzer = null;
         this.meshLoadingAnimation = null;
         this.keypointRenderer = null;
+        this.lastLandmarks = null;  // Track last known landmarks for A-pose positioning
+        this.lastFrameAspect = null;
 
         // Initialize on DOM ready
         if (document.readyState === 'loading') {
@@ -239,14 +241,28 @@ class SpokenWardrobeApp {
             if (state === 'CALIBRATING' && this.threeScene) {
                 this.threeScene.resetToCenter();
             }
+
+            // Position A-pose SVG based on user's keypoints when entering A_POSE state
+            if (state === 'A_POSE' && this.lastLandmarks && this.keypointRenderer) {
+                const topKeypoint = this.keypointRenderer.getTopKeypoint(this.lastLandmarks);
+                if (topKeypoint) {
+                    this._positionAposeSvg(topKeypoint, this.lastFrameAspect);
+                }
+            }
         };
 
-        this.wsClient.onFrame = (imageBase64, landmarks, calibration, boneRotations, landmarks2d) => {
+        this.wsClient.onFrame = (imageBase64, landmarks, calibration, boneRotations, landmarks2d, frameAspect) => {
             this.stateManager.updateCameraFeed(imageBase64);
+
+            // Store landmarks for A-pose positioning
+            if (landmarks2d) {
+                this.lastLandmarks = landmarks2d;
+                this.lastFrameAspect = frameAspect;
+            }
 
             // Render keypoints on overlay canvas (always visible)
             if (this.keypointRenderer && landmarks2d) {
-                this.keypointRenderer.render(landmarks2d);
+                this.keypointRenderer.render(landmarks2d, frameAspect);
             } else if (this.keypointRenderer) {
                 // Clear keypoints if no body detected
                 this.keypointRenderer.clear();
@@ -337,6 +353,66 @@ class SpokenWardrobeApp {
             console.error('[App] Check that three-mesh-bvh version is compatible with three.js version');
             // Three.js is optional - UI continues without 3D mesh overlay
         }
+    }
+
+    /**
+     * Position the A-pose SVG overlay based on user's top keypoint.
+     * Centers horizontally and aligns top to keypoint position + head offset.
+     * @param {Object} topKeypoint - {x, y} in normalized coordinates [0-1]
+     * @param {number} frameAspect - Frame aspect ratio for cover calculation
+     * @private
+     */
+    _positionAposeSvg(topKeypoint, frameAspect) {
+        const aposeOverlay = document.querySelector('.apose-overlay');
+        if (!aposeOverlay) return;
+
+        // Get container dimensions
+        const container = document.getElementById('app') || document.body;
+        const containerRect = container.getBoundingClientRect();
+        const w = containerRect.width;
+        const h = containerRect.height;
+
+        if (w === 0 || h === 0) return;
+
+        // Calculate object-fit: cover transformation (same as keypoint renderer)
+        const canvasAspect = w / h;
+        const imgAspect = frameAspect || (4/3);
+
+        let scaleX, scaleY, offsetX, offsetY;
+        if (canvasAspect > imgAspect) {
+            const scaledW = w;
+            const scaledH = w / imgAspect;
+            scaleX = scaledW;
+            scaleY = scaledH;
+            offsetX = 0;
+            offsetY = (scaledH - h) / 2;
+        } else {
+            const scaledH = h;
+            const scaledW = h * imgAspect;
+            scaleX = scaledW;
+            scaleY = scaledH;
+            offsetX = (scaledW - w) / 2;
+            offsetY = 0;
+        }
+
+        // Transform normalized keypoint to screen position
+        const screenY = topKeypoint.y * scaleY - offsetY;
+
+        // Add offset for head (nose is ~10% down from top of head)
+        const headOffset = h * 0.08;
+        const topPosition = Math.max(0, screenY - headOffset);
+
+        // Calculate SVG height to fill from top position to near bottom
+        const bottomMargin = h * 0.05;
+        const svgHeight = Math.max(100, h - topPosition - bottomMargin);
+
+        // Apply positioning - keep centered horizontally, align top to keypoint
+        aposeOverlay.style.top = `${topPosition}px`;
+        aposeOverlay.style.left = '50%';
+        aposeOverlay.style.transform = 'translateX(-50%)';
+        aposeOverlay.style.height = `${svgHeight}px`;
+
+        console.log(`[App] A-pose SVG positioned: top=${topPosition.toFixed(0)}px, height=${svgHeight.toFixed(0)}px`);
     }
 
     /**

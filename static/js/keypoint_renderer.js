@@ -46,6 +46,9 @@ export class KeypointRenderer {
         // Visibility threshold
         this.visibilityThreshold = 0.5;
 
+        // Initialize transform (will be calculated in render())
+        this._transform = { scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0 };
+
         // Resize canvas to match display size
         this._resizeCanvas();
         window.addEventListener('resize', () => this._resizeCanvas());
@@ -73,8 +76,9 @@ export class KeypointRenderer {
     /**
      * Render keypoints and skeleton connections.
      * @param {Array} landmarks - Array of {x, y, visibility} objects (33 landmarks)
+     * @param {number} frameAspect - Original frame aspect ratio (width/height)
      */
-    render(landmarks) {
+    render(landmarks, frameAspect = null) {
         if (!landmarks || landmarks.length === 0) {
             this.clear();
             return;
@@ -86,18 +90,60 @@ export class KeypointRenderer {
         const w = this.canvas.width;
         const h = this.canvas.height;
 
+        if (w === 0 || h === 0) return;  // Canvas not ready
+
+        // Calculate object-fit: cover transformation
+        // The camera feed uses object-fit: cover, so we need to match that
+        const canvasAspect = w / h;
+        const imgAspect = frameAspect || (4/3);  // Default to 4:3 if not provided
+
+        let scaleX, scaleY, offsetX, offsetY;
+
+        if (canvasAspect > imgAspect) {
+            // Canvas is wider than image - image scaled by width, height cropped
+            const scaledW = w;
+            const scaledH = w / imgAspect;
+            scaleX = scaledW;
+            scaleY = scaledH;
+            offsetX = 0;
+            offsetY = (scaledH - h) / 2;
+        } else {
+            // Canvas is taller than image - image scaled by height, width cropped
+            const scaledH = h;
+            const scaledW = h * imgAspect;
+            scaleX = scaledW;
+            scaleY = scaledH;
+            offsetX = (scaledW - w) / 2;
+            offsetY = 0;
+        }
+
+        // Store transform for drawing methods
+        this._transform = { scaleX, scaleY, offsetX, offsetY };
+
         // Draw connections first (so keypoints are on top)
-        this._drawConnections(landmarks, w, h);
+        this._drawConnections(landmarks);
 
         // Draw keypoints
-        this._drawKeypoints(landmarks, w, h);
+        this._drawKeypoints(landmarks);
+    }
+
+    /**
+     * Transform normalized coordinates to canvas pixels accounting for object-fit: cover.
+     * @private
+     */
+    _transformCoord(normX, normY) {
+        const { scaleX, scaleY, offsetX, offsetY } = this._transform;
+        // Map normalized [0-1] coords to scaled image, then offset for centering
+        const x = normX * scaleX - offsetX;
+        const y = normY * scaleY - offsetY;
+        return { x, y };
     }
 
     /**
      * Draw skeleton connections.
      * @private
      */
-    _drawConnections(landmarks, w, h) {
+    _drawConnections(landmarks) {
         this.ctx.strokeStyle = this.colors.secondary;
         this.ctx.lineWidth = 2;
         this.ctx.lineCap = 'round';
@@ -110,19 +156,17 @@ export class KeypointRenderer {
             if (start.visibility < this.visibilityThreshold) continue;
             if (end.visibility < this.visibilityThreshold) continue;
 
-            // Scale normalized [0-1] coordinates to canvas pixels
-            const x1 = start.x * w;
-            const y1 = start.y * h;
-            const x2 = end.x * w;
-            const y2 = end.y * h;
+            // Transform normalized coordinates to canvas pixels (accounting for object-fit: cover)
+            const p1 = this._transformCoord(start.x, start.y);
+            const p2 = this._transformCoord(end.x, end.y);
 
             // Draw glow effect (wider, lighter line behind)
             this.ctx.strokeStyle = this.colors.light;
             this.ctx.lineWidth = 4;
             this.ctx.globalAlpha = 0.3;
             this.ctx.beginPath();
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
+            this.ctx.moveTo(p1.x, p1.y);
+            this.ctx.lineTo(p2.x, p2.y);
             this.ctx.stroke();
 
             // Draw main line
@@ -130,8 +174,8 @@ export class KeypointRenderer {
             this.ctx.lineWidth = 2;
             this.ctx.globalAlpha = 1.0;
             this.ctx.beginPath();
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
+            this.ctx.moveTo(p1.x, p1.y);
+            this.ctx.lineTo(p2.x, p2.y);
             this.ctx.stroke();
         }
     }
@@ -140,14 +184,13 @@ export class KeypointRenderer {
      * Draw keypoint dots.
      * @private
      */
-    _drawKeypoints(landmarks, w, h) {
+    _drawKeypoints(landmarks) {
         for (let i = 0; i < landmarks.length; i++) {
             const lm = landmarks[i];
             if (!lm || lm.visibility < this.visibilityThreshold) continue;
 
-            // Scale normalized [0-1] coordinates to canvas pixels
-            const x = lm.x * w;
-            const y = lm.y * h;
+            // Transform normalized coordinates to canvas pixels (accounting for object-fit: cover)
+            const { x, y } = this._transformCoord(lm.x, lm.y);
 
             const isKey = this.keyLandmarks.has(i);
 
@@ -184,5 +227,32 @@ export class KeypointRenderer {
         }
 
         this.ctx.globalAlpha = 1.0;
+    }
+
+    /**
+     * Get the top-most visible keypoint Y position (for A-pose alignment).
+     * Returns the Y coordinate of the nose (landmark 0) or highest visible point.
+     * @param {Array} landmarks - Array of {x, y, visibility} objects
+     * @returns {Object|null} {x, y} in normalized coordinates or null if no landmarks
+     */
+    getTopKeypoint(landmarks) {
+        if (!landmarks || landmarks.length === 0) return null;
+
+        // Prefer nose (landmark 0) as it's the top of the tracked body
+        const nose = landmarks[0];
+        if (nose && nose.visibility >= this.visibilityThreshold) {
+            return { x: nose.x, y: nose.y };
+        }
+
+        // Fallback: find highest visible keypoint
+        let topY = 1;
+        let topX = 0.5;
+        for (const lm of landmarks) {
+            if (lm && lm.visibility >= this.visibilityThreshold && lm.y < topY) {
+                topY = lm.y;
+                topX = lm.x;
+            }
+        }
+        return topY < 1 ? { x: topX, y: topY } : null;
     }
 }

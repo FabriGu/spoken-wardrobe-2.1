@@ -45,6 +45,9 @@ class PipelineState(Enum):
     GENERATING_2D = auto()
     GENERATING_3D = auto()
     PREVIEW = auto()
+    REVEAL_FULL = auto()
+    REVEAL_CLOTHING = auto()
+    COMPLETE = auto()
     CALIBRATING = auto()
     TRY_ON = auto()
     ERROR = auto()
@@ -134,6 +137,21 @@ class StateManager:
         'PREVIEW': {
             'title': 'PREVIEW COMPLETE!',
             'subtitle': 'Your clothing design is ready',
+            'show_camera': False
+        },
+        'REVEAL_FULL': {
+            'title': 'BEHOLD YOUR CREATION',
+            'subtitle': 'Your dream made manifest',
+            'show_camera': False
+        },
+        'REVEAL_CLOTHING': {
+            'title': 'YOUR IMPOSSIBLE GARMENT',
+            'subtitle': 'Step away when ready for the next dreamer',
+            'show_camera': False
+        },
+        'COMPLETE': {
+            'title': 'CREATION COMPLETE',
+            'subtitle': 'Your design joins the gallery of dreams',
             'show_camera': False
         },
         'CALIBRATING': {

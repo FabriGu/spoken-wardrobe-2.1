@@ -253,6 +253,8 @@ class PipelineWebSocketServer:
             frame_h, frame_w = frame_rgb.shape[:2]
             # Convert 2D landmarks to normalized [0-1] format for JSON serialization
             message['landmarks_2d'] = self._serialize_landmarks_2d(landmarks_2d, frame_w, frame_h, visibility)
+            # Include frame aspect ratio for proper scaling with object-fit: cover
+            message['frame_aspect'] = frame_w / frame_h if frame_h > 0 else 1.0
 
         self._message_queue.put(message)
 

@@ -42,11 +42,11 @@
             <!-- IDLE State: Welcome screen -->
             <div id="state-idle" class="state-screen active">
                 <div class="state-content centered">
-                    <h1 class="title-gradient">SPOKEN WARDROBE</h1>
-                    <p class="subtitle">Step in front of the camera to begin</p>
+                    <h1 class="title-gradient">DREAM WARDROBE</h1>
+                    <p class="subtitle">Step into the mirror of imagination</p>
                     <div class="instruction-box">
-                        <p>Describe the clothing you want to create with your voice.</p>
-                        <p>Our AI will generate a custom 3D garment just for you.</p>
+                        <p>Whisper your wildest fashion dreams into existence.</p>
+                        <p>Watch as AI weaves impossible garments from your words.</p>
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                                 <line x1="8" y1="23" x2="16" y2="23"/>
                             </svg>
                         </div>
-                        <span class="listening-text">Loading Speech Recognition</span>
+                        <span class="listening-text">Awakening the Oracle</span>
                     </div>
                     <div class="waveform-container loading-wave">
                         <div class="wave-loader">
@@ -74,17 +74,17 @@
                             <div class="wave-bar"></div>
                         </div>
                     </div>
-                    <p class="prompt-text">Get ready to speak!</p>
+                    <p class="prompt-text">Tuning into your creative frequency...</p>
                 </div>
             </div>
 
             <!-- RECORDING State: Recording audio -->
             <div id="state-recording" class="state-screen">
                 <div class="state-content">
-                    <p class="prompt-text instruction-top">Describe your clothing idea</p>
+                    <p class="prompt-text instruction-top">Speak your vision into being...</p>
                     <div class="recording-indicator">
                         <div class="recording-dot"></div>
-                        <span class="recording-text">Recording</span>
+                        <span class="recording-text">Channeling</span>
                     </div>
                     <div class="waveform-container">
                         <div class="waveform-bars" id="waveform-recording">
@@ -102,7 +102,7 @@
             <div id="state-transcribing" class="state-screen">
                 <div class="state-content centered">
                     <div class="spinner"></div>
-                    <p class="status-text">Analyzing wish...</p>
+                    <p class="status-text">Decoding your imagination...</p>
                 </div>
             </div>
 
@@ -113,8 +113,8 @@
                         <img src="assets/aPoseMan.svg" alt="A-pose guide" class="apose-silhouette">
                     </div>
                     <div class="countdown" id="apose-countdown">3</div>
-                    <p class="instruction-text">Strike an A-Pose</p>
-                    <p class="sub-instruction">Stand with arms slightly away from your body</p>
+                    <p class="instruction-text">Become the Canvas</p>
+                    <p class="sub-instruction">Arms out, ready to receive your creation</p>
                 </div>
             </div>
 
@@ -126,7 +126,7 @@
             <!-- GENERATING_2D State: 2D generation progress -->
             <div id="state-generating_2d" class="state-screen">
                 <div class="state-content centered">
-                    <h2 class="title-gradient">Generating Preview</h2>
+                    <h2 class="title-gradient">Weaving Dreams Into Reality</h2>
                     <div class="fabric-animation">
                         <div class="fabric-container">
                             <div class="fabric-wave"></div>
@@ -136,8 +136,8 @@
                         </div>
                     </div>
                     <div class="did-you-know">
-                        <p><strong>Did you know?</strong></p>
-                        <p id="fun-fact">Our AI uses Stable Diffusion to generate your unique design.</p>
+                        <p><strong>The loom of imagination spins...</strong></p>
+                        <p id="fun-fact">Neural networks dance with your words to birth impossible fabrics.</p>
                     </div>
                 </div>
             </div>
@@ -145,14 +145,14 @@
             <!-- PREVIEW State: Show 2D preview (two-stage: full image then cropped) -->
             <div id="state-preview" class="state-screen">
                 <div class="state-content centered">
-                    <h2 class="preview-title" id="preview-title">Clothing Preview Generated</h2>
+                    <h2 class="preview-title" id="preview-title">Your Vision Materializes</h2>
                     <div class="preview-image-wrapper">
                         <div class="preview-image-container extracting">
                             <img id="preview-image-full" alt="Generated clothing" src="assets/preview_full.png" class="preview-image active">
                             <img id="preview-image-cropped" alt="Extracted clothing" src="assets/preview_cropped.png" class="preview-image">
                         </div>
                     </div>
-                    <p class="status-text" id="preview-status">Extracting clothing from image...</p>
+                    <p class="status-text" id="preview-status">Extracting the essence...</p>
                 </div>
             </div>
 
@@ -166,12 +166,24 @@
                 </div>
             </div>
 
-            <!-- CALIBRATING State: Mesh calibration -->
+            <!-- CALIBRATING State: Speech recognition calibration -->
             <div id="state-calibrating" class="state-screen">
-                <div class="state-content">
-                    <div class="countdown large" id="calibration-countdown">3</div>
-                    <p class="instruction-text">Stand in T-pose</p>
-                    <p class="sub-instruction">Arms stretched out horizontally</p>
+                <div class="state-content centered">
+                    <h2 class="title-gradient" id="calibrating-title">AWAKENING</h2>
+                    <div class="calibration-animation">
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring delay-1"></div>
+                        <div class="pulse-ring delay-2"></div>
+                        <div class="mic-icon calibrating">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="subtitle" id="calibrating-subtitle">Tuning into your creative frequency...</p>
                 </div>
             </div>
 
@@ -201,7 +213,7 @@
             <!-- REVEAL_FULL State: Dramatic full image reveal (10s) -->
             <div id="state-reveal_full" class="state-screen">
                 <div class="state-content centered">
-                    <h2 class="reveal-title title-gradient" id="reveal-full-title">BEHOLD YOUR CREATION</h2>
+                    <h2 class="reveal-title title-gradient" id="reveal-full-title">BEHOLD WHAT YOU HAVE DREAMED</h2>
                     <div class="reveal-image-wrapper">
                         <div class="reveal-image-container">
                             <img id="reveal-full-image" alt="Your creation" src="assets/preview_full.png" class="reveal-image">
@@ -214,7 +226,7 @@
             <!-- REVEAL_CLOTHING State: Cropped clothing reveal (8s) -->
             <div id="state-reveal_clothing" class="state-screen">
                 <div class="state-content centered">
-                    <h2 class="reveal-title title-gradient" id="reveal-clothing-title">YOUR DESIGN</h2>
+                    <h2 class="reveal-title title-gradient" id="reveal-clothing-title">YOUR IMPOSSIBLE GARMENT</h2>
                     <div class="reveal-image-wrapper clothing-only">
                         <div class="reveal-image-container clothing-reveal">
                             <img id="reveal-clothing-image" alt="Your clothing design" class="reveal-image cropped">
