@@ -39,6 +39,8 @@ debug_*.png
 .env
 *.key
 secrets.txt
+firebase-credentials.json
+*-firebase-adminsdk-*.json
 
 # External dependencies (clone separately)
 external/depthai_blazepose/

@@ -26,6 +26,9 @@ tqdm==4.66.1
 websockets>=12.0
 aiohttp>=3.9.0
 
+# Firebase Cloud Storage (optional - for gallery feature)
+firebase-admin>=6.2.0
+
 # NOTE: The following packages from the original repo are NOT needed for this minimal pipeline:
 # - chumpy: Only used for cage deformation (removed)
 # - trimesh, pyglet, networkx: Only used for 3D mesh processing (removed)

@@ -12,10 +12,13 @@
  *   - A_POSE: A-pose capture
  *   - CAPTURING: Capturing body frame
  *   - GENERATING_2D: 2D generation
+ *   - REVEAL_FULL: Show full generated image (10s)
+ *   - REVEAL_CLOTHING: Show cropped clothing only (8s)
  *   - GENERATING_3D: 3D generation
- *   - PREVIEW: Show 2D preview
+ *   - PREVIEW: Show 2D preview (legacy)
  *   - CALIBRATING: Mesh calibration
  *   - TRY_ON: 3D mesh overlay
+ *   - COMPLETE: Creation complete
  *   - ERROR: Error state
  */
 
@@ -43,7 +46,8 @@ export class UIStateManager {
         const states = [
             'idle', 'listening', 'recording', 'transcribing',
             'a_pose', 'capturing', 'generating_2d', 'generating_3d',
-            'preview', 'calibrating', 'try_on', 'error'
+            'preview', 'calibrating', 'try_on', 'error',
+            'reveal_full', 'reveal_clothing', 'complete'
         ];
 
         states.forEach(state => {
@@ -186,6 +190,18 @@ export class UIStateManager {
 
             case 'TRY_ON':
                 this._startTryOnAnimation();
+                break;
+
+            case 'REVEAL_FULL':
+                this._startRevealFull(data);
+                break;
+
+            case 'REVEAL_CLOTHING':
+                this._startRevealClothing(data);
+                break;
+
+            case 'COMPLETE':
+                this._showComplete(data);
                 break;
         }
     }
@@ -605,6 +621,83 @@ export class UIStateManager {
         const el = document.getElementById('error-message');
         if (el) {
             el.textContent = message;
+        }
+    }
+
+    /**
+     * Start the REVEAL_FULL state - show full generated image.
+     * @private
+     */
+    _startRevealFull(data) {
+        const title = document.getElementById('reveal-full-title');
+        const subtitle = document.getElementById('reveal-full-subtitle');
+        const img = document.getElementById('reveal-full-image');
+        const container = document.querySelector('#state-reveal_full .reveal-image-container');
+
+        // Update text if provided
+        if (title && data.title) title.textContent = data.title;
+        if (subtitle && data.subtitle) subtitle.textContent = data.subtitle;
+
+        // Add dramatic entrance animation
+        if (container) {
+            container.classList.add('animate-reveal');
+        }
+
+        console.log(`[StateManager] REVEAL_FULL started (${data.duration || 10}s)`);
+    }
+
+    /**
+     * Start the REVEAL_CLOTHING state - show cropped clothing only.
+     * @private
+     */
+    _startRevealClothing(data) {
+        const title = document.getElementById('reveal-clothing-title');
+        const subtitle = document.getElementById('reveal-clothing-subtitle');
+        const fullImg = document.getElementById('reveal-full-image');
+        const croppedImg = document.getElementById('reveal-clothing-image');
+
+        // Update text if provided
+        if (title && data.title) title.textContent = data.title;
+        if (subtitle && data.subtitle) subtitle.textContent = data.subtitle;
+
+        // Apply mask to create cropped image
+        if (fullImg && croppedImg && this._previewMaskSrc) {
+            this._applyMaskToPreview(fullImg.src, this._previewMaskSrc, croppedImg);
+        } else if (fullImg && croppedImg) {
+            // Fallback: copy full image if no mask
+            croppedImg.src = fullImg.src;
+        }
+
+        console.log(`[StateManager] REVEAL_CLOTHING started (${data.duration || 8}s)`);
+    }
+
+    /**
+     * Show the COMPLETE state.
+     * @private
+     */
+    _showComplete(data) {
+        const title = document.getElementById('complete-title');
+        const subtitle = document.getElementById('complete-subtitle');
+
+        if (title && data.title) title.textContent = data.title;
+        if (subtitle && data.subtitle) subtitle.textContent = data.subtitle;
+
+        console.log('[StateManager] COMPLETE state');
+    }
+
+    /**
+     * Update the reveal full image.
+     * @param {string} base64Image - Base64 encoded image
+     */
+    updateRevealFullImage(base64Image) {
+        const img = document.getElementById('reveal-full-image');
+        if (img) {
+            img.src = `data:image/png;base64,${base64Image}`;
+        }
+        // Also update preview-image-full for backward compatibility
+        const previewImg = document.getElementById('preview-image-full');
+        if (previewImg) {
+            previewImg.src = `data:image/png;base64,${base64Image}`;
         }
     }
 

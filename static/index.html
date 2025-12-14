@@ -197,6 +197,46 @@
                     <button id="btn-retry" class="control-btn">Try Again</button>
                 </div>
             </div>
+
+            <!-- REVEAL_FULL State: Dramatic full image reveal (10s) -->
+            <div id="state-reveal_full" class="state-screen">
+                <div class="state-content centered">
+                    <h2 class="reveal-title title-gradient" id="reveal-full-title">BEHOLD YOUR CREATION</h2>
+                    <div class="reveal-image-wrapper">
+                        <div class="reveal-image-container">
+                            <img id="reveal-full-image" alt="Your creation" src="assets/preview_full.png" class="reveal-image">
+                        </div>
+                    </div>
+                    <p class="reveal-subtitle" id="reveal-full-subtitle"></p>
+                </div>
+            </div>
+
+            <!-- REVEAL_CLOTHING State: Cropped clothing reveal (8s) -->
+            <div id="state-reveal_clothing" class="state-screen">
+                <div class="state-content centered">
+                    <h2 class="reveal-title title-gradient" id="reveal-clothing-title">YOUR DESIGN</h2>
+                    <div class="reveal-image-wrapper clothing-only">
+                        <div class="reveal-image-container clothing-reveal">
+                            <img id="reveal-clothing-image" alt="Your clothing design" class="reveal-image cropped">
+                        </div>
+                    </div>
+                    <p class="reveal-subtitle" id="reveal-clothing-subtitle"></p>
+                </div>
+            </div>
+
+            <!-- COMPLETE State: Creation complete -->
+            <div id="state-complete" class="state-screen">
+                <div class="state-content centered">
+                    <div class="complete-icon">✨</div>
+                    <h2 class="title-gradient" id="complete-title">CREATION COMPLETE</h2>
+                    <p class="complete-subtitle" id="complete-subtitle">Your design joins the gallery of dreams</p>
+                    <div class="complete-animation">
+                        <div class="sparkle"></div>
+                        <div class="sparkle"></div>
+                        <div class="sparkle"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Transcription overlay (shows transcribed text) -->
