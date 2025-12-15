@@ -121,6 +121,15 @@ class CameraBroadcaster(threading.Thread):
         self._start_time = 0
         self._last_emit_time = 0
 
+        # Camera health tracking
+        self._consecutive_errors = 0
+        self._max_consecutive_errors = 10  # Trigger recovery after this many errors
+        self._camera_error = False  # Flag to signal fatal camera error
+        self._last_successful_frame = 0  # Timestamp of last good frame
+
+        # Pause control (for thermal management - camera stays init but stops capturing)
+        self._paused = False
+
         # Optional callback for when new frames arrive
         self.on_frame: Optional[Callable[[FrameData], None]] = None
 
@@ -149,21 +158,37 @@ class CameraBroadcaster(threading.Thread):
         Continuously captures frames from the OAK-D camera and:
         1. Stores the latest frame (thread-safe)
         2. Emits to WebSocket at target FPS
+        3. Detects fatal camera errors and signals for recovery
         """
         self._running = True
         self._start_time = time.time()
         self._last_emit_time = 0
+        self._last_successful_frame = time.time()
+        self._consecutive_errors = 0
+        self._camera_error = False
 
         print(f"[CameraBroadcaster] Started at {self.target_fps} FPS target")
 
         while self._running:
+            # Skip capture when paused (thermal management)
+            if self._paused:
+                time.sleep(0.1)
+                continue
+
             try:
                 # Capture frame from OAK-D (this is the blocking call)
                 frame, body = self.tracker.next_frame()
 
                 if frame is None:
+                    self._consecutive_errors += 1
+                    if self._consecutive_errors > self._max_consecutive_errors:
+                        print(f"[CameraBroadcaster] Too many consecutive null frames ({self._consecutive_errors})")
                     time.sleep(0.01)  # Brief sleep if no frame available
                     continue
+
+                # Reset error counter on successful frame
+                self._consecutive_errors = 0
+                self._last_successful_frame = time.time()
 
                 # Convert BGR to RGB (BlazePose returns BGR)
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -194,14 +219,31 @@ class CameraBroadcaster(threading.Thread):
                         print(f"[CameraBroadcaster] Frame callback error: {e}")
 
             except Exception as e:
-                print(f"[CameraBroadcaster] Error in capture loop: {e}")
-                time.sleep(0.1)  # Back off on error
+                error_str = str(e)
+                self._consecutive_errors += 1
+
+                # Check for fatal camera errors (X_LINK_ERROR, device disconnected, etc.)
+                is_fatal = any(fatal in error_str for fatal in [
+                    'X_LINK_ERROR', 'device error', 'Communication exception',
+                    'Device not found', 'Connection refused', 'USB', 'disconnected'
+                ])
+
+                if is_fatal or self._consecutive_errors >= self._max_consecutive_errors:
+                    print(f"[CameraBroadcaster] FATAL camera error detected: {e}")
+                    print(f"[CameraBroadcaster] Consecutive errors: {self._consecutive_errors}")
+                    self._camera_error = True
+                    self._running = False  # Stop the loop - camera needs restart
+                    break
+                else:
+                    print(f"[CameraBroadcaster] Error in capture loop ({self._consecutive_errors}/{self._max_consecutive_errors}): {e}")
+                    time.sleep(0.1)  # Back off on error
 
         # Report statistics on exit
         elapsed = time.time() - self._start_time
         if elapsed > 0:
             avg_fps = self._frame_count / elapsed
-            print(f"[CameraBroadcaster] Stopped. {self._frame_count} frames "
+            status = "FATAL ERROR" if self._camera_error else "Stopped"
+            print(f"[CameraBroadcaster] {status}. {self._frame_count} frames "
                   f"in {elapsed:.1f}s ({avg_fps:.1f} avg FPS)")
 
     # Theme colors for keypoint visualization (RGB)
@@ -466,7 +508,38 @@ class CameraBroadcaster(threading.Thread):
         print("[CameraBroadcaster] Stop requested")
         self._running = False
 
+    def pause(self):
+        """Pause frame capture (camera stays initialized but stops streaming)."""
+        self._paused = True
+        print("[CameraBroadcaster] Paused")
+
+    def resume(self):
+        """Resume frame capture."""
+        self._paused = False
+        print("[CameraBroadcaster] Resumed")
+
     @property
     def is_running(self) -> bool:
         """Check if broadcaster is currently running."""
         return self._running
+
+    @property
+    def has_fatal_error(self) -> bool:
+        """Check if a fatal camera error occurred."""
+        return self._camera_error
+
+    @property
+    def is_healthy(self) -> bool:
+        """
+        Check if camera is healthy and producing frames.
+
+        Returns False if:
+        - Not running
+        - Fatal error occurred
+        - No frames for more than 5 seconds
+        """
+        if not self._running or self._camera_error:
+            return False
+        if self._last_successful_frame == 0:
+            return True  # Just started, no frames yet
+        return (time.time() - self._last_successful_frame) < 5.0

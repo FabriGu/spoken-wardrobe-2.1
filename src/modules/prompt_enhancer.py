@@ -44,7 +44,11 @@ class PromptEnhancer:
         'lingerie', 'bikini', 'underwear', 'nude', 'naked', 'see-through',
         'transparent', 'sheer', 'skin-tight', 'bodycon', 'mini skirt',
         'hot', 'attractive', 'beautiful woman', 'pretty girl', 'gorgeous',
-        'feminine figure', 'hourglass', 'voluptuous'
+        'feminine figure', 'hourglass', 'voluptuous',
+        # Additional blocked terms for safety
+        'bare', 'exposed', 'topless', 'bottomless', 'bra', 'panties',
+        'thong', 'swimsuit', 'crop top', 'mini', 'short shorts', 'booty',
+        'nsfw', 'erotic', 'sexual', 'sensuous', 'alluring', 'flirty'
     ]
 
     # Creative style modifiers to add artistic flair

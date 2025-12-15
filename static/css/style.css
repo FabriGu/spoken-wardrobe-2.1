@@ -251,9 +251,9 @@ body.generating-3d-active #state-generating_3d {
     gap: 1.5rem;
 }
 
-/* Typography */
+/* Typography - Font sizes increased 1.5x for vertical TV display */
 .title-gradient {
-    font-size: 3.5rem;
+    font-size: 5.25rem;
     font-weight: 700;
     font-style: italic;
     background: var(--gradient-title);
@@ -264,7 +264,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .subtitle {
-    font-size: 1.25rem;
+    font-size: 1.875rem;
     color: var(--text-secondary);
     margin-top: 1rem;
 }
@@ -308,7 +308,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .listening-text {
-    font-size: 1.5rem;
+    font-size: 2.25rem;
     color: var(--accent-cyan);
     font-weight: 500;
     margin: 0;
@@ -377,7 +377,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .prompt-text {
-    font-size: 1.125rem;
+    font-size: 1.7rem;
     color: var(--text-secondary);
     margin: 0;
 }
@@ -413,14 +413,14 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .recording-text {
-    font-size: 1.5rem;
+    font-size: 2.25rem;
     color: var(--accent-red);
     font-weight: 500;
     margin: 0;
 }
 
 .timer {
-    font-size: 4rem;
+    font-size: 6rem;
     font-weight: 700;
     color: var(--text-primary);
     font-family: var(--font-mono);
@@ -429,7 +429,7 @@ body.generating-3d-active #state-generating_3d {
 
 /* Instruction text at top */
 .instruction-top {
-    font-size: 1.5rem;
+    font-size: 2.25rem;
     color: var(--text-secondary);
     margin-bottom: 0.5rem;
 }
@@ -437,12 +437,12 @@ body.generating-3d-active #state-generating_3d {
 /* Live transcription display */
 .live-transcription {
     min-height: 60px;
-    max-width: 500px;
+    max-width: 600px;
     padding: 1rem;
     background: var(--bg-card);
     border-radius: var(--border-radius);
     color: var(--text-primary);
-    font-size: 1.125rem;
+    font-size: 1.7rem;
     text-align: center;
     font-style: italic;
     opacity: 0.9;
@@ -484,7 +484,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .countdown {
-    font-size: 8rem;
+    font-size: 12rem;
     font-weight: 700;
     color: var(--text-primary);
     text-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
@@ -494,7 +494,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .countdown.large {
-    font-size: 12rem;
+    font-size: 18rem;
 }
 
 @keyframes countdownPulse {
@@ -503,7 +503,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .instruction-text {
-    font-size: 2rem;
+    font-size: 3rem;
     font-weight: 600;
     color: var(--text-primary);
     margin-top: 2rem;
@@ -512,7 +512,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .sub-instruction {
-    font-size: 1.125rem;
+    font-size: 1.7rem;
     color: var(--text-secondary);
     margin-top: 0.5rem;
     position: relative;
@@ -622,7 +622,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .status-text {
-    font-size: 1rem;
+    font-size: 1.5rem;
     color: var(--text-secondary);
 }
 
@@ -668,7 +668,7 @@ body.generating-3d-active #state-generating_3d {
 
 /* Preview State */
 .preview-title {
-    font-size: 1.75rem;
+    font-size: 2.625rem;
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 1.5rem;
@@ -889,7 +889,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 #transcription-text {
-    font-size: 1.25rem;
+    font-size: 1.875rem;
     color: var(--text-primary);
     text-align: center;
 }
@@ -934,22 +934,22 @@ body.generating-3d-active #state-generating_3d {
     display: none !important;
 }
 
-/* Responsive */
+/* Responsive - proportionally scaled with 1.5x base sizes */
 @media (max-width: 768px) {
     .title-gradient {
-        font-size: 2.5rem;
+        font-size: 3.75rem;
     }
 
     .countdown {
-        font-size: 6rem;
+        font-size: 9rem;
     }
 
     .countdown.large {
-        font-size: 8rem;
+        font-size: 12rem;
     }
 
     .instruction-text {
-        font-size: 1.5rem;
+        font-size: 2.25rem;
     }
 
     .state-content {
@@ -1072,7 +1072,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .reveal-title {
-    font-size: 2.5rem;
+    font-size: 3.75rem;
     font-weight: 700;
     margin-bottom: 2rem;
     text-align: center;
@@ -1080,7 +1080,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .reveal-subtitle {
-    font-size: 1.25rem;
+    font-size: 1.875rem;
     color: var(--text-secondary);
     margin-top: 1.5rem;
     text-align: center;
@@ -1186,7 +1186,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 .complete-subtitle {
-    font-size: 1.5rem;
+    font-size: 2.25rem;
     color: var(--text-secondary);
     margin-top: 1rem;
 }
@@ -1313,7 +1313,7 @@ body.generating-3d-active #state-generating_3d {
 }
 
 #state-calibrating .subtitle {
-    font-size: 1.25rem;
+    font-size: 1.875rem;
     color: var(--text-secondary);
     animation: fadeInUp 0.8s ease-out;
 }

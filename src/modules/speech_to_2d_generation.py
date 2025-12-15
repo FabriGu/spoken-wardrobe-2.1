@@ -67,12 +67,16 @@ from BlazeposeDepthaiEdge import BlazeposeDepthai
 # CONFIGURATION - Timing and messaging for playtest experience
 # ============================================================================
 
-# Reveal timing (in seconds)
-REVEAL_FULL_DURATION = 10      # Show full image with body
-REVEAL_CLOTHING_DURATION = 8    # Show cropped clothing only
+# Reveal timing (in seconds) - DOUBLED for playtest readability
+REVEAL_FULL_DURATION = 20      # Show full image with body (was 10)
+REVEAL_CLOTHING_DURATION = 16   # Show cropped clothing only (was 8)
 
-# Recording duration
-RECORDING_DURATION = 10.0       # Fixed 10-second recording
+# Recording duration - DOUBLED for playtest
+RECORDING_DURATION = 20.0       # Fixed 20-second recording (was 10)
+
+# Segmentation retry configuration
+MAX_SEGMENTATION_RETRIES = 2    # Allow 2 retries (3 total attempts)
+RETRY_MESSAGE_DURATION = 6.0    # Seconds to show retry message
 
 # Creative messaging for UI
 UI_MESSAGES = {
@@ -266,18 +270,30 @@ class SpeechTo2DPipeline:
         """Clean up all resources"""
         print("\n    Cleaning up...")
 
+        # Check if camera had a fatal error - if so, don't try to close device
+        camera_crashed = False
+        if self.camera_broadcaster and hasattr(self.camera_broadcaster, '_camera_error'):
+            camera_crashed = self.camera_broadcaster._camera_error
+
         if self.camera_broadcaster:
             try:
                 self.camera_broadcaster.stop()
             except Exception:
                 pass
+            self.camera_broadcaster = None
 
         if self.tracker:
-            try:
-                if hasattr(self.tracker, 'device'):
-                    self.tracker.device.close()
-            except Exception:
-                pass
+            if camera_crashed:
+                # Device crashed - keep reference alive to prevent GC crash
+                print("    Skipping device.close() (device crashed)")
+                SpeechTo2DPipeline._abandoned_trackers.append(self.tracker)
+            else:
+                try:
+                    if hasattr(self.tracker, 'device') and self.tracker.device:
+                        self.tracker.device.close()
+                except Exception:
+                    pass
+            self.tracker = None
 
         if self.ws_server:
             try:
@@ -323,7 +339,7 @@ class SpeechTo2DPipeline:
         audio.terminate()
         return None
 
-    def calibrate_microphone(self, duration=3.0):
+    def calibrate_microphone(self, duration=6.0):
         """Calibrate microphone for ambient noise"""
         print(f"\n    Calibrating microphone ({duration}s)...")
 
@@ -398,6 +414,100 @@ class SpeechTo2DPipeline:
         else:
             print("    Warning: No frames yet")
 
+    # Store abandoned trackers here to prevent Python GC from crashing
+    _abandoned_trackers = []
+
+    def cleanup_camera(self, force_abandon=False):
+        """
+        Clean up camera resources (for restart).
+
+        Args:
+            force_abandon: If True, don't try to close device (use when device crashed)
+        """
+        print("    Cleaning up camera resources...")
+
+        # Check if camera had a fatal error - if so, don't try to close it
+        camera_crashed = force_abandon
+        if self.camera_broadcaster and hasattr(self.camera_broadcaster, '_camera_error'):
+            camera_crashed = camera_crashed or self.camera_broadcaster._camera_error
+
+        # Stop broadcaster first
+        if self.camera_broadcaster:
+            try:
+                self.camera_broadcaster.stop()
+                # Only join if not crashed (crashed thread may be stuck)
+                if not camera_crashed:
+                    self.camera_broadcaster.join(timeout=2.0)
+            except Exception as e:
+                print(f"    Warning: Broadcaster cleanup error: {e}")
+            self.camera_broadcaster = None
+
+        # Handle tracker/device cleanup
+        if self.tracker:
+            if camera_crashed:
+                # Device crashed - DO NOT touch it at all!
+                # Keep reference alive to prevent Python GC from triggering destructor crash
+                print("    Device crashed - keeping reference alive (prevents GC crash)")
+                SpeechTo2DPipeline._abandoned_trackers.append(self.tracker)
+                self.tracker = None  # Clear our reference but object stays alive in list
+            else:
+                # Normal cleanup - safe to close
+                try:
+                    if hasattr(self.tracker, 'device') and self.tracker.device:
+                        self.tracker.device.close()
+                except Exception as e:
+                    print(f"    Warning: Tracker cleanup error: {e}")
+                self.tracker = None
+
+        # Longer pause when device crashed to let USB fully reset
+        wait_time = 5.0 if camera_crashed else 1.0
+        print(f"    Waiting {wait_time}s for USB to settle...")
+        time.sleep(wait_time)
+        print("    Camera cleanup complete")
+
+    def restart_camera(self, max_attempts=3):
+        """
+        Restart camera after error (full cleanup and reinitialize).
+
+        Args:
+            max_attempts: Number of initialization attempts before giving up
+
+        Returns:
+            True if camera restarted successfully, False otherwise
+        """
+        print("\n" + "="*70)
+        print("    CAMERA RESTART - Recovering from error")
+        print("="*70)
+
+        self.cleanup_camera()  # Will detect if crashed and skip close()
+
+        # Extra pause for USB to fully reset after device crash
+        print("    Waiting 5s for USB device to fully reset...")
+        time.sleep(5.0)
+
+        # Try to reinitialize with retries
+        for attempt in range(max_attempts):
+            try:
+                print(f"    Initialization attempt {attempt + 1}/{max_attempts}...")
+                self.initialize_camera()
+                print("    Camera restarted successfully!")
+                return True
+            except Exception as e:
+                print(f"    Attempt {attempt + 1} failed: {e}")
+                if attempt < max_attempts - 1:
+                    wait = 3.0 * (attempt + 1)  # Increasing wait: 3s, 6s, 9s
+                    print(f"    Waiting {wait}s before retry...")
+                    time.sleep(wait)
+
+        print("    Camera restart FAILED after all attempts")
+        return False
+
+    def is_camera_healthy(self):
+        """Check if camera is healthy and producing frames"""
+        if not self.camera_broadcaster:
+            return False
+        return self.camera_broadcaster.is_healthy
+
     def is_body_detected(self, body):
         """Check if a body is detected"""
         return body and hasattr(body, 'landmarks_world')
@@ -452,6 +562,7 @@ class SpeechTo2DPipeline:
         print(f"\n    Recording for {RECORDING_DURATION} seconds (with streaming transcription)...")
 
         CHUNK_DURATION = 2.0  # Transcribe every 2 seconds for real-time feedback
+        MAX_DISPLAY_LENGTH = 200  # Max characters to display (prevents overflow)
 
         audio = pyaudio.PyAudio()
 
@@ -469,6 +580,7 @@ class SpeechTo2DPipeline:
             current_chunk = []
             start_time = time.time()
             chunk_start_time = time.time()
+            last_sent_text = ""  # Track last sent to avoid duplicates
 
             # Ensure Whisper model is loaded
             if not self.speech_recognizer:
@@ -491,9 +603,18 @@ class SpeechTo2DPipeline:
                         # Transcribe all audio so far (accumulated) for context
                         accumulated_audio = b''.join(all_audio_chunks)
                         partial_text = self._transcribe_chunk(accumulated_audio)
+
                         if partial_text and self.ws_server:
-                            self.ws_server.emit_transcription(partial_text, is_final=False)
-                            print(f"    [Streaming] Partial: '{partial_text}'")
+                            # Truncate if too long (prevents UI overflow)
+                            if len(partial_text) > MAX_DISPLAY_LENGTH:
+                                partial_text = partial_text[:MAX_DISPLAY_LENGTH] + "..."
+
+                            # Only send if different from last (prevents duplicates)
+                            if partial_text != last_sent_text:
+                                self.ws_server.emit_transcription(partial_text, is_final=False)
+                                print(f"    [Streaming] Partial: '{partial_text[:50]}...'")
+                                last_sent_text = partial_text
+
                         chunk_start_time = time.time()
 
                 except Exception:
@@ -605,24 +726,30 @@ class SpeechTo2DPipeline:
         print(f"    Original: '{prompt}'")
         print(f"    Enhanced: '{enhanced_prompt}'")
 
-        # Build final prompt with creative fashion modifiers
+        # Build final prompt with creative fashion modifiers and coverage emphasis
         final_prompt = (
             f"{enhanced_prompt}, "
+            "fully clothed, modest fashion, full coverage garment, "
             "haute couture wearable art, fashion photography, "
-            "intricate details, dramatic studio lighting, "
-            "professional fashion editorial, surrealist fashion, "
-            "Alexander McQueen aesthetic, Iris van Herpen inspired, "
+            "intricate fabric details, dramatic studio lighting, "
+            "professional fashion editorial, artistic fashion, "
             "8k quality, sharp focus, masterpiece"
         )
 
-        # Strong negative prompt to avoid mundane/problematic results
+        # CRITICAL: Aggressive negative prompt to block all nudity and sexualization
         negative_prompt = (
-            "realistic, mundane, boring, plain, simple, basic, ordinary, "
-            "sexy, revealing, provocative, nsfw, nude, cleavage, "
+            # Block all nudity and sexualization
+            "nude, naked, nudity, nsfw, porn, pornographic, xxx, "
+            "bare skin, exposed skin, bare chest, bare body, topless, bottomless, "
+            "sexy, sexual, seductive, erotic, provocative, sensual, "
+            "revealing, skimpy, see-through, transparent clothing, sheer, "
+            "cleavage, breasts, nipples, genitals, buttocks, "
+            "tight clothing, skin-tight, bodycon, form-fitting, "
+            "lingerie, underwear, bikini, swimwear, "
+            # Quality issues
+            "realistic, mundane, boring, plain, "
             "low quality, blurry, distorted, deformed, ugly, bad anatomy, "
-            "watermark, text, amateur, cartoon, anime, illustration, "
-            "mannequin, store display, catalog photo, stock photo, "
-            "cheap fabric, wrinkled, poorly lit, overexposed"
+            "watermark, text, amateur"
         )
 
         try:
@@ -694,10 +821,11 @@ class SpeechTo2DPipeline:
     def run_reveal_sequence(self, result_image, mask):
         """
         Run dramatic reveal sequence:
-        1. REVEAL_FULL: Show full image (10 seconds)
-        2. REVEAL_CLOTHING: Show cropped clothing only (until user leaves OR 2 min timeout)
+        1. REVEAL_FULL: Show full image (20 seconds)
+        2. REVEAL_CLOTHING: Show cropped clothing only (10 seconds)
+        Camera is OFF during this sequence for thermal management.
         """
-        print(f"\n    Reveal sequence: {REVEAL_FULL_DURATION}s full + until user leaves")
+        print(f"\n    Reveal sequence: {REVEAL_FULL_DURATION}s full + 10s clothing")
 
         # Convert image to base64
         buffer = io.BytesIO()
@@ -717,15 +845,12 @@ class SpeechTo2DPipeline:
         print(f"    Stage 1: Full reveal ({REVEAL_FULL_DURATION}s)")
         time.sleep(REVEAL_FULL_DURATION)
 
-        # Stage 2: REVEAL_CLOTHING - Show cropped clothing only
-        # This stage lasts until user leaves or 2-minute timeout
+        # Stage 2: REVEAL_CLOTHING - Show cropped clothing only (10 seconds)
         self._emit_state('REVEAL_CLOTHING')
         if self.ws_server:
             self.ws_server._message_queue.put({'type': 'preview_mask', 'mask': mask_b64})
-        print("    Stage 2: Clothing reveal (until user leaves)")
-
-        # Wait for user to leave (returns when body lost for 3s, or 2min timeout)
-        self.wait_for_user_exit(timeout=120)
+        print("    Stage 2: Clothing reveal (10s)")
+        time.sleep(10)
 
         return image_b64
 
@@ -894,22 +1019,46 @@ class SpeechTo2DPipeline:
     def run_session(self):
         """Run a single session: speech -> generate -> reveal -> (background 3D)"""
 
-        # Wait for body
+        # Wait for body (with camera duty cycling for thermal management)
         self._emit_state('IDLE')
-        print("\n    Waiting for person...")
+        print("\n    Waiting for person (camera in standby)...")
 
-        while True:
-            frame, body = self.get_frame()
-            if frame is not None and self.is_body_detected(body):
-                break
-            time.sleep(0.05)
+        # Camera starts paused to save heat
+        if self.camera_broadcaster:
+            self.camera_broadcaster.pause()
 
+        CAMERA_CHECK_DURATION = 1.0   # Seconds to check for body
+        CAMERA_SLEEP_DURATION = 3.0   # Seconds to rest camera
+
+        body_detected = False
+        while not body_detected:
+            # Resume camera briefly to check for body
+            if self.camera_broadcaster:
+                self.camera_broadcaster.resume()
+            time.sleep(0.2)  # Let camera warm up
+
+            # Check for body for a short duration
+            check_start = time.time()
+            while (time.time() - check_start) < CAMERA_CHECK_DURATION:
+                frame, body = self.get_frame()
+                if frame is not None and self.is_body_detected(body):
+                    body_detected = True
+                    break
+                time.sleep(0.05)
+
+            if not body_detected:
+                # No body - pause camera to cool down
+                if self.camera_broadcaster:
+                    self.camera_broadcaster.pause()
+                time.sleep(CAMERA_SLEEP_DURATION)
+
+        # Body detected - keep camera running for session
         print("    Body detected!")
 
         # Calibrate microphone if not already done
         if self.volume_threshold == 0:
             self._emit_state('CALIBRATING')
-            self.calibrate_microphone(duration=3.0)
+            self.calibrate_microphone(duration=6.0)
 
         # Wait for speech
         self._emit_state('LISTENING')
@@ -947,6 +1096,8 @@ class SpeechTo2DPipeline:
 
         if not audio_data:
             self._emit_state('ERROR', error_message='Recording failed')
+            if self.camera_broadcaster:
+                self.camera_broadcaster.pause()
             return False
 
         # Transcribe
@@ -961,39 +1112,69 @@ class SpeechTo2DPipeline:
 
         print(f"\n    Transcription: '{self.transcribed_text}'")
 
-        # A-pose capture
-        self._emit_state('A_POSE', countdown=3)
-        print("\n    A-pose countdown...")
+        # Clear transcription display before moving to A-pose
+        if self.ws_server:
+            self.ws_server.emit_transcription("", is_final=True)
 
-        # Disable skeleton for clean capture
-        if self.camera_broadcaster:
-            self.camera_broadcaster.draw_skeleton = False
-
-        for i in range(3, 0, -1):
-            print(f"    {i}...")
-            time.sleep(1)
-
-        # Capture frame
+        # A-pose capture with retry logic for segmentation failures
         frame_rgb = None
-        if self.camera_broadcaster:
-            frame_data = self.camera_broadcaster.get_latest_frame()
-            if frame_data:
-                frame_rgb = frame_data.frame_rgb
+        mask = None
 
-        if frame_rgb is None:
-            self._emit_state('ERROR', error_message='Capture failed')
-            return False
+        for attempt in range(MAX_SEGMENTATION_RETRIES + 1):
+            # A-pose capture (doubled countdown for playtest)
+            self._emit_state('A_POSE', countdown=6)
+            print(f"\n    A-pose countdown... (attempt {attempt + 1}/{MAX_SEGMENTATION_RETRIES + 1})")
 
-        self._emit_state('CAPTURING')
-        print("    Frame captured!")
+            # Disable skeleton for clean capture
+            if self.camera_broadcaster:
+                self.camera_broadcaster.draw_skeleton = False
 
-        # Segment body
-        print("    Running BodyPix segmentation...")
-        mask = self.segment_body_parts(frame_rgb)
+            for i in range(6, 0, -1):
+                print(f"    {i}...")
+                time.sleep(1)
 
-        if mask is None or mask.sum() == 0:
-            self._emit_state('ERROR', error_message='Segmentation failed')
-            return False
+            # Capture frame
+            frame_rgb = None
+            if self.camera_broadcaster:
+                frame_data = self.camera_broadcaster.get_latest_frame()
+                if frame_data:
+                    frame_rgb = frame_data.frame_rgb
+
+            if frame_rgb is None:
+                if attempt < MAX_SEGMENTATION_RETRIES:
+                    print("    Capture failed - retrying...")
+                    self._emit_state('ERROR', error_message='Could not capture frame. Please try again!')
+                    time.sleep(RETRY_MESSAGE_DURATION)
+                    continue
+                else:
+                    self._emit_state('ERROR', error_message='Capture failed after retries')
+                    if self.camera_broadcaster:
+                        self.camera_broadcaster.pause()
+                    return False
+
+            self._emit_state('CAPTURING')
+            print("    Frame captured!")
+
+            # Segment body
+            print("    Running BodyPix segmentation...")
+            mask = self.segment_body_parts(frame_rgb)
+
+            if mask is not None and mask.sum() > 0:
+                print("    Segmentation successful!")
+                break  # Success - exit retry loop
+
+            # Segmentation failed
+            if attempt < MAX_SEGMENTATION_RETRIES:
+                print(f"    Segmentation failed - retry {attempt + 1}/{MAX_SEGMENTATION_RETRIES}")
+                self._emit_state('ERROR', error_message='Could not detect body. Please try again!')
+                time.sleep(RETRY_MESSAGE_DURATION)
+                # Loop will continue to next attempt
+            else:
+                # All retries exhausted
+                self._emit_state('ERROR', error_message='Segmentation failed after retries')
+                if self.camera_broadcaster:
+                    self.camera_broadcaster.pause()
+                return False
 
         # Generate 2D clothing
         self._emit_state('GENERATING_2D')
@@ -1001,10 +1182,21 @@ class SpeechTo2DPipeline:
 
         if not result_image:
             self._emit_state('ERROR', error_message='Generation failed')
+            if self.camera_broadcaster:
+                self.camera_broadcaster.pause()
             return False
+
+        # Turn OFF camera now - not needed during reveal (helps cool down)
+        if self.camera_broadcaster:
+            self.camera_broadcaster.pause()
+            print("    Camera paused for reveal (thermal management)")
 
         # Dramatic reveal sequence (waits for user to leave)
         self.run_reveal_sequence(result_image, mask)
+
+        # 10-second timeout before reset
+        print("    Final timeout: 10 seconds before reset...")
+        time.sleep(10)
 
         # User has left - start background 3D generation and save
         print("\n" + "="*70)
@@ -1031,21 +1223,62 @@ class SpeechTo2DPipeline:
         print("   Press Ctrl+C to exit\n")
 
         # Initialize
-        self.calibrate_microphone(duration=3.0)
+        self.calibrate_microphone(duration=6.0)
         self.initialize_camera()
+
+        # Track consecutive camera failures for exponential backoff
+        camera_restart_count = 0
+        max_camera_restarts = 3
+        CAMERA_COOLDOWN = 30  # Seconds to wait after camera crash before restart
 
         # Main loop
         while True:
             try:
+                # Check camera health before each session
+                if not self.is_camera_healthy():
+                    print("\n    Camera unhealthy - attempting restart...")
+                    self._emit_state('ERROR', error_message='Camera reconnecting...')
+
+                    # Always wait 30s cooldown after crash to let hardware fully reset
+                    print(f"    Waiting {CAMERA_COOLDOWN}s for hardware cooldown...")
+                    time.sleep(CAMERA_COOLDOWN)
+
+                    if camera_restart_count >= max_camera_restarts:
+                        print(f"    Too many failures ({camera_restart_count}). Extended wait...")
+                        time.sleep(30)  # Extra 30s on top
+                        camera_restart_count = 0
+
+                    if self.restart_camera():
+                        camera_restart_count = 0
+                        print("    Camera recovered!")
+                    else:
+                        camera_restart_count += 1
+                        print(f"    Restart failed ({camera_restart_count}/{max_camera_restarts})")
+                        continue
+
                 self.run_session()
                 print("\n    Ready for next user!\n")
-                time.sleep(2)
+                time.sleep(4)
+
             except KeyboardInterrupt:
                 raise
             except Exception as e:
+                error_str = str(e)
                 print(f"\n    Session error: {e}")
+
+                # Check if this is a camera-related error
+                is_camera_error = any(err in error_str for err in [
+                    'X_LINK_ERROR', 'device error', 'Communication exception',
+                    'Device not found', 'camera', 'Camera', 'frame'
+                ])
+
+                if is_camera_error:
+                    print("    Detected camera error - will restart after cooldown")
+                    if self.camera_broadcaster:
+                        self.camera_broadcaster._camera_error = True
+
                 self._emit_state('ERROR', error_message=str(e)[:50])
-                time.sleep(3)
+                time.sleep(6)
 
 
 def main():
