@@ -286,6 +286,69 @@ body.generating-3d-active #state-generating_3d {
     margin-bottom: 0;
 }
 
+/* TITLE State - Initial "Say START" screen */
+#state-title .state-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+#state-title .title-gradient.large {
+    font-size: 7rem;
+    text-align: center;
+}
+
+#state-title .subtitle {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.start-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.start-prompt .mic-icon.pulsing {
+    color: var(--accent-cyan);
+    animation: mic-pulse 1.5s ease-in-out infinite;
+}
+
+.start-prompt .instruction-text.highlight {
+    font-size: 3.5rem;
+    color: var(--accent-cyan);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    animation: text-glow 2s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px var(--accent-cyan));
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 20px var(--accent-cyan));
+    }
+}
+
+@keyframes text-glow {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(0, 212, 255, 0.8), 0 0 30px rgba(0, 212, 255, 0.4);
+    }
+}
+
 /* Listening State */
 #state-listening .state-content {
     display: flex;

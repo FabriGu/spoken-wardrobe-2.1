@@ -78,26 +78,35 @@ class StateManager:
 
     # Valid state transitions (from_state -> [allowed_to_states])
     VALID_TRANSITIONS = {
-        'IDLE': ['LISTENING', 'ERROR'],
+        'TITLE': ['IDLE', 'ERROR'],  # TITLE -> IDLE (after "START" detected)
+        'IDLE': ['LISTENING', 'TITLE', 'ERROR'],  # IDLE -> TITLE (if no body timeout)
         'LISTENING': ['RECORDING', 'IDLE', 'ERROR'],
         'RECORDING': ['TRANSCRIBING', 'ERROR'],
         'TRANSCRIBING': ['A_POSE', 'ERROR'],
         'A_POSE': ['CAPTURING', 'IDLE', 'ERROR'],
         'CAPTURING': ['GENERATING_2D', 'ERROR'],
-        'GENERATING_2D': ['PREVIEW', 'GENERATING_3D', 'ERROR'],
+        'GENERATING_2D': ['PREVIEW', 'GENERATING_3D', 'REVEAL_FULL', 'ERROR'],
         'GENERATING_3D': ['CALIBRATING', 'ERROR'],
         'PREVIEW': ['GENERATING_3D', 'IDLE', 'ERROR'],
+        'REVEAL_FULL': ['REVEAL_CLOTHING', 'TITLE', 'ERROR'],
+        'REVEAL_CLOTHING': ['TITLE', 'IDLE', 'ERROR'],
         'CALIBRATING': ['TRY_ON', 'ERROR'],
-        'TRY_ON': ['IDLE', 'ERROR'],
-        'ERROR': ['IDLE']
+        'TRY_ON': ['IDLE', 'TITLE', 'ERROR'],
+        'COMPLETE': ['TITLE', 'IDLE', 'ERROR'],
+        'ERROR': ['IDLE', 'TITLE']
     }
 
     # State metadata (descriptions for UI)
     STATE_INFO = {
-        'IDLE': {
-            'title': 'SPOKEN WARDROBE',
-            'subtitle': 'Step in front of the camera to begin',
+        'TITLE': {
+            'title': 'DREAM WARDROBE',
+            'subtitle': 'Say "START" loudly to begin!',
             'show_camera': False
+        },
+        'IDLE': {
+            'title': 'STEP INTO FRAME',
+            'subtitle': 'Walk in front of the camera',
+            'show_camera': True
         },
         'LISTENING': {
             'title': 'Listening...',

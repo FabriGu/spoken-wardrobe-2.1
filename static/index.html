@@ -39,8 +39,27 @@
         <div id="ui-overlay">
             <!-- State-specific UI screens -->
 
-            <!-- IDLE State: Welcome screen -->
-            <div id="state-idle" class="state-screen active">
+            <!-- TITLE State: Initial screen waiting for "START" (Camera OFF) -->
+            <div id="state-title" class="state-screen active">
+                <div class="state-content centered">
+                    <h1 class="title-gradient large">DREAM WARDROBE</h1>
+                    <p class="subtitle">AI Fashion Installation</p>
+                    <div class="start-prompt">
+                        <div class="mic-icon pulsing">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                        </div>
+                        <p class="instruction-text highlight">Say "START" loudly to begin!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IDLE State: Body detection (after START detected) -->
+            <div id="state-idle" class="state-screen">
                 <div class="state-content centered">
                     <h1 class="title-gradient">DREAM WARDROBE</h1>
                     <p class="subtitle">Step into the mirror of imagination</p>
@@ -63,7 +82,7 @@
                                 <line x1="8" y1="23" x2="16" y2="23"/>
                             </svg>
                         </div>
-                        <span class="listening-text">Awakening the Oracle</span>
+                        <span class="listening-text">Speak Your Vision</span>
                     </div>
                     <div class="waveform-container loading-wave">
                         <div class="wave-loader">
@@ -74,7 +93,7 @@
                             <div class="wave-bar"></div>
                         </div>
                     </div>
-                    <p class="prompt-text">Tuning into your creative frequency...</p>
+                    <p class="prompt-text">Describe your dream clothing loudly and clearly!</p>
                 </div>
             </div>
 

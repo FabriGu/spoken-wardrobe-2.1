@@ -5,15 +5,16 @@
  * and coordinating visual updates.
  *
  * States:
- *   - IDLE: Welcome screen
+ *   - TITLE: Initial screen waiting for "START" (camera OFF)
+ *   - IDLE: Body detection screen
  *   - LISTENING: Listening for speech
  *   - RECORDING: Recording audio
  *   - TRANSCRIBING: Processing audio
  *   - A_POSE: A-pose capture
  *   - CAPTURING: Capturing body frame
  *   - GENERATING_2D: 2D generation
- *   - REVEAL_FULL: Show full generated image (10s)
- *   - REVEAL_CLOTHING: Show cropped clothing only (8s)
+ *   - REVEAL_FULL: Show full generated image (20s)
+ *   - REVEAL_CLOTHING: Show cropped clothing only (10s)
  *   - GENERATING_3D: 3D generation
  *   - PREVIEW: Show 2D preview (legacy)
  *   - CALIBRATING: Mesh calibration
@@ -44,7 +45,7 @@ export class UIStateManager {
      */
     _initStateScreens() {
         const states = [
-            'idle', 'listening', 'recording', 'transcribing',
+            'title', 'idle', 'listening', 'recording', 'transcribing',
             'a_pose', 'capturing', 'generating_2d', 'generating_3d',
             'preview', 'calibrating', 'try_on', 'error',
             'reveal_full', 'reveal_clothing', 'complete'

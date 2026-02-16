@@ -354,7 +354,8 @@ class ComfyUIClient:
         workflow_path: str = "workflows/sdxl_inpainting_api.json",
         seed: int = 100,
         steps: int = 30,
-        cfg: float = 7.5
+        cfg: float = 7.5,
+        model: str = "512-inpainting-ema.safetensors"
     ) -> Optional[Image.Image]:
         """
         Generate inpainted image using ComfyUI.
@@ -422,6 +423,13 @@ class ComfyUIClient:
             workflow_template = self.load_workflow_template(workflow_path)
             if not workflow_template:
                 raise Exception(f"Failed to load workflow: {workflow_path}")
+
+            # 4b. Substitute model name if different from default
+            print(f"    Using model: {model}")
+            workflow_str = json.dumps(workflow_template)
+            # Replace the default model with the specified one
+            workflow_str = workflow_str.replace('"512-inpainting-ema.safetensors"', f'"{model}"')
+            workflow_template = json.loads(workflow_str)
 
             # 5. Prepare workflow
             print("\n⚙️  Preparing workflow...")

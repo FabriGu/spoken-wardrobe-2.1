@@ -78,6 +78,14 @@ RECORDING_DURATION = 20.0       # Fixed 20-second recording (was 10)
 MAX_SEGMENTATION_RETRIES = 2    # Allow 2 retries (3 total attempts)
 RETRY_MESSAGE_DURATION = 6.0    # Seconds to show retry message
 
+# Inpainting model switching - press b/n/m during runtime to switch
+# Update these to match the checkpoints available on your ComfyUI server
+INPAINTING_MODELS = {
+    'b': '512-inpainting-ema.safetensors',      # Default SD 1.5 inpainting
+    'n': 'sd-v1-5-inpainting.ckpt',             # Alternative SD 1.5
+    'm': 'realisticVisionV60_v60.safetensors'   # Realistic Vision (if available)
+}
+
 # Creative messaging for UI
 UI_MESSAGES = {
     'IDLE': {
@@ -191,6 +199,10 @@ class SpeechTo2DPipeline:
         self.transcribed_text = ""
         self.mic_index = None
 
+        # Model switching (b/n/m keys)
+        self.current_model = INPAINTING_MODELS.get('b', '512-inpainting-ema.safetensors')
+        self._setup_keyboard_listener()
+
         # UI Components
         self.ws_server = None
         self.state_manager = None
@@ -206,6 +218,101 @@ class SpeechTo2DPipeline:
 
         print("    Pipeline initialized")
         print("="*70 + "\n")
+
+    def _setup_keyboard_listener(self):
+        """Set up background thread to listen for model-switching keypresses (b/n/m)."""
+        import select
+        import sys
+
+        def listen_for_keys():
+            """Background thread that listens for keypresses to switch models."""
+            while True:
+                try:
+                    # Check if there's input available (non-blocking)
+                    if select.select([sys.stdin], [], [], 0.1)[0]:
+                        key = sys.stdin.read(1).lower()
+                        if key in INPAINTING_MODELS:
+                            old_model = self.current_model
+                            self.current_model = INPAINTING_MODELS[key]
+                            print(f"\n    [MODEL SWITCHED] '{key}' pressed")
+                            print(f"    Old: {old_model}")
+                            print(f"    New: {self.current_model}\n")
+                except Exception:
+                    # Ignore errors (e.g., if stdin not available)
+                    time.sleep(0.5)
+
+        # Start keyboard listener thread
+        keyboard_thread = threading.Thread(target=listen_for_keys, daemon=True, name="KeyboardListener")
+        keyboard_thread.start()
+        print("    Keyboard listener started (press b/n/m to switch models)")
+
+    def wait_for_start_keyword(self):
+        """
+        Listen for the "START" keyword to begin interaction.
+        Camera stays OFF during this phase for thermal management.
+
+        Returns True when "START" is detected, allowing the session to proceed.
+        """
+        print("\n    [TITLE] Listening for 'START' keyword (camera OFF)...")
+
+        # Ensure Whisper model is loaded for quick transcription
+        if not self.speech_recognizer:
+            print("    Loading Whisper model...")
+            self.speech_recognizer = SpeechRecognizer(modelSize="base")
+            self.speech_recognizer.loadWhisperModel()
+
+        audio = pyaudio.PyAudio()
+
+        try:
+            stream = audio.open(
+                format=pyaudio.paInt16,
+                channels=1,
+                rate=16000,
+                input=True,
+                frames_per_buffer=8000,  # 0.5 second chunks
+                input_device_index=self.mic_index
+            )
+
+            CHUNK_DURATION = 0.5  # Check every 0.5 seconds
+            audio_buffer = []
+
+            while True:
+                try:
+                    # Read 0.5 seconds of audio
+                    audio_data = stream.read(8000, exception_on_overflow=False)
+                    audio_buffer.append(audio_data)
+
+                    # Keep only last 2 seconds of audio (4 chunks)
+                    if len(audio_buffer) > 4:
+                        audio_buffer.pop(0)
+
+                    # Transcribe the buffer to check for "START"
+                    combined_audio = b''.join(audio_buffer)
+                    text = self._transcribe_chunk(combined_audio)
+
+                    if text:
+                        text_lower = text.lower().strip()
+                        # Check for "start" keyword (allow for Whisper variations)
+                        if 'start' in text_lower:
+                            print(f"\n    'START' detected! (heard: '{text}')")
+                            stream.stop_stream()
+                            stream.close()
+                            audio.terminate()
+                            return True
+
+                except Exception as e:
+                    # Ignore audio errors, keep listening
+                    continue
+
+        except Exception as e:
+            print(f"    Error in start keyword listener: {e}")
+            return False
+
+        finally:
+            try:
+                audio.terminate()
+            except:
+                pass
 
     def _init_firebase(self):
         """Initialize Firebase storage if credentials available"""
@@ -558,11 +665,16 @@ class SpeechTo2DPipeline:
         return None, None
 
     def record_speech(self):
-        """Record speech for fixed duration with streaming transcription"""
-        print(f"\n    Recording for {RECORDING_DURATION} seconds (with streaming transcription)...")
+        """Record speech for fixed duration with INCREMENTAL transcription.
 
-        CHUNK_DURATION = 2.0  # Transcribe every 2 seconds for real-time feedback
-        MAX_DISPLAY_LENGTH = 200  # Max characters to display (prevents overflow)
+        Key improvement: Only transcribe NEW audio chunks and APPEND to accumulated text.
+        This prevents the "multiplication" bug where re-transcribing all audio produces
+        slightly different results each time.
+        """
+        print(f"\n    Recording for {RECORDING_DURATION} seconds (with incremental transcription)...")
+
+        CHUNK_DURATION = 2.0  # Transcribe every 2 seconds
+        MAX_DISPLAY_LENGTH = 200  # Max characters to display
 
         audio = pyaudio.PyAudio()
 
@@ -577,10 +689,12 @@ class SpeechTo2DPipeline:
             )
 
             all_audio_chunks = []
-            current_chunk = []
             start_time = time.time()
             chunk_start_time = time.time()
-            last_sent_text = ""  # Track last sent to avoid duplicates
+
+            # INCREMENTAL transcription state
+            last_transcribed_count = 0  # How many chunks we've already transcribed
+            accumulated_text = ""  # Growing transcription result
 
             # Ensure Whisper model is loaded
             if not self.speech_recognizer:
@@ -591,29 +705,41 @@ class SpeechTo2DPipeline:
                 try:
                     audio_data = stream.read(1024, exception_on_overflow=False)
                     all_audio_chunks.append(audio_data)
-                    current_chunk.append(audio_data)
 
                     # Emit audio level for waveform
                     audio_array = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32)
                     level = np.sqrt(np.mean(audio_array**2))
                     self._emit_audio_level(level)
 
-                    # Every CHUNK_DURATION seconds, transcribe accumulated audio for streaming feedback
+                    # Every CHUNK_DURATION seconds, transcribe only NEW audio
                     if (time.time() - chunk_start_time) >= CHUNK_DURATION:
-                        # Transcribe all audio so far (accumulated) for context
-                        accumulated_audio = b''.join(all_audio_chunks)
-                        partial_text = self._transcribe_chunk(accumulated_audio)
+                        # Get only the NEW chunks since last transcription
+                        new_chunks = all_audio_chunks[last_transcribed_count:]
 
-                        if partial_text and self.ws_server:
-                            # Truncate if too long (prevents UI overflow)
-                            if len(partial_text) > MAX_DISPLAY_LENGTH:
-                                partial_text = partial_text[:MAX_DISPLAY_LENGTH] + "..."
+                        if new_chunks:
+                            new_audio = b''.join(new_chunks)
+                            new_text = self._transcribe_chunk(new_audio)
 
-                            # Only send if different from last (prevents duplicates)
-                            if partial_text != last_sent_text:
-                                self.ws_server.emit_transcription(partial_text, is_final=False)
-                                print(f"    [Streaming] Partial: '{partial_text[:50]}...'")
-                                last_sent_text = partial_text
+                            if new_text and new_text.strip():
+                                # APPEND to accumulated text (don't replace!)
+                                clean_text = new_text.strip()
+                                if accumulated_text:
+                                    accumulated_text += " " + clean_text
+                                else:
+                                    accumulated_text = clean_text
+
+                                # Emit the growing accumulated transcription
+                                if self.ws_server:
+                                    display_text = accumulated_text
+                                    if len(display_text) > MAX_DISPLAY_LENGTH:
+                                        # Show end of text (most recent) if too long
+                                        display_text = "..." + display_text[-(MAX_DISPLAY_LENGTH - 3):]
+
+                                    self.ws_server.emit_transcription(display_text, is_final=False)
+                                    print(f"    [Incremental] '{clean_text[:30]}...' -> Total: {len(accumulated_text)} chars")
+
+                            # Mark these chunks as transcribed
+                            last_transcribed_count = len(all_audio_chunks)
 
                         chunk_start_time = time.time()
 
@@ -753,6 +879,7 @@ class SpeechTo2DPipeline:
         )
 
         try:
+            print(f"    Using inpainting model: {self.current_model}")
             result = self.comfyui_client.generate_inpainting(
                 image=frame_rgb,
                 mask=mask,
@@ -761,7 +888,8 @@ class SpeechTo2DPipeline:
                 workflow_path=self.workflow_path_2d,
                 seed=100,
                 steps=35,
-                cfg=9.5
+                cfg=9.5,
+                model=self.current_model
             )
             return result
 
@@ -1017,40 +1145,53 @@ class SpeechTo2DPipeline:
             print(f"    [Background] Error: {e}")
 
     def run_session(self):
-        """Run a single session: speech -> generate -> reveal -> (background 3D)"""
+        """Run a single session: TITLE -> START -> body detect -> speech -> generate -> reveal"""
 
-        # Wait for body (with camera duty cycling for thermal management)
-        self._emit_state('IDLE')
-        print("\n    Waiting for person (camera in standby)...")
+        # ===== TITLE STATE: Camera OFF, waiting for "START" keyword =====
+        self._emit_state('TITLE')
+        print("\n" + "="*70)
+        print("    TITLE STATE: Say 'START' to begin (camera OFF)")
+        print("="*70)
 
-        # Camera starts paused to save heat
+        # Ensure camera is OFF during title
         if self.camera_broadcaster:
             self.camera_broadcaster.pause()
 
-        CAMERA_CHECK_DURATION = 1.0   # Seconds to check for body
-        CAMERA_SLEEP_DURATION = 3.0   # Seconds to rest camera
+        # Wait for "START" keyword
+        if not self.wait_for_start_keyword():
+            print("    Failed to detect START - retrying...")
+            return False
 
+        print("\n    'START' detected! Activating camera...")
+
+        # ===== IDLE STATE: Camera ON, waiting for body (30s timeout) =====
+        self._emit_state('IDLE')
+
+        # Turn camera ON for body detection
+        if self.camera_broadcaster:
+            self.camera_broadcaster.resume()
+            time.sleep(0.5)  # Let camera warm up
+
+        BODY_DETECTION_TIMEOUT = 30.0  # Seconds to wait for body before returning to TITLE
+        body_wait_start = time.time()
         body_detected = False
+
+        print(f"    Waiting for person (30s timeout)...")
+
         while not body_detected:
-            # Resume camera briefly to check for body
-            if self.camera_broadcaster:
-                self.camera_broadcaster.resume()
-            time.sleep(0.2)  # Let camera warm up
-
-            # Check for body for a short duration
-            check_start = time.time()
-            while (time.time() - check_start) < CAMERA_CHECK_DURATION:
-                frame, body = self.get_frame()
-                if frame is not None and self.is_body_detected(body):
-                    body_detected = True
-                    break
-                time.sleep(0.05)
-
-            if not body_detected:
-                # No body - pause camera to cool down
+            # Check timeout
+            elapsed = time.time() - body_wait_start
+            if elapsed > BODY_DETECTION_TIMEOUT:
+                print(f"    No body detected in {BODY_DETECTION_TIMEOUT}s - returning to TITLE")
                 if self.camera_broadcaster:
                     self.camera_broadcaster.pause()
-                time.sleep(CAMERA_SLEEP_DURATION)
+                return False  # Will restart at TITLE
+
+            frame, body = self.get_frame()
+            if frame is not None and self.is_body_detected(body):
+                body_detected = True
+                break
+            time.sleep(0.05)
 
         # Body detected - keep camera running for session
         print("    Body detected!")
@@ -1222,16 +1363,21 @@ class SpeechTo2DPipeline:
         print("="*70)
         print("   Press Ctrl+C to exit\n")
 
-        # Initialize
+        # Initialize microphone calibration
         self.calibrate_microphone(duration=6.0)
+
+        # Initialize camera but keep it OFF (thermal management)
         self.initialize_camera()
+        if self.camera_broadcaster:
+            self.camera_broadcaster.pause()
+            print("    Camera initialized but paused (thermal management)")
 
         # Track consecutive camera failures for exponential backoff
         camera_restart_count = 0
         max_camera_restarts = 3
         CAMERA_COOLDOWN = 30  # Seconds to wait after camera crash before restart
 
-        # Main loop
+        # Main loop - each session starts at TITLE state
         while True:
             try:
                 # Check camera health before each session
@@ -1251,14 +1397,18 @@ class SpeechTo2DPipeline:
                     if self.restart_camera():
                         camera_restart_count = 0
                         print("    Camera recovered!")
+                        # Keep camera paused after recovery
+                        if self.camera_broadcaster:
+                            self.camera_broadcaster.pause()
                     else:
                         camera_restart_count += 1
                         print(f"    Restart failed ({camera_restart_count}/{max_camera_restarts})")
                         continue
 
+                # Run session (starts at TITLE, returns after reveal or timeout)
                 self.run_session()
-                print("\n    Ready for next user!\n")
-                time.sleep(4)
+                # Brief pause before next cycle
+                time.sleep(2)
 
             except KeyboardInterrupt:
                 raise

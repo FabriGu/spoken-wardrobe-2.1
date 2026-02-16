@@ -413,12 +413,27 @@ export class ThreeScene {
                     console.log('[ThreeScene] Skeletal animation enabled');
                     console.log('[ThreeScene] Weight transfer stats:', this.weightTransfer.getStats());
 
-                    // DEBUG: Add visible bounding box to verify mesh position
+                    // DEBUG: Add visualizations when debug mode enabled
                     if (this.debugMode) {
+                        // Add visible bounding box to verify mesh position
                         const debugBox = new THREE.Box3().setFromObject(this.skinnedClothingMesh);
                         const debugHelper = new THREE.Box3Helper(debugBox, 0x00ff00);
                         this.scene.add(debugHelper);
                         console.log('[ThreeScene] DEBUG: Added bounding box helper (green)');
+
+                        // Add skeleton helper to visualize bones
+                        const skeletonHelper = new THREE.SkeletonHelper(this.bodyMesh);
+                        skeletonHelper.visible = true;
+                        this.scene.add(skeletonHelper);
+                        this.skeletonHelper = skeletonHelper;
+                        console.log('[ThreeScene] DEBUG: Added skeleton helper');
+
+                        // Log detailed weight information
+                        this.weightTransfer.logWeightDebugInfo(this.skinnedClothingMesh, this.skeleton);
+
+                        // Optionally apply weight visualization material
+                        // Uncomment to see weight painting instead of actual texture:
+                        // this.skinnedClothingMesh.material = this.weightTransfer.createWeightVisualizationMaterial(this.skinnedClothingMesh);
                     }
 
                 } catch (weightError) {
