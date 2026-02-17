@@ -126,6 +126,14 @@ export class ThreeScene {
         // Start animation loop
         this.animate();
 
+        // DEBUG: Add a visible test sphere at camera target to verify rendering
+        const testGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+        const testMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        this.debugSphere = new THREE.Mesh(testGeometry, testMaterial);
+        this.debugSphere.position.set(0, 0.8, 0); // At camera lookAt target
+        this.scene.add(this.debugSphere);
+        console.log('[ThreeScene] DEBUG: Added red test sphere at (0, 0.8, 0)');
+
         // Pre-load the rigged body mesh
         this.loadBodyMesh();
 
@@ -413,27 +421,12 @@ export class ThreeScene {
                     console.log('[ThreeScene] Skeletal animation enabled');
                     console.log('[ThreeScene] Weight transfer stats:', this.weightTransfer.getStats());
 
-                    // DEBUG: Add visualizations when debug mode enabled
+                    // DEBUG: Add visible bounding box to verify mesh position
                     if (this.debugMode) {
-                        // Add visible bounding box to verify mesh position
                         const debugBox = new THREE.Box3().setFromObject(this.skinnedClothingMesh);
                         const debugHelper = new THREE.Box3Helper(debugBox, 0x00ff00);
                         this.scene.add(debugHelper);
                         console.log('[ThreeScene] DEBUG: Added bounding box helper (green)');
-
-                        // Add skeleton helper to visualize bones
-                        const skeletonHelper = new THREE.SkeletonHelper(this.bodyMesh);
-                        skeletonHelper.visible = true;
-                        this.scene.add(skeletonHelper);
-                        this.skeletonHelper = skeletonHelper;
-                        console.log('[ThreeScene] DEBUG: Added skeleton helper');
-
-                        // Log detailed weight information
-                        this.weightTransfer.logWeightDebugInfo(this.skinnedClothingMesh, this.skeleton);
-
-                        // Optionally apply weight visualization material
-                        // Uncomment to see weight painting instead of actual texture:
-                        // this.skinnedClothingMesh.material = this.weightTransfer.createWeightVisualizationMaterial(this.skinnedClothingMesh);
                     }
 
                 } catch (weightError) {

@@ -110,11 +110,9 @@ export class SkinWeightTransfer {
         this._applyWeightsToGeometry(clothingMesh.geometry, targetWeights);
 
         // 8. Convert to SkinnedMesh and bind to body's skeleton
-        // IMPORTANT: Do NOT clone skeleton - we need clothing to share the same
-        // skeleton instance that SkeletalAnimator will update
         const skinnedClothing = this._createSkinnedMesh(
             clothingMesh,
-            bodyMesh.skeleton  // Share skeleton reference (not clone!)
+            bodyMesh.skeleton.clone()  // Clone skeleton for independent control
         );
 
         // 9. Record performance stats
@@ -558,21 +556,13 @@ export class SkinWeightTransfer {
         // Copy name and other properties
         skinnedClothing.name = clothingMesh.name || 'rigged_clothing';
 
-        // IMPORTANT: Do NOT add skeleton.bones[0] as child - that would remove it
-        // from the body mesh hierarchy! Instead, just bind the skeleton.
-        // The skeleton bones remain in the body mesh scene graph, and the
-        // clothing mesh will reference them via the skeleton binding.
+        // Add root bone to mesh before binding
+        skinnedClothing.add(skeleton.bones[0]);
 
-        // BIND - this calculates inverse bind matrices from current bone transforms
-        // The skeleton's boneInverses will be computed from each bone's matrixWorld
+        // BIND ONCE - this calculates inverse bind matrices
         skinnedClothing.bind(skeleton);
 
-        // Enable frustum culling fix for skinned meshes
-        skinnedClothing.frustumCulled = false;
-
         console.log(`[SkinWeightTransfer] Created SkinnedMesh with ${skeleton.bones.length} bones`);
-        console.log(`[SkinWeightTransfer] Skeleton bone matrices valid:`,
-            skeleton.bones.every(b => b.matrixWorld.elements.some(e => e !== 0)));
 
         return skinnedClothing;
     }
@@ -631,125 +621,5 @@ export class SkinWeightTransfer {
                 this.stats.verticesProcessed / (this.stats.transferTime / 1000)
             )
         };
-    }
-
-    /**
-     * Create a debug material that visualizes skin weights by bone.
-     * Each bone gets a unique color, and vertices show their dominant bone influence.
-     *
-     * @param {THREE.SkinnedMesh} skinnedMesh - The skinned mesh to visualize
-     * @returns {THREE.MeshBasicMaterial} - Material with vertex colors showing weights
-     */
-    createWeightVisualizationMaterial(skinnedMesh) {
-        const geometry = skinnedMesh.geometry;
-        const skinIndices = geometry.attributes.skinIndex;
-        const skinWeights = geometry.attributes.skinWeight;
-        const numVertices = geometry.attributes.position.count;
-
-        // Generate distinct colors for each bone
-        const boneColors = [
-            new THREE.Color(0xff0000), // Red - bone 0 (root/hips)
-            new THREE.Color(0x00ff00), // Green - bone 1 (spine)
-            new THREE.Color(0x0000ff), // Blue - bone 2
-            new THREE.Color(0xffff00), // Yellow - bone 3
-            new THREE.Color(0xff00ff), // Magenta - bone 4
-            new THREE.Color(0x00ffff), // Cyan - bone 5
-            new THREE.Color(0xff8000), // Orange - bone 6
-            new THREE.Color(0x8000ff), // Purple - bone 7
-            new THREE.Color(0x00ff80), // Teal - bone 8
-            new THREE.Color(0xffffff), // White - fallback
-        ];
-
-        // Create vertex colors array
-        const colors = new Float32Array(numVertices * 3);
-
-        for (let i = 0; i < numVertices; i++) {
-            // Find dominant bone (highest weight)
-            let maxWeight = 0;
-            let dominantBone = 0;
-
-            for (let j = 0; j < 4; j++) {
-                const weight = skinWeights.getX(i * 4 + j);
-                if (weight > maxWeight) {
-                    maxWeight = weight;
-                    dominantBone = skinIndices.getX(i * 4 + j);
-                }
-            }
-
-            // Get color for dominant bone
-            const color = boneColors[dominantBone % boneColors.length];
-
-            // Blend with gray based on weight strength (weaker = more gray)
-            const blendedColor = new THREE.Color().lerpColors(
-                new THREE.Color(0x808080),
-                color,
-                maxWeight
-            );
-
-            colors[i * 3] = blendedColor.r;
-            colors[i * 3 + 1] = blendedColor.g;
-            colors[i * 3 + 2] = blendedColor.b;
-        }
-
-        // Add vertex colors to geometry
-        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-        // Return material that uses vertex colors
-        return new THREE.MeshBasicMaterial({
-            vertexColors: true,
-            side: THREE.DoubleSide
-        });
-    }
-
-    /**
-     * Log detailed weight information for debugging
-     */
-    logWeightDebugInfo(skinnedMesh, skeleton) {
-        const geometry = skinnedMesh.geometry;
-        const skinIndices = geometry.attributes.skinIndex;
-        const skinWeights = geometry.attributes.skinWeight;
-        const numVertices = geometry.attributes.position.count;
-
-        console.log('[SkinWeightTransfer DEBUG] Weight distribution:');
-
-        // Count vertices per dominant bone
-        const boneCounts = {};
-        let totalWeight = 0;
-        let zeroWeightVertices = 0;
-
-        for (let i = 0; i < numVertices; i++) {
-            let vertexTotalWeight = 0;
-            let maxWeight = 0;
-            let dominantBone = 0;
-
-            for (let j = 0; j < 4; j++) {
-                const weight = skinWeights.getX(i * 4 + j);
-                const boneIdx = skinIndices.getX(i * 4 + j);
-                vertexTotalWeight += weight;
-
-                if (weight > maxWeight) {
-                    maxWeight = weight;
-                    dominantBone = boneIdx;
-                }
-            }
-
-            if (vertexTotalWeight < 0.001) {
-                zeroWeightVertices++;
-            }
-
-            totalWeight += vertexTotalWeight;
-            boneCounts[dominantBone] = (boneCounts[dominantBone] || 0) + 1;
-        }
-
-        console.log(`  Total vertices: ${numVertices}`);
-        console.log(`  Average weight sum per vertex: ${(totalWeight / numVertices).toFixed(4)}`);
-        console.log(`  Vertices with ~0 weight: ${zeroWeightVertices}`);
-        console.log(`  Bone distribution:`);
-
-        for (const [boneIdx, count] of Object.entries(boneCounts)) {
-            const boneName = skeleton.bones[boneIdx]?.name || `bone_${boneIdx}`;
-            const pct = ((count / numVertices) * 100).toFixed(1);
-            console.log(`    ${boneName}: ${count} vertices (${pct}%)`);
-        }
     }
 }
