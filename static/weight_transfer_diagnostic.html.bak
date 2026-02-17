@@ -849,9 +849,8 @@
                     // Color by dominant bone
                     let maxW = 0, maxB = 0;
                     for (let k = 0; k < 4; k++) {
-                        // FIX: Use direct array access instead of getX(i*4+k)
-                        const w = bodySkinWeights.array[i * 4 + k];
-                        const b = bodySkinIndices.array[i * 4 + k];
+                        const w = bodySkinWeights.getX(i * 4 + k);
+                        const b = bodySkinIndices.getX(i * 4 + k);
                         if (w > maxW) { maxW = w; maxB = b; }
                     }
                     const color = boneColors[maxB % 10] || [0.5,0.5,0.5];
@@ -866,26 +865,6 @@
                 state.scene.add(bodyPoints);
                 state.bodyPoints = bodyPoints;
                 log('Added body vertex visualization (colored points)');
-
-                // Diagnostic logging: Analyze body mesh bone distribution
-                log('=== Body Mesh Skinning Data ===');
-                log(`Total vertices: ${bodyPositions.count}`);
-                const bodyboneCounts = {};
-                for (let i = 0; i < bodyPositions.count; i++) {
-                    let maxW = 0, maxB = 0;
-                    for (let k = 0; k < 4; k++) {
-                        const w = bodySkinWeights.array[i * 4 + k];
-                        const b = bodySkinIndices.array[i * 4 + k];
-                        if (w > maxW) { maxW = w; maxB = b; }
-                    }
-                    bodyboneCounts[maxB] = (bodyboneCounts[maxB] || 0) + 1;
-                }
-                log('Body mesh bone distribution:');
-                Object.entries(bodyboneCounts).sort((a, b) => b[1] - a[1]).forEach(([boneIdx, count]) => {
-                    const boneName = state.skeleton.bones[boneIdx]?.name || `bone_${boneIdx}`;
-                    const pct = (count / bodyPositions.count * 100).toFixed(1);
-                    log(`  ${boneName}: ${count} verts (${pct}%)`);
-                });
 
                 // Build BVH for body mesh to find closest point on surface (not just vertices)
                 log('Building BVH for body mesh...');
@@ -944,36 +923,25 @@
                     // Calculate barycentric coordinates of closest point on triangle
                     const bary = getBarycentric(target.point, v0, v1, v2);
 
-                    // FIX: Proper barycentric interpolation with bone influence aggregation
-                    // Collect bone influences from all 3 triangle vertices
-                    const boneInfluences = new Map();
-
-                    for (const [vertIdx, baryWeight] of [[i0, bary.u], [i1, bary.v], [i2, bary.w]]) {
-                        for (let k = 0; k < 4; k++) {
-                            const boneIdx = bodySkinIndices.array[vertIdx * 4 + k];
-                            const weight = bodySkinWeights.array[vertIdx * 4 + k] * baryWeight;
-
-                            if (weight > 0.001) {
-                                boneInfluences.set(boneIdx, (boneInfluences.get(boneIdx) || 0) + weight);
-                            }
-                        }
-                    }
-
-                    // Sort by weight and take top 4
-                    const sorted = Array.from(boneInfluences.entries())
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 4);
-
-                    // Normalize so weights sum to 1.0
-                    const totalWeight = sorted.reduce((sum, [_, w]) => sum + w, 0);
-
-                    for (let j = 0; j < 4; j++) {
-                        if (j < sorted.length && totalWeight > 0) {
-                            skinIndices[i * 4 + j] = sorted[j][0];
-                            skinWeights[i * 4 + j] = sorted[j][1] / totalWeight;
+                    // Interpolate weights from triangle vertices using barycentric coordinates
+                    for (let k = 0; k < 4; k++) {
+                        const w0 = bodySkinWeights.getX(i0 * 4 + k);
+                        const w1 = bodySkinWeights.getX(i1 * 4 + k);
+                        const w2 = bodySkinWeights.getX(i2 * 4 + k);
+                        const i0b = bodySkinIndices.getX(i0 * 4 + k);
+                        const i1b = bodySkinIndices.getX(i1 * 4 + k);
+                        const i2b = bodySkinIndices.getX(i2 * 4 + k);
+                        
+                        // Use bone from vertex with highest barycentric weight
+                        if (bary.u >= bary.v && bary.u >= bary.w) {
+                            skinIndices[i * 4 + k] = i0b;
+                            skinWeights[i * 4 + k] = w0;
+                        } else if (bary.v >= bary.u && bary.v >= bary.w) {
+                            skinIndices[i * 4 + k] = i1b;
+                            skinWeights[i * 4 + k] = w1;
                         } else {
-                            skinIndices[i * 4 + j] = 0;
-                            skinWeights[i * 4 + j] = 0;
+                            skinIndices[i * 4 + k] = i2b;
+                            skinWeights[i * 4 + k] = w2;
                         }
                     }
 
@@ -1060,10 +1028,6 @@
                 // Hide original clothing
                 state.clothingMesh.visible = false;
 
-                // Add summary logging
-                log('=== Weight Transfer Results ===');
-                log(`Vertices with weight: ${matchedCount} (${(matchedCount / numVerts * 100).toFixed(1)}%)`);
-                log(`Vertices with zero weight: ${zeroWeightCount} (${(zeroWeightCount / numVerts * 100).toFixed(1)}%)`);
                 log('Weight transfer complete!', 'success');
                 updateInfo();
 
@@ -1112,9 +1076,8 @@
                 let hasWeight = false;
 
                 for (let j = 0; j < 4; j++) {
-                    // FIX: Use direct array access instead of getX(i*4+j)
-                    const weight = skinWeights.array[i * 4 + j];
-                    const boneIdx = skinIndices.array[i * 4 + j];
+                    const weight = skinWeights.getX(i * 4 + j);
+                    const boneIdx = skinIndices.getX(i * 4 + j);
                     totalWeight += weight;
 
                     if (weight > 0.001) {
@@ -1225,11 +1188,6 @@
             // Reset all
             document.querySelectorAll('.viz-btn').forEach(btn => btn.classList.remove('active'));
 
-            // Hide skeleton helper when switching modes (will show again if bones mode)
-            if (state.skeletonHelper) {
-                state.skeletonHelper.visible = false;
-            }
-
             if (mode === 'weights') {
                 document.getElementById('btn-weights').classList.add('active');
                 applyWeightVisualization();
@@ -1240,9 +1198,6 @@
                 document.getElementById('btn-bones').classList.add('active');
                 if (state.skeletonHelper) {
                     state.skeletonHelper.visible = true;
-                    log('Skeleton visualization enabled');
-                } else {
-                    log('No skeleton helper available. Load body mesh first.', 'error');
                 }
             } else if (mode === 'heatmap') {
                 document.getElementById('btn-heatmap').classList.add('active');

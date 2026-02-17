@@ -495,9 +495,8 @@ export class SkinWeightTransfer {
 
         for (const [vertIdx, baryWeight] of [[i0, u], [i1, v], [i2, w]]) {
             for (let j = 0; j < 4; j++) {
-                // FIX: Use direct array access instead of getX(vertIdx*4+j)
-                const boneIdx = skinIndices.array[vertIdx * 4 + j];
-                const weight = skinWeights.array[vertIdx * 4 + j] * baryWeight;
+                const boneIdx = skinIndices.getX(vertIdx * 4 + j);
+                const weight = skinWeights.getX(vertIdx * 4 + j) * baryWeight;
 
                 if (weight > 0.001) {
                     boneInfluences.set(boneIdx, (boneInfluences.get(boneIdx) || 0) + weight);
