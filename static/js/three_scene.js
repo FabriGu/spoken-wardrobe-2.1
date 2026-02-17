@@ -15,6 +15,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { SkinWeightTransfer } from './SkinWeightTransfer.js';
 import { SkeletalAnimator } from './SkeletalAnimator.js';
+import { MeshAligner } from './MeshAligner.js';
 
 export class ThreeScene {
     constructor(canvas) {
@@ -364,14 +365,17 @@ export class ThreeScene {
                 try {
                     console.log('[ThreeScene] Attempting weight transfer for skeletal animation...');
 
-                    // Get body mesh bounds to align clothing properly
-                    const bodyBox = new THREE.Box3().setFromObject(this.bodyMesh);
-                    const bodyCenter = bodyBox.getCenter(new THREE.Vector3());
+                    // STEP 1: Align clothing to body BEFORE weight transfer
+                    // This is critical - otherwise vertices are in different coordinate spaces
+                    console.log('[ThreeScene] Aligning clothing to body...');
+                    const alignment = MeshAligner.calculateAlignment(this.bodyMesh, loadedMesh);
+                    MeshAligner.applyAlignment(loadedMesh, alignment);
+                    console.log('[ThreeScene] Clothing aligned:', {
+                        scale: loadedMesh.scale.x,
+                        position: loadedMesh.position.toArray()
+                    });
 
-                    console.log('[ThreeScene] Body mesh center:', bodyCenter.toArray());
-                    console.log('[ThreeScene] Clothing mesh center:', center.toArray());
-
-                    // Transfer weights from body to clothing
+                    // STEP 2: Transfer weights from body to aligned clothing
                     this.skinnedClothingMesh = this.weightTransfer.transfer(
                         this.bodyMesh,
                         loadedMesh
@@ -381,14 +385,9 @@ export class ThreeScene {
                     this.skinnedClothingMesh.material = loadedMesh.material.clone();
                     this.skinnedClothingMesh.material.side = THREE.DoubleSide;
 
-                    // Position skinned mesh to align with body mesh
-                    // The clothing mesh center should align with the body mesh center
-                    // Offset = bodyCenter - (clothingCenter * scaleFactor)
-                    const clothingCenterScaled = center.clone().multiplyScalar(scaleFactor);
-                    const positionOffset = bodyCenter.clone().sub(clothingCenterScaled);
-
-                    this.skinnedClothingMesh.position.copy(positionOffset);
-                    this.skinnedClothingMesh.scale.setScalar(scaleFactor);
+                    // Position skinned mesh at aligned position
+                    this.skinnedClothingMesh.position.copy(loadedMesh.position);
+                    this.skinnedClothingMesh.scale.copy(loadedMesh.scale);
 
                     console.log('[ThreeScene] Position offset for alignment:', positionOffset.toArray());
 
