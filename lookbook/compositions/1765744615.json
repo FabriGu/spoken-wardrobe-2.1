@@ -1,0 +1,158 @@
+{
+  "id": "1765744615",
+  "transcription": "So I want to wear, I want to wear, say something. I want to dress like Kpop. Kpop theme in hundreds.",
+  "keywords": [
+    "dress",
+    "wear",
+    "kpop"
+  ],
+  "background": {
+    "color": "#FF6347"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765744615/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765744615/original_frame.png",
+      "target_2d": {
+        "x": 0.13155934129103264,
+        "y": 0.6505932685218603
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": -15,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765744615/generated_clothing.png",
+      "target_2d": {
+        "x": 0.2810388519643059,
+        "y": 0.19206340378637574
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -15
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765744615/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "DRESS",
+      "target_2d": {
+        "x": 0.4361186361629853,
+        "y": 0.702218409103521
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.10994003234237382,
+      "color": "#8b5cf6",
+      "rotation": 15
+    },
+    {
+      "type": "text_3d",
+      "text": "WEAR",
+      "target_2d": {
+        "x": 0.4264498314095041,
+        "y": 0.734831051187278
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.11533238752993336,
+      "color": "#FFFFFF",
+      "rotation": 45
+    },
+    {
+      "type": "text_3d",
+      "text": "KPOP",
+      "target_2d": {
+        "x": 0.7783566913902635,
+        "y": 0.6258392127380125
+      },
+      "depth_range": {
+        "min": 10,
+        "max": 14
+      },
+      "scale": 0.14764634524449352,
+      "color": "#FFFFFF",
+      "rotation": 0
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.5889239181628296,
+        "y": 0.14310776091769056
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.16271304077329604,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.37872891604431425,
+        "y": 0.8276670445404217
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.30715990393995524,
+      "opacity": 0.25,
+      "color": "#ec4899",
+      "color2": "#000000"
+    }
+  ]
+}

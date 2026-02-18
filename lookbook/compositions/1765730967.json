@@ -1,0 +1,161 @@
+{
+  "id": "1765730967",
+  "transcription": "I have to plug in the microphone. Winter? Winter? Oh, winter? Just winter? Snowboarding? Snowboarding? Okay.",
+  "keywords": [
+    "winter",
+    "snowboarding"
+  ],
+  "background": {
+    "color": "#32CD32"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765730967/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765730967/original_frame.png",
+      "target_2d": {
+        "x": 0.37430956463336595,
+        "y": 0.11170326234424216
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 135,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765730967/generated_clothing.png",
+      "target_2d": {
+        "x": 0.20488547448077182,
+        "y": 0.14475703324480366
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 45
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765730967/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "WINTER",
+      "target_2d": {
+        "x": 0.29590631048462845,
+        "y": 0.24192371511993996
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.08716932259645326,
+      "color": "#FFFFFF",
+      "rotation": 30
+    },
+    {
+      "type": "text_3d",
+      "text": "SNOWBOARDING",
+      "target_2d": {
+        "x": 0.4546905510144611,
+        "y": 0.8165953296890827
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.09042771352411547,
+      "color": "#FF4500",
+      "rotation": 180
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.6937413893556517,
+        "y": 0.41462235795883406
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.23466400354323858,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.30796168274831826,
+        "y": 0.29339947428052937
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.20280692359485306,
+      "opacity": 0.25,
+      "color": "#FF1493",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.3880539482566158,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#00FF7F",
+      "angle": 30,
+      "rotation": 30
+    }
+  ]
+}

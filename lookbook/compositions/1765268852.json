@@ -1,0 +1,158 @@
+{
+  "id": "1765268852",
+  "transcription": "get a red t-shirt please. I think that's a really nice red t-shirt.",
+  "keywords": [
+    "red",
+    "nice",
+    "t-shirt"
+  ],
+  "background": {
+    "color": "#8b5cf6"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765268852/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765268852/original_frame.png",
+      "target_2d": {
+        "x": 0.21687424623804802,
+        "y": 0.318708765077921
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": -30,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765268852/generated_clothing.png",
+      "target_2d": {
+        "x": 0.7499414152088238,
+        "y": 0.14897167099395353
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -90
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765268852/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "RED",
+      "target_2d": {
+        "x": 0.2542254297958107,
+        "y": 0.4930101013877439
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.09665020371570777,
+      "color": "#FF69B4",
+      "rotation": -45
+    },
+    {
+      "type": "text_3d",
+      "text": "NICE",
+      "target_2d": {
+        "x": 0.780782190379766,
+        "y": 0.5728447955032394
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.14790278146168095,
+      "color": "#FFFFFF",
+      "rotation": 30
+    },
+    {
+      "type": "text_3d",
+      "text": "T-SHIRT",
+      "target_2d": {
+        "x": 0.2700852155622376,
+        "y": 0.617284278239097
+      },
+      "depth_range": {
+        "min": 10,
+        "max": 14
+      },
+      "scale": 0.10747825269910599,
+      "color": "#FFFFFF",
+      "rotation": 135
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.4556863482358652,
+        "y": 0.11763112887776464
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2776264949683735,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.1283404659129838,
+        "y": 0.47730625190553533
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.34613636589971386,
+      "opacity": 0.25,
+      "color": "#ec4899",
+      "color2": "#000000"
+    }
+  ]
+}

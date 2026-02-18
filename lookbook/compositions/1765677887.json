@@ -1,0 +1,109 @@
+{
+  "id": "1765677887",
+  "transcription": "That's how it is.",
+  "keywords": [],
+  "background": {
+    "color": "#8b5cf6"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765677887/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765677887/original_frame.png",
+      "target_2d": {
+        "x": 0.6300555437266323,
+        "y": 0.7020976674703964
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": -30,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765677887/generated_clothing.png",
+      "target_2d": {
+        "x": 0.8589040213762589,
+        "y": 0.4254463212653349
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 0
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765677887/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.6358971933892859,
+        "y": 0.7361397701971313
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.20273667280038143,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.8761444130739003,
+        "y": 0.7206010952429013
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.3541532808483169,
+      "opacity": 0.25,
+      "color": "#1E90FF",
+      "color2": "#000000"
+    }
+  ]
+}

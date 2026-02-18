@@ -1,0 +1,126 @@
+{
+  "id": "1765745617",
+  "transcription": "So now you have to like speak your vision. Bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bung",
+  "keywords": [
+    "bunga"
+  ],
+  "background": {
+    "color": "#FF69B4"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765745617/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765745617/original_frame.png",
+      "target_2d": {
+        "x": 0.3000961719196492,
+        "y": 0.8155476719874692
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": -15,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765745617/generated_clothing.png",
+      "target_2d": {
+        "x": 0.7141544320978515,
+        "y": 0.8315386919522849
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -45
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765745617/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "BUNGA",
+      "target_2d": {
+        "x": 0.5321780427060515,
+        "y": 0.8769460939336637
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.14973409210567484,
+      "color": "#1E90FF",
+      "rotation": -45
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.2590744255906359,
+        "y": 0.7191071435179709
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2581919831299595,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.8885896888183369,
+        "y": 0.4082576431109739
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.3783379593437377,
+      "opacity": 0.25,
+      "color": "#FF1493",
+      "color2": "#000000"
+    }
+  ]
+}

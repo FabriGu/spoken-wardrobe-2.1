@@ -1,0 +1,145 @@
+{
+  "id": "1765588013",
+  "transcription": "I could start a lot. I'm like right at the right beach. Make him a clown, make him a clown.",
+  "keywords": [
+    "clown"
+  ],
+  "background": {
+    "color": "#FF69B4"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765588013/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765588013/original_frame.png",
+      "target_2d": {
+        "x": 0.17583955642233765,
+        "y": 0.8075945045597093
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 30,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765588013/generated_clothing.png",
+      "target_2d": {
+        "x": 0.6197202089341863,
+        "y": 0.752042714673592
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -30
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765588013/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "CLOWN",
+      "target_2d": {
+        "x": 0.42880611875318075,
+        "y": 0.7418845700745206
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.0946400328517796,
+      "color": "#FFFFFF",
+      "rotation": -90
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.7461596988060577,
+        "y": 0.27037290215341364
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.28030089075439796,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.7190937057803853,
+        "y": 0.5975979360661382
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.20485290626910768,
+      "opacity": 0.25,
+      "color": "#00CED1",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.2432952895774389,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#00FF7F",
+      "angle": 60,
+      "rotation": 60
+    }
+  ]
+}

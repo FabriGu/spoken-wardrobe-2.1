@@ -1,0 +1,161 @@
+{
+  "id": "1764637901",
+  "transcription": "The red t-shirt with the extra large red on top, please. Yes.",
+  "keywords": [
+    "red",
+    "t-shirt"
+  ],
+  "background": {
+    "color": "#00FF7F"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1764637901/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1764637901/original_frame.png",
+      "target_2d": {
+        "x": 0.12817859857828467,
+        "y": 0.6542759965405561
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 180,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1764637901/generated_clothing.png",
+      "target_2d": {
+        "x": 0.44439502474048265,
+        "y": 0.23353469973223268
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -45
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1764637901/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "RED",
+      "target_2d": {
+        "x": 0.2746709907456082,
+        "y": 0.1831915069376021
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.13340190094557092,
+      "color": "#FFFFFF",
+      "rotation": -90
+    },
+    {
+      "type": "text_3d",
+      "text": "T-SHIRT",
+      "target_2d": {
+        "x": 0.2824047023263796,
+        "y": 0.8244504162603767
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.09774782758704002,
+      "color": "#FFFFFF",
+      "rotation": 180
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.220681200084125,
+        "y": 0.3959691202179796
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.23378836031125866,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.8961647242913834,
+        "y": 0.8762704955561089
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.24826574917114075,
+      "opacity": 0.25,
+      "color": "#8b5cf6",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.38213042307924583,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#FFD700",
+      "angle": -30,
+      "rotation": -30
+    }
+  ]
+}

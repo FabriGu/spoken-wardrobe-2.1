@@ -1,0 +1,178 @@
+{
+  "id": "1765733993",
+  "transcription": "Oh, Jesus. Oh, Jesus. Rick and Morty. Rick and Morty. Rick and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Morty. Morty and Mort",
+  "keywords": [
+    "morty",
+    "and",
+    "rick",
+    "jesus"
+  ],
+  "background": {
+    "color": "#FFD700"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765733993/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765733993/original_frame.png",
+      "target_2d": {
+        "x": 0.3563818580779786,
+        "y": 0.7903152041072591
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 30,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765733993/generated_clothing.png",
+      "target_2d": {
+        "x": 0.7754581067254702,
+        "y": 0.8979935010484092
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -90
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765733993/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "MORTY",
+      "target_2d": {
+        "x": 0.8463240400013455,
+        "y": 0.15899125935779443
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.13123327966999776,
+      "color": "#FFFFFF",
+      "rotation": -90
+    },
+    {
+      "type": "text_3d",
+      "text": "AND",
+      "target_2d": {
+        "x": 0.7380813328528538,
+        "y": 0.211686258170396
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.09348918633668762,
+      "color": "#FFFFFF",
+      "rotation": 135
+    },
+    {
+      "type": "text_3d",
+      "text": "RICK",
+      "target_2d": {
+        "x": 0.18761780475909495,
+        "y": 0.7485701327160338
+      },
+      "depth_range": {
+        "min": 10,
+        "max": 14
+      },
+      "scale": 0.12127310972948432,
+      "color": "#FFFFFF",
+      "rotation": 0
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.8212655822758852,
+        "y": 0.4157882213907592
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2511131839996372,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.1364781652969149,
+        "y": 0.22202239447823013
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.21562401388205688,
+      "opacity": 0.25,
+      "color": "#FFD700",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.3641942710763759,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#00FF7F",
+      "angle": 30,
+      "rotation": 30
+    }
+  ]
+}

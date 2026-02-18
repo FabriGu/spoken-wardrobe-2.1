@@ -1,0 +1,145 @@
+{
+  "id": "1765599995",
+  "transcription": "I literally finished a month ago, because I lied to myself saying, oh yeah, I just want to do this cute little thing and I'm not going to",
+  "keywords": [
+    "cute"
+  ],
+  "background": {
+    "color": "#FF4500"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765599995/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765599995/original_frame.png",
+      "target_2d": {
+        "x": 0.540322926257336,
+        "y": 0.8822672090535186
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 90,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765599995/generated_clothing.png",
+      "target_2d": {
+        "x": 0.23716315891514433,
+        "y": 0.4386184588966059
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 15
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765599995/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "CUTE",
+      "target_2d": {
+        "x": 0.8146908824093289,
+        "y": 0.5863244409516688
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.08233901989090468,
+      "color": "#FFFFFF",
+      "rotation": -15
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.22818398334013903,
+        "y": 0.11871500225893028
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.17928576104095437,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.19901522845733144,
+        "y": 0.26309030517736565
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.34425590127775885,
+      "opacity": 0.25,
+      "color": "#1E90FF",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.2817942747286126,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#8b5cf6",
+      "angle": -45,
+      "rotation": -45
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "id": "1765733175",
+  "transcription": "I'm going to go to the next room.",
+  "keywords": [],
+  "background": {
+    "color": "#FF1493"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765733175/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765733175/original_frame.png",
+      "target_2d": {
+        "x": 0.15038897067764326,
+        "y": 0.7269644291419709
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 45,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765733175/generated_clothing.png",
+      "target_2d": {
+        "x": 0.8226368775112538,
+        "y": 0.10217755957164217
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 90
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765733175/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.40515389262462354,
+        "y": 0.14052495341067175
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2935587774003632,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.5348472501717425,
+        "y": 0.17917247701274192
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.26317322104133073,
+      "opacity": 0.25,
+      "color": "#9400D3",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.21571361077338716,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#FF4500",
+      "angle": -30,
+      "rotation": -30
+    }
+  ]
+}

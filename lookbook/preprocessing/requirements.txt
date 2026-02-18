@@ -1,0 +1,13 @@
+# Lookbook preprocessing dependencies
+
+# NLP for keyword extraction (optional but recommended)
+spacy>=3.0
+
+# HTTP requests for found imagery
+requests>=2.28
+
+# Image processing (for future enhancements)
+Pillow>=9.0
+
+# Note: After installing, download the spaCy English model:
+#   python -m spacy download en_core_web_sm

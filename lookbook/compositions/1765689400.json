@@ -1,0 +1,145 @@
+{
+  "id": "1765689400",
+  "transcription": "I'm like a Marlin. I'm like a Marlin. And here, like this TV just hangs out here, doesn't it? Yeah. Nobody does anything about that. Yeah. It's here for ITP Camp. Yeah.",
+  "keywords": [
+    "marlin"
+  ],
+  "background": {
+    "color": "#FF4500"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765689400/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765689400/original_frame.png",
+      "target_2d": {
+        "x": 0.2746693806760039,
+        "y": 0.15557484386455905
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765689400/generated_clothing.png",
+      "target_2d": {
+        "x": 0.7160034410919882,
+        "y": 0.28866834372660344
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -15
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765689400/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "MARLIN",
+      "target_2d": {
+        "x": 0.14480909431600308,
+        "y": 0.6046476632507441
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.13615423920137404,
+      "color": "#00FF7F",
+      "rotation": 90
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.6611386699244075,
+        "y": 0.25444287968101
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.18187552262245188,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.21074626700782187,
+        "y": 0.3431217860773552
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.21208873509842005,
+      "opacity": 0.25,
+      "color": "#ec4899",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.3694540339848621,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#8b5cf6",
+      "angle": 45,
+      "rotation": 45
+    }
+  ]
+}

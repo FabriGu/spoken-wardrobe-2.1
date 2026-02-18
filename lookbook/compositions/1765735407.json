@@ -1,0 +1,109 @@
+{
+  "id": "1765735407",
+  "transcription": "the article. You have to say we won. We want to wear. Go on, go on. Ask me code.",
+  "keywords": [],
+  "background": {
+    "color": "#00FF7F"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765735407/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735407/original_frame.png",
+      "target_2d": {
+        "x": 0.3021188874107999,
+        "y": 0.24648651070597577
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 135,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735407/generated_clothing.png",
+      "target_2d": {
+        "x": 0.776853085806028,
+        "y": 0.5429088848284204
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 15
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735407/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.16084659366874138,
+        "y": 0.11628444338031407
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.21917124298013757,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.3736993037642632,
+        "y": 0.7860125144394269
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.2856769822473502,
+      "opacity": 0.25,
+      "color": "#9400D3",
+      "color2": "#000000"
+    }
+  ]
+}

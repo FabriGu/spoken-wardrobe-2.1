@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamwear Lookbook</title>
+
+    <!-- Three.js from CDN -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Controls overlay */
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        #controls:hover {
+            opacity: 1;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn.primary {
+            background: rgba(139, 92, 246, 0.5);
+            border-color: rgba(139, 92, 246, 0.8);
+        }
+
+        .btn.primary:hover {
+            background: rgba(139, 92, 246, 0.7);
+        }
+
+        /* Info panel */
+        #info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 100;
+            opacity: 0.7;
+        }
+
+        #info h2 {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #info .transcription {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        #info .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .keyword {
+            background: rgba(236, 72, 153, 0.3);
+            padding: 4px 8px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Navigation */
+        #nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #nav.left { left: 20px; }
+        #nav.right { right: 20px; }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Loading state */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 200;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="loading">Loading composition...</div>
+
+    <div id="info" class="hidden">
+        <h2 id="composition-title">DREAMWEAR</h2>
+        <div class="transcription" id="transcription"></div>
+        <div class="keywords" id="keywords"></div>
+    </div>
+
+    <div id="controls" class="hidden">
+        <button class="btn" id="btn-orbit">Free Orbit</button>
+        <button class="btn primary" id="btn-snap">Snap to View</button>
+        <button class="btn" id="btn-screenshot">Export Print</button>
+    </div>
+
+    <div id="nav" class="left hidden">
+        <button class="nav-btn" id="btn-prev">&larr;</button>
+    </div>
+    <div id="nav" class="right hidden">
+        <button class="nav-btn" id="btn-next">&rarr;</button>
+    </div>
+
+    <script type="module">
+        import { AnamorphicScene } from './static/js/AnamorphicScene.js';
+        import { CompositionLoader } from './static/js/CompositionLoader.js';
+        import { ScreenshotCapture } from './static/js/ScreenshotCapture.js';
+
+        // Get composition ID from URL params
+        const params = new URLSearchParams(window.location.search);
+        const compositionId = params.get('id') || 'test';
+
+        // Initialize
+        const container = document.getElementById('canvas-container');
+        const scene = new AnamorphicScene(container);
+        const loader = new CompositionLoader();
+        const screenshot = new ScreenshotCapture(scene.renderer, scene.scene, scene.camera);
+
+        // Load composition
+        async function loadComposition(id) {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('info').classList.add('hidden');
+            document.getElementById('controls').classList.add('hidden');
+
+            try {
+                const config = await loader.loadConfig(id);
+                await scene.loadComposition(config);
+
+                // Update info panel
+                document.getElementById('composition-title').textContent =
+                    config.keywords?.[0]?.toUpperCase() || 'DREAMWEAR';
+                document.getElementById('transcription').textContent =
+                    `"${config.transcription}"`;
+
+                const keywordsEl = document.getElementById('keywords');
+                keywordsEl.innerHTML = '';
+                (config.keywords || []).forEach(kw => {
+                    const span = document.createElement('span');
+                    span.className = 'keyword';
+                    span.textContent = kw;
+                    keywordsEl.appendChild(span);
+                });
+
+                // Show UI
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('info').classList.remove('hidden');
+                document.getElementById('controls').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Failed to load composition:', error);
+                document.getElementById('loading').textContent = 'Failed to load composition';
+            }
+        }
+
+        // Control handlers
+        document.getElementById('btn-orbit').addEventListener('click', () => {
+            scene.enableOrbit(true);
+        });
+
+        document.getElementById('btn-snap').addEventListener('click', () => {
+            scene.snapToAnamorphicView();
+        });
+
+        document.getElementById('btn-screenshot').addEventListener('click', () => {
+            screenshot.captureHighRes(4096, 4096);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                scene.snapToAnamorphicView();
+            } else if (e.key === 'p' || e.key === 'P') {
+                screenshot.captureHighRes(4096, 4096);
+            }
+        });
+
+        // Start
+        loadComposition(compositionId);
+    </script>
+</body>
+</html>

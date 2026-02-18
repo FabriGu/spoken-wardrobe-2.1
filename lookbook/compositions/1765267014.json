@@ -1,0 +1,126 @@
+{
+  "id": "1765267014",
+  "transcription": "Or Danish? Yeah, we have some community use at the hotel. Cool. I'm not sure about that. Everything, does this shit fucking work in there?",
+  "keywords": [
+    "cool"
+  ],
+  "background": {
+    "color": "#FF6347"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765267014/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765267014/original_frame.png",
+      "target_2d": {
+        "x": 0.24252220149197642,
+        "y": 0.691915633602062
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 135,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765267014/generated_clothing.png",
+      "target_2d": {
+        "x": 0.43936504552795996,
+        "y": 0.7981201509810911
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -90
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765267014/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "COOL",
+      "target_2d": {
+        "x": 0.2723514550462055,
+        "y": 0.13731106007535843
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.08627367713018626,
+      "color": "#FFFFFF",
+      "rotation": 0
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.17656933588838364,
+        "y": 0.30273778276552465
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.21945585110314947,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.13500202083491378,
+        "y": 0.4842382481737374
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.39990665723533236,
+      "opacity": 0.25,
+      "color": "#FF1493",
+      "color2": "#000000"
+    }
+  ]
+}

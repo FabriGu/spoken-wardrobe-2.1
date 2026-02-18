@@ -1,0 +1,109 @@
+{
+  "id": "1765678415",
+  "transcription": "The other thing.",
+  "keywords": [],
+  "background": {
+    "color": "#1E90FF"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765678415/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765678415/original_frame.png",
+      "target_2d": {
+        "x": 0.7610769165101761,
+        "y": 0.6304518322317466
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765678415/generated_clothing.png",
+      "target_2d": {
+        "x": 0.4115372508626137,
+        "y": 0.8611858160223217
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 0
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765678415/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.2418736290489193,
+        "y": 0.5126520369721117
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.24475271808690008,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.13433521016617772,
+        "y": 0.6737775680657275
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.35528683573996345,
+      "opacity": 0.25,
+      "color": "#FF4500",
+      "color2": "#000000"
+    }
+  ]
+}

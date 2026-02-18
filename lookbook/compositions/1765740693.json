@@ -1,0 +1,109 @@
+{
+  "id": "1765740693",
+  "transcription": "Marlin is souped.",
+  "keywords": [],
+  "background": {
+    "color": "#FF6347"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765740693/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765740693/original_frame.png",
+      "target_2d": {
+        "x": 0.5924015542345592,
+        "y": 0.8508600519781723
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 45,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765740693/generated_clothing.png",
+      "target_2d": {
+        "x": 0.28185146959356217,
+        "y": 0.28253303496910265
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -30
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765740693/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.42471509158983434,
+        "y": 0.8190633902401089
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2894858861228501,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.40382481952353,
+        "y": 0.7751321833048176
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.22898072850077053,
+      "opacity": 0.25,
+      "color": "#1E90FF",
+      "color2": "#000000"
+    }
+  ]
+}

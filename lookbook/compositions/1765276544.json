@@ -1,0 +1,142 @@
+{
+  "id": "1765276544",
+  "transcription": "Those two are red t-shirt.",
+  "keywords": [
+    "red",
+    "t-shirt"
+  ],
+  "background": {
+    "color": "#9400D3"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765276544/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765276544/original_frame.png",
+      "target_2d": {
+        "x": 0.8513750781174438,
+        "y": 0.8785803057550668
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 135,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765276544/generated_clothing.png",
+      "target_2d": {
+        "x": 0.6883092390365557,
+        "y": 0.12539129772832006
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -90
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765276544/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "RED",
+      "target_2d": {
+        "x": 0.5335311292247785,
+        "y": 0.7113156962225675
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.09190328425608135,
+      "color": "#00FF7F",
+      "rotation": 45
+    },
+    {
+      "type": "text_3d",
+      "text": "T-SHIRT",
+      "target_2d": {
+        "x": 0.21861294054926683,
+        "y": 0.7344372515540795
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.11158647512067846,
+      "color": "#FFFFFF",
+      "rotation": 45
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.10976095165670419,
+        "y": 0.5724901659165624
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.15047149021077283,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.5294644930845839,
+        "y": 0.7667618599496053
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.20642250219273395,
+      "opacity": 0.25,
+      "color": "#32CD32",
+      "color2": "#000000"
+    }
+  ]
+}

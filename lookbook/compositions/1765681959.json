@@ -1,0 +1,109 @@
+{
+  "id": "1765681959",
+  "transcription": "I get baked bacon, egg and cheese burger.",
+  "keywords": [],
+  "background": {
+    "color": "#9400D3"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765681959/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765681959/original_frame.png",
+      "target_2d": {
+        "x": 0.1581099604590195,
+        "y": 0.747996482543601
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 90,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765681959/generated_clothing.png",
+      "target_2d": {
+        "x": 0.6452586205088136,
+        "y": 0.28641693503984544
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 45
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765681959/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.41242098361802615,
+        "y": 0.8701216739458087
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2418721973712063,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.8032497552300798,
+        "y": 0.6303026610377291
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.24784384208539223,
+      "opacity": 0.25,
+      "color": "#32CD32",
+      "color2": "#000000"
+    }
+  ]
+}

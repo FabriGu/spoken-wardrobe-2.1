@@ -1,0 +1,128 @@
+{
+  "id": "1765731130",
+  "transcription": "I was doing an engine discharge and then carging the oil in there.",
+  "keywords": [],
+  "background": {
+    "color": "#00CED1"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765731130/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765731130/original_frame.png",
+      "target_2d": {
+        "x": 0.29000823572823353,
+        "y": 0.16402662460366246
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": -15,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765731130/generated_clothing.png",
+      "target_2d": {
+        "x": 0.8437921964990716,
+        "y": 0.8701014769555779
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 135
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765731130/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.2633657051702148,
+        "y": 0.5656408005536723
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2681972343020935,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.7354428950140095,
+        "y": 0.11127540104750366
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.36441957288993565,
+      "opacity": 0.25,
+      "color": "#8b5cf6",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.35305511059999883,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#FF1493",
+      "angle": 45,
+      "rotation": 45
+    }
+  ]
+}

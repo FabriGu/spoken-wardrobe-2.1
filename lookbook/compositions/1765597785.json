@@ -1,0 +1,126 @@
+{
+  "id": "1765597785",
+  "transcription": "or a long answer. However, when you tell it to, when you command it and you tell it like, instead of please, please can you make these changes? Fix it.",
+  "keywords": [
+    "tell"
+  ],
+  "background": {
+    "color": "#00FF7F"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765597785/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765597785/original_frame.png",
+      "target_2d": {
+        "x": 0.267133499211219,
+        "y": 0.5740774969597261
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 45,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765597785/generated_clothing.png",
+      "target_2d": {
+        "x": 0.5975816393436045,
+        "y": 0.25781614677032005
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 30
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765597785/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "TELL",
+      "target_2d": {
+        "x": 0.4850894520677437,
+        "y": 0.7719779601844857
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.12202560152669557,
+      "color": "#FFFFFF",
+      "rotation": -45
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.20791212715167262,
+        "y": 0.5638345958760803
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2108636521356958,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.35504190666835744,
+        "y": 0.16137207944374277
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.2449038022346368,
+      "opacity": 0.25,
+      "color": "#00FF7F",
+      "color2": "#000000"
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "id": "1765735272",
+  "transcription": "wedding dress wedding dress wedding dress wedding dress wedding dress wedding dress wedding dress",
+  "keywords": [
+    "wedding",
+    "dress"
+  ],
+  "background": {
+    "color": "#ec4899"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765735272/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735272/original_frame.png",
+      "target_2d": {
+        "x": 0.865161043673814,
+        "y": 0.7227202407618103
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735272/generated_clothing.png",
+      "target_2d": {
+        "x": 0.6621050281617225,
+        "y": 0.21313333663361755
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -90
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735272/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "WEDDING",
+      "target_2d": {
+        "x": 0.15405025762782432,
+        "y": 0.5346378545024826
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.08874143465216555,
+      "color": "#9400D3",
+      "rotation": 15
+    },
+    {
+      "type": "text_3d",
+      "text": "DRESS",
+      "target_2d": {
+        "x": 0.8721850706549277,
+        "y": 0.18540201743373663
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.13575921199780044,
+      "color": "#FFFFFF",
+      "rotation": -90
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.5693977225760637,
+        "y": 0.24909426360167253
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.29856504105293014,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.4541958337783124,
+        "y": 0.758580833405088
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.37841715007376603,
+      "opacity": 0.25,
+      "color": "#FF69B4",
+      "color2": "#000000"
+    }
+  ]
+}

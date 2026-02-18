@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamwear Lookbook - Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .composition-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .composition-card:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .card-preview {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            background: linear-gradient(135deg, var(--card-color, #ec4899), #1a1a1a);
+        }
+
+        .card-info {
+            padding: 20px;
+        }
+
+        .card-id {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+
+        .card-transcription {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .keyword {
+            background: rgba(236, 72, 153, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .error {
+            text-align: center;
+            padding: 60px;
+            color: #ff6b6b;
+        }
+
+        .test-card {
+            border: 2px dashed rgba(139, 92, 246, 0.5);
+        }
+
+        .test-card .card-preview {
+            background: linear-gradient(135deg, #8b5cf6, #1a1a1a);
+        }
+
+        .test-badge {
+            background: rgba(139, 92, 246, 0.5);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dreamwear Lookbook</h1>
+        <p class="subtitle">Anamorphic Fashion Dreams</p>
+    </header>
+
+    <div class="gallery" id="gallery">
+        <div class="loading">Loading compositions...</div>
+    </div>
+
+    <script>
+        const BOLD_COLORS = [
+            '#FF1493', '#00CED1', '#FFD700', '#FF4500', '#9400D3',
+            '#00FF7F', '#FF6347', '#1E90FF', '#FF69B4', '#32CD32'
+        ];
+
+        async function loadGallery() {
+            const gallery = document.getElementById('gallery');
+
+            // Always show test composition first
+            const testCard = createCard({
+                id: 'test',
+                transcription: 'Test composition with floating dreams and chaotic elements',
+                keywords: ['test', 'dream', 'chaos'],
+                isTest: true
+            });
+            gallery.innerHTML = '';
+            gallery.appendChild(testCard);
+
+            // Try to load composition index
+            try {
+                const response = await fetch('/compositions/index.json');
+                if (response.ok) {
+                    const compositionIds = await response.json();
+
+                    for (const id of compositionIds) {
+                        // Load each composition config
+                        try {
+                            const configResponse = await fetch(`/compositions/${id}.json`);
+                            if (configResponse.ok) {
+                                const config = await configResponse.json();
+                                const card = createCard(config);
+                                gallery.appendChild(card);
+                            }
+                        } catch (e) {
+                            console.warn(`Failed to load composition ${id}:`, e);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('No compositions index found, showing test only');
+            }
+        }
+
+        function createCard(config) {
+            const card = document.createElement('div');
+            card.className = 'composition-card' + (config.isTest ? ' test-card' : '');
+
+            const color = config.background?.color || BOLD_COLORS[Math.floor(Math.random() * BOLD_COLORS.length)];
+
+            card.innerHTML = `
+                <div class="card-preview" style="--card-color: ${color}">
+                    ${config.isTest ? '✨' : '👗'}
+                </div>
+                <div class="card-info">
+                    <div class="card-id">
+                        #${config.id}
+                        ${config.isTest ? '<span class="test-badge">Test</span>' : ''}
+                    </div>
+                    <div class="card-transcription">"${config.transcription || 'No transcription'}"</div>
+                    <div class="card-keywords">
+                        ${(config.keywords || []).slice(0, 4).map(kw =>
+                            `<span class="keyword">${kw}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                window.location.href = `/composition.html?id=${config.id}`;
+            });
+
+            return card;
+        }
+
+        // Load on page load
+        loadGallery();
+    </script>
+</body>
+</html>

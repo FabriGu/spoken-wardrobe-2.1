@@ -1,0 +1,126 @@
+{
+  "id": "1765680581",
+  "transcription": "I tried to make it as light way as possible so that it just like legit fits onto here. There's nothing holding it other than...",
+  "keywords": [
+    "light"
+  ],
+  "background": {
+    "color": "#FF6347"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765680581/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765680581/original_frame.png",
+      "target_2d": {
+        "x": 0.8494647100137266,
+        "y": 0.8890807946673118
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": -90,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765680581/generated_clothing.png",
+      "target_2d": {
+        "x": 0.8293480800895672,
+        "y": 0.4338338607725948
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 15
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765680581/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "LIGHT",
+      "target_2d": {
+        "x": 0.7299944125171023,
+        "y": 0.8861586319854171
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.14527960184374303,
+      "color": "#FFFFFF",
+      "rotation": -135
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.548565320001108,
+        "y": 0.8691964223791174
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.15521756118730157,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.607679418842754,
+        "y": 0.783079961841631
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.2830700629418542,
+      "opacity": 0.25,
+      "color": "#FFD700",
+      "color2": "#000000"
+    }
+  ]
+}

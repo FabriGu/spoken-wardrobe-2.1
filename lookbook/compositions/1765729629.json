@@ -1,0 +1,142 @@
+{
+  "id": "1765729629",
+  "transcription": "It would just give you like it would just make you a runway model every time Well now you're gonna be a runway model because they said",
+  "keywords": [
+    "runway",
+    "model"
+  ],
+  "background": {
+    "color": "#FFD700"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765729629/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765729629/original_frame.png",
+      "target_2d": {
+        "x": 0.3631006406590147,
+        "y": 0.8090723118516464
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 180,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765729629/generated_clothing.png",
+      "target_2d": {
+        "x": 0.8463266261108457,
+        "y": 0.6654814857152382
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": -15
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765729629/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "RUNWAY",
+      "target_2d": {
+        "x": 0.8246233716196149,
+        "y": 0.8957580376840081
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.12830399514275959,
+      "color": "#FFFFFF",
+      "rotation": -30
+    },
+    {
+      "type": "text_3d",
+      "text": "MODEL",
+      "target_2d": {
+        "x": 0.28683547598075354,
+        "y": 0.7325794470844518
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.14314085236142032,
+      "color": "#FFFFFF",
+      "rotation": 90
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.43729605142396777,
+        "y": 0.17204828122001015
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.2315765479788272,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.35341904117352774,
+        "y": 0.6855044083444832
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.3478989841056385,
+      "opacity": 0.25,
+      "color": "#00CED1",
+      "color2": "#000000"
+    }
+  ]
+}

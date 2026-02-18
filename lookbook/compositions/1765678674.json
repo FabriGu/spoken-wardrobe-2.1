@@ -1,0 +1,158 @@
+{
+  "id": "1765678674",
+  "transcription": "Cloud, red clown, clown. Clown outfit.",
+  "keywords": [
+    "red",
+    "clown",
+    "outfit"
+  ],
+  "background": {
+    "color": "#FF6347"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765678674/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765678674/original_frame.png",
+      "target_2d": {
+        "x": 0.26608795368742466,
+        "y": 0.756312567345438
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765678674/generated_clothing.png",
+      "target_2d": {
+        "x": 0.548473378563742,
+        "y": 0.22824715486010605
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 0
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765678674/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "RED",
+      "target_2d": {
+        "x": 0.6481219209681534,
+        "y": 0.14414148029310017
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.12507556112145274,
+      "color": "#FFFFFF",
+      "rotation": 0
+    },
+    {
+      "type": "text_3d",
+      "text": "CLOWN",
+      "target_2d": {
+        "x": 0.39189859380255754,
+        "y": 0.12011338693596746
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.1317414880180208,
+      "color": "#FFFFFF",
+      "rotation": 0
+    },
+    {
+      "type": "text_3d",
+      "text": "OUTFIT",
+      "target_2d": {
+        "x": 0.3517795788731073,
+        "y": 0.19875587457460275
+      },
+      "depth_range": {
+        "min": 10,
+        "max": 14
+      },
+      "scale": 0.09793256568252806,
+      "color": "#FFFFFF",
+      "rotation": 0
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.427742594595223,
+        "y": 0.8339678264316416
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.25906791761575587,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.5649947503890483,
+        "y": 0.7305679165710922
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.20839688237280443,
+      "opacity": 0.25,
+      "color": "#FF6347",
+      "color2": "#000000"
+    }
+  ]
+}

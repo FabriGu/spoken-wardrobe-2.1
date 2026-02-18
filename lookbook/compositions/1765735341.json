@@ -1,0 +1,177 @@
+{
+  "id": "1765735341",
+  "transcription": "Yeah, this is okay. It's not very bad. What do you want? Sorry. Sorry? Sorry? Indian Wear. Indian Wear.",
+  "keywords": [
+    "sorry",
+    "indian",
+    "wear"
+  ],
+  "background": {
+    "color": "#00CED1"
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      10
+    ],
+    "fov": 50,
+    "target": [
+      0,
+      0,
+      0
+    ]
+  },
+  "elements": [
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765735341/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 4,
+        "max": 6
+      },
+      "scale": 0.35
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735341/original_frame.png",
+      "target_2d": {
+        "x": 0.7770222511309436,
+        "y": 0.8168555671529829
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.15,
+      "rotation": 30,
+      "opacity": 0.7
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735341/generated_clothing.png",
+      "target_2d": {
+        "x": 0.1060896294130897,
+        "y": 0.15060960870666001
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 12
+      },
+      "scale": 0.2,
+      "rotation": 90
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765735341/mask.png",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 3,
+        "max": 4
+      },
+      "scale": 0.4,
+      "opacity": 0.2
+    },
+    {
+      "type": "text_3d",
+      "text": "SORRY",
+      "target_2d": {
+        "x": 0.6403621204389879,
+        "y": 0.6979608109836286
+      },
+      "depth_range": {
+        "min": 6,
+        "max": 10
+      },
+      "scale": 0.11811593653837477,
+      "color": "#ec4899",
+      "rotation": 135
+    },
+    {
+      "type": "text_3d",
+      "text": "INDIAN",
+      "target_2d": {
+        "x": 0.8837310272636255,
+        "y": 0.863487202386338
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 12
+      },
+      "scale": 0.11020749525703505,
+      "color": "#FF4500",
+      "rotation": -15
+    },
+    {
+      "type": "text_3d",
+      "text": "WEAR",
+      "target_2d": {
+        "x": 0.1648733984984605,
+        "y": 0.5819906213102453
+      },
+      "depth_range": {
+        "min": 10,
+        "max": 14
+      },
+      "scale": 0.08386917480730116,
+      "color": "#FFFFFF",
+      "rotation": 15
+    },
+    {
+      "type": "shader_plane",
+      "shader": "chromatic",
+      "target_2d": {
+        "x": 0.1538831453101177,
+        "y": 0.17457820724396989
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 10
+      },
+      "scale": 0.171558318904928,
+      "opacity": 0.3
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glow",
+      "target_2d": {
+        "x": 0.10792430851799857,
+        "y": 0.3499072926026927
+      },
+      "depth_range": {
+        "min": 8,
+        "max": 15
+      },
+      "scale": 0.39813667775370637,
+      "opacity": 0.25,
+      "color": "#FFD700",
+      "color2": "#000000"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "diagonal",
+      "target_2d": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 2,
+        "max": 3
+      },
+      "width": 15,
+      "height": 0.22013541416689336,
+      "scale": 1.0,
+      "opacity": 0.7,
+      "color": "#ec4899",
+      "angle": -30,
+      "rotation": -30
+    }
+  ]
+}
