@@ -383,8 +383,9 @@
                     <input type="checkbox" id="chk-hide-stretched" checked>
                     <label for="chk-hide-stretched">Hide Stretched Triangles</label>
                     <p style="font-size: 11px; color: #888; margin: 5px 0 0 20px;">Auto-detect and hide triangles with very long edges (reduces artifacts)</p>
-                    <label style="font-size: 11px; margin-left: 20px;">Threshold: <span id="stretch-threshold-value">5.0</span></label>
-                    <input type="range" id="stretch-threshold" min="0.1" max="1" step="0.1" value="0.5" style="width: 80%; margin-left: 20px;">
+                    <label style="font-size: 11px; margin-left: 20px;">Threshold: <span id="stretch-threshold-value">0.5</span></label>
+                    <input type="range" id="stretch-threshold" min="0.05" max="2.0" step="0.05" value="0.5" style="width: 80%; margin-left: 20px;">
+                    <button id="btn-clear-viz" style="margin-left: 20px; width: 80%; margin-top: 5px; font-size: 11px;">Clear Red Visualization</button>
                 </div>
                 <div class="checkbox-group">
                     <input type="checkbox" id="chk-show-body" checked>
@@ -1629,7 +1630,8 @@
             log('Topology check requires full analysis - use "Run Full Analysis"', 'warning');
         });
 
-        // Detect and hide stretched triangles
+        // Detect and hide stretched triangles using current pose
+        // This uses the proper skinning calculation to get deformed positions
         function detectAndHideStretchedTriangles() {
             if (!state.skinnedClothingMesh) {
                 log('No skinned clothing mesh to analyze', 'error');
@@ -1637,7 +1639,6 @@
             }
 
             const geometry = state.skinnedClothingMesh.geometry;
-            const positions = geometry.attributes.position;
             const index = geometry.index;
 
             if (!index) {
@@ -1645,12 +1646,33 @@
                 return;
             }
 
-            const threshold = parseFloat(document.getElementById('stretch-threshold').value);
+            let threshold = parseFloat(document.getElementById('stretch-threshold').value);
+            const meshScale = state.skinnedClothingMesh.scale.length();
+            const adjustedThreshold = threshold * meshScale;
+            
             const problematicFaces = new Set();
             const edgeLengths = [];
 
-            log(`=== Stretched Triangle Detection ===`);
-            log(`Threshold: ${threshold.toFixed(2)}`);
+            log(`=== Stretched Triangle Detection (Current Pose) ===`);
+            log(`Threshold: ${threshold.toFixed(2)} (adjusted: ${adjustedThreshold.toFixed(2)})`);
+            log('Computing skinned vertex positions...');
+
+            // Ensure skeleton is updated
+            state.skeleton.update();
+            state.skinnedClothingMesh.updateMatrixWorld(true);
+
+            // Cache for skinned positions
+            const skinnedPositions = new Map();
+            const uniqueVertexIndices = new Set();
+            for (let i = 0; i < index.count; i++) {
+                uniqueVertexIndices.add(index.array[i]);
+            }
+            
+            // Pre-compute all skinned positions
+            for (const vertexIndex of uniqueVertexIndices) {
+                const pos = getSkinnedVertexPosition_v3(state.skinnedClothingMesh, vertexIndex);
+                skinnedPositions.set(vertexIndex, pos);
+            }
 
             // Analyze all triangles
             for (let i = 0; i < index.count; i += 3) {
@@ -1658,11 +1680,12 @@
                 const i1 = index.array[i + 1];
                 const i2 = index.array[i + 2];
 
-                const v0 = new THREE.Vector3().fromBufferAttribute(positions, i0);
-                const v1 = new THREE.Vector3().fromBufferAttribute(positions, i1);
-                const v2 = new THREE.Vector3().fromBufferAttribute(positions, i2);
+                // Get SKINNED vertex positions
+                const v0 = skinnedPositions.get(i0);
+                const v1 = skinnedPositions.get(i1);
+                const v2 = skinnedPositions.get(i2);
 
-                // Calculate edge lengths
+                // Calculate edge lengths in world space
                 const edge1 = v0.distanceTo(v1);
                 const edge2 = v1.distanceTo(v2);
                 const edge3 = v2.distanceTo(v0);
@@ -1671,7 +1694,7 @@
                 edgeLengths.push(maxEdge);
 
                 // If ANY edge is too long, mark triangle as problematic
-                if (maxEdge > threshold) {
+                if (maxEdge > adjustedThreshold) {
                     problematicFaces.add(Math.floor(i / 3));
                 }
             }
@@ -1680,9 +1703,14 @@
             log(`Percentage: ${(problematicFaces.size / Math.floor(index.count / 3) * 100).toFixed(1)}%`);
 
             // Statistics
-            const avgEdge = edgeLengths.reduce((a, b) => a + b, 0) / edgeLengths.length;
-            const maxEdgeLength = Math.max(...edgeLengths);
-            log(`Average max edge: ${avgEdge.toFixed(3)}, Max edge: ${maxEdgeLength.toFixed(3)}`);
+            if (edgeLengths.length > 0) {
+                const sortedEdges = [...edgeLengths].sort((a, b) => a - b);
+                const avgEdge = edgeLengths.reduce((a, b) => a + b, 0) / edgeLengths.length;
+                const maxEdgeLength = Math.max(...edgeLengths);
+                const medianEdge = sortedEdges[Math.floor(sortedEdges.length / 2)];
+                
+                log(`Edge length stats: avg=${avgEdge.toFixed(3)}, median=${medianEdge.toFixed(3)}, max=${maxEdgeLength.toFixed(3)}`);
+            }
 
             // Store original indices if not already stored
             if (!state.originalIndices) {
@@ -1691,15 +1719,19 @@
 
             // Hide problematic triangles by rebuilding index
             const newIndices = [];
-            for (let i = 0; i < index.count; i += 3) {
+            for (let i = 0; i < state.originalIndices.length; i += 3) {
                 const faceIdx = Math.floor(i / 3);
                 if (!problematicFaces.has(faceIdx)) {
-                    newIndices.push(index.array[i], index.array[i + 1], index.array[i + 2]);
+                    newIndices.push(
+                        state.originalIndices[i],
+                        state.originalIndices[i + 1],
+                        state.originalIndices[i + 2]
+                    );
                 }
             }
 
             geometry.setIndex(newIndices);
-            geometry.computeVertexNormals(); // Recompute normals after removing triangles
+            geometry.computeVertexNormals();
 
             log(`Hidden ${problematicFaces.size} stretched triangles`, 'success');
         }
@@ -1717,6 +1749,146 @@
             log('Restored all triangles');
         }
 
+        // Compute deformed vertex position by applying skinning transformation
+        // This mimics what the GPU shader does for SkinnedMesh
+        function getSkinnedVertexPosition(mesh, vertexIndex, target = new THREE.Vector3()) {
+            const geometry = mesh.geometry;
+            const positions = geometry.attributes.position;
+            const skinIndices = geometry.attributes.skinIndex;
+            const skinWeights = geometry.attributes.skinWeight;
+            const skeleton = mesh.skeleton;
+            
+            // Get bind matrices
+            const bindMatrix = mesh.bindMatrix;
+            const bindMatrixInverse = mesh.bindMatrixInverse;
+            
+            // Get local position
+            target.fromBufferAttribute(positions, vertexIndex);
+            
+            // Apply bind matrix to get to skeleton space
+            const skinVertex = target.clone().applyMatrix4(bindMatrix);
+            
+            // Accumulate bone influences
+            const skinned = new THREE.Vector3(0, 0, 0);
+            const temp = new THREE.Vector3();
+            const boneMatrix = new THREE.Matrix4();
+            let totalWeight = 0;
+            
+            for (let i = 0; i < 4; i++) {
+                const boneIndex = skinIndices.array[vertexIndex * 4 + i];
+                const weight = skinWeights.array[vertexIndex * 4 + i];
+                
+                if (weight > 0) {
+                    totalWeight += weight;
+                    // Get bone matrix from skeleton
+                    boneMatrix.fromArray(skeleton.boneMatrices, boneIndex * 16);
+                    
+                    // Transform vertex by bone matrix and weight
+                    temp.copy(skinVertex).applyMatrix4(boneMatrix).multiplyScalar(weight);
+                    skinned.add(temp);
+                }
+            }
+            
+            // Apply bind matrix inverse to get back to local space
+            target.copy(skinned).applyMatrix4(bindMatrixInverse);
+            
+            // Transform to world space
+            target.applyMatrix4(mesh.matrixWorld);
+            
+            return target;
+        }
+        
+        // Alternative: Get deformed position using Three.js's built-in method
+        function getSkinnedVertexPosition_v2(mesh, vertexIndex, target = new THREE.Vector3()) {
+            // Get the local position
+            const positions = mesh.geometry.attributes.position;
+            target.fromBufferAttribute(positions, vertexIndex);
+            
+            // Transform by mesh's matrix world (this is what SkinnedMesh does internally)
+            // But we also need to apply bone transformations...
+            
+            // Actually, let's use a different approach - use the SkinnedMesh's
+            // bone transformation directly
+            const skinIndex = mesh.geometry.attributes.skinIndex;
+            const skinWeight = mesh.geometry.attributes.skinWeight;
+            const skeleton = mesh.skeleton;
+            
+            const bindMatrix = mesh.bindMatrix;
+            const bindMatrixInverse = mesh.bindMatrixInverse;
+            
+            // Get bind position
+            const bindPos = target.clone();
+            
+            // Transform to skeleton space
+            const posInSkeletonSpace = bindPos.clone().applyMatrix4(bindMatrix);
+            
+            // Apply bone transformations
+            let result = new THREE.Vector3(0, 0, 0);
+            const temp = new THREE.Vector3();
+            
+            for (let i = 0; i < 4; i++) {
+                const boneIdx = skinIndex.array[vertexIndex * 4 + i];
+                const weight = skinWeight.array[vertexIndex * 4 + i];
+                
+                if (weight > 0.001) {
+                    // Get the bone matrix
+                    const bone = skeleton.bones[boneIdx];
+                    if (bone) {
+                        // Transform: bone matrix * position
+                        temp.copy(posInSkeletonSpace);
+                        temp.applyMatrix4(bone.matrix);
+                        temp.multiplyScalar(weight);
+                        result.add(temp);
+                    }
+                }
+            }
+            
+            // Transform back to local space
+            result.applyMatrix4(bindMatrixInverse);
+            
+            // Transform to world space
+            result.applyMatrix4(mesh.matrixWorld);
+            
+            return result;
+        }
+        
+        // Third approach: Use bone.matrixWorld directly 
+        // This treats the bone world matrices as the primary transformation
+        function getSkinnedVertexPosition_v3(mesh, vertexIndex, target = new THREE.Vector3()) {
+            const positions = mesh.geometry.attributes.position;
+            const skinIndex = mesh.geometry.attributes.skinIndex;
+            const skinWeight = mesh.geometry.attributes.skinWeight;
+            const skeleton = mesh.skeleton;
+            
+            // Get local bind position
+            const localPos = new THREE.Vector3().fromBufferAttribute(positions, vertexIndex);
+            
+            // Apply mesh's local transform first (position/rotation/scale of the mesh itself)
+            localPos.applyMatrix4(mesh.matrix);
+            
+            // Now apply bone influences
+            let worldPos = new THREE.Vector3(0, 0, 0);
+            const temp = new THREE.Vector3();
+            
+            for (let i = 0; i < 4; i++) {
+                const boneIdx = skinIndex.array[vertexIndex * 4 + i];
+                const weight = skinWeight.array[vertexIndex * 4 + i];
+                
+                if (weight > 0.001) {
+                    const bone = skeleton.bones[boneIdx];
+                    if (bone) {
+                        // Transform local position by bone's world matrix
+                        temp.copy(localPos);
+                        temp.applyMatrix4(bone.matrixWorld);
+                        temp.multiplyScalar(weight);
+                        worldPos.add(temp);
+                    }
+                }
+            }
+            
+            return worldPos;
+        }
+
         // Detect stretched triangles using test pose (arms raised 45°)
         async function detectStretchedTrianglesWithTestPose() {
             if (!state.skinnedClothingMesh || !state.skeleton) {
@@ -1725,7 +1897,6 @@
             }
 
             log('=== Stretched Triangle Detection with Test Pose ===', 'info');
-            log('Raising arms to 45° to detect stretched triangles...');
 
             // Save current state
             const savedSpineRigid = document.getElementById('chk-spine-rigid').checked;
@@ -1737,18 +1908,28 @@
             }));
             const savedSpineRigidRotation = state.spineRigidRotation ? state.spineRigidRotation.clone() : null;
 
+            // Clear any previous visualization
+            if (state.stretchedTriangleVisualizer) {
+                state.scene.remove(state.stretchedTriangleVisualizer);
+                state.stretchedTriangleVisualizer = null;
+            }
+
             try {
                 // Temporarily disable spine rigid mode for test
                 document.getElementById('chk-spine-rigid').checked = false;
+                state.spineRigidRotation = null;
 
                 // Reset to rest pose first
                 state.skeleton.bones.forEach(bone => {
                     bone.quaternion.set(0, 0, 0, 1);
                 });
-                state.spineRigidRotation = null;
                 state.skeleton.update();
+                
+                // Update mesh matrices
+                state.skinnedClothingMesh.updateMatrix();
+                state.skinnedClothingMesh.updateMatrixWorld(true);
 
-                // Rotate both arms to 45° (Z-axis rotation)
+                // Get arm bones
                 const leftArmBone = state.skeleton.bones.find(b => b.name === 'left_upper_arm');
                 const rightArmBone = state.skeleton.bones.find(b => b.name === 'right_upper_arm');
 
@@ -1757,52 +1938,157 @@
                     return;
                 }
 
-                const angle = Math.PI / 4; // 45 degrees
+                // DEBUG: Log initial bone positions
+                log(`DEBUG: Left arm bone initial pos: [${leftArmBone.position.x.toFixed(3)}, ${leftArmBone.position.y.toFixed(3)}, ${leftArmBone.position.z.toFixed(3)}]`);
+                
+                // Rotate both arms to 80° (MORE extreme to ensure visible stretching)
+                const angle = 80 * Math.PI / 180; // 80 degrees for very pronounced stretching
                 const axis = new THREE.Vector3(0, 0, 1);
 
                 leftArmBone.quaternion.setFromAxisAngle(axis, angle);
                 rightArmBone.quaternion.setFromAxisAngle(axis, -angle);
+                
+                // CRITICAL: Update skeleton and scene matrices
                 state.skeleton.update();
-
-                log('Arms raised to 45°, waiting for mesh update...');
-
-                // Wait for render loop to update skinned mesh (2 frames should be enough)
-                await new Promise(resolve => {
-                    let frameCount = 0;
-                    const checkFrame = () => {
-                        frameCount++;
-                        if (frameCount >= 2) {
-                            resolve();
-                        } else {
-                            requestAnimationFrame(checkFrame);
+                state.skinnedClothingMesh.updateMatrixWorld(true);
+                
+                // Also update bone world matrices explicitly
+                state.skeleton.bones.forEach(bone => bone.updateMatrixWorld(true));
+                
+                // DEBUG: Verify bone rotation was applied
+                log(`DEBUG: Left arm bone after rotation - quaternion: [${leftArmBone.quaternion.x.toFixed(3)}, ${leftArmBone.quaternion.y.toFixed(3)}, ${leftArmBone.quaternion.z.toFixed(3)}, ${leftArmBone.quaternion.w.toFixed(3)}]`);
+                
+                // DEBUG: Get world position of left arm bone
+                const leftArmWorldPos = new THREE.Vector3();
+                leftArmBone.getWorldPosition(leftArmWorldPos);
+                log(`DEBUG: Left arm bone world position: [${leftArmWorldPos.x.toFixed(3)}, ${leftArmWorldPos.y.toFixed(3)}, ${leftArmWorldPos.z.toFixed(3)}]`);
+                
+                // DEBUG: Check left arm bone matrixWorld
+                const leftArmMatrixWorldPos = new THREE.Vector3().setFromMatrixPosition(leftArmBone.matrixWorld);
+                log(`DEBUG: Left arm bone matrixWorld position: [${leftArmMatrixWorldPos.x.toFixed(3)}, ${leftArmMatrixWorldPos.y.toFixed(3)}, ${leftArmMatrixWorldPos.z.toFixed(3)}]`);
+                
+                // DEBUG: Check if skeleton has boneMatrices
+                log(`DEBUG: Skeleton boneMatrices length: ${state.skeleton.boneMatrices.length}`);
+                log(`DEBUG: Skeleton boneMatrices[0-3]: ${state.skeleton.boneMatrices[0].toFixed(2)}, ${state.skeleton.boneMatrices[1].toFixed(2)}, ${state.skeleton.boneMatrices[2].toFixed(2)}, ${state.skeleton.boneMatrices[3].toFixed(2)}`);
+                
+                // DEBUG: Check left arm bone's matrixWorld
+                const leftArmMatrix = new THREE.Matrix4();
+                const leftArmBoneIndex = state.skeleton.bones.indexOf(leftArmBone);
+                leftArmMatrix.fromArray(state.skeleton.boneMatrices, leftArmBoneIndex * 16);
+                const leftArmPos = new THREE.Vector3();
+                leftArmPos.setFromMatrixPosition(leftArmMatrix);
+                log(`DEBUG: Left arm bone matrix position (from boneMatrices): [${leftArmPos.x.toFixed(3)}, ${leftArmPos.y.toFixed(3)}, ${leftArmPos.z.toFixed(3)}]`);
+                
+                // DEBUG: Sample some vertices to see their bone weights
+                const sampleVerts = [0, 100, 500];
+                
+                // Get geometry reference early
+                const geometry = state.skinnedClothingMesh.geometry;
+                const skinIndices = geometry.attributes.skinIndex;
+                const skinWeights = geometry.attributes.skinWeight;
+                log('DEBUG: Sample vertex bone assignments:');
+                for (const vIdx of sampleVerts) {
+                    if (vIdx < geometry.attributes.position.count) {
+                        let weights = [];
+                        for (let i = 0; i < 4; i++) {
+                            const bIdx = skinIndices.array[vIdx * 4 + i];
+                            const w = skinWeights.array[vIdx * 4 + i];
+                            if (w > 0.01) {
+                                const boneName = state.skeleton.bones[bIdx]?.name || `bone_${bIdx}`;
+                                weights.push(`${boneName}:${w.toFixed(2)}`);
+                            }
                         }
-                    };
-                    requestAnimationFrame(checkFrame);
-                });
+                        log(`  Vertex ${vIdx}: ${weights.join(', ')}`);
+                    }
+                }
+                
+                log('Arms raised to 80°, computing skinned vertex positions...');
+                
+                // DEBUG: Check mesh bind matrices
+                log(`DEBUG: Mesh bindMatrix: ${JSON.stringify(state.skinnedClothingMesh.bindMatrix.elements.map(v => v.toFixed(2)))}`);
+                log(`DEBUG: Mesh bindMatrixInverse: ${JSON.stringify(state.skinnedClothingMesh.bindMatrixInverse.elements.map(v => v.toFixed(2)))}`);
+                
+                // Render one frame to ensure GPU is updated (optional but helpful)
+                state.renderer.render(state.scene, state.camera);
 
                 // Now detect stretched triangles on the deformed mesh
-                const geometry = state.skinnedClothingMesh.geometry;
-                const positions = geometry.attributes.position;
                 const index = geometry.index;
-                const threshold = parseFloat(document.getElementById('stretch-threshold').value);
+                let threshold = parseFloat(document.getElementById('stretch-threshold').value);
+                
+                // Auto-adjust threshold based on mesh scale
+                const meshScale = state.skinnedClothingMesh.scale.length();
+                const adjustedThreshold = threshold * meshScale;
+                
+                log(`Threshold: ${threshold.toFixed(2)} (adjusted: ${adjustedThreshold.toFixed(2)} for scale ${meshScale.toFixed(2)})`);
 
                 const problematicFaces = new Set();
                 const edgeLengths = [];
+                const problematicEdges = []; // Store for visualization
+                
+                // Cache for skinned positions to avoid recomputation
+                const skinnedPositions = new Map();
+                
+                // Pre-compute all unique vertex positions that are used
+                const uniqueVertexIndices = new Set();
+                for (let i = 0; i < index.count; i++) {
+                    uniqueVertexIndices.add(index.array[i]);
+                }
+                
+                log(`Computing skinned positions for ${uniqueVertexIndices.size} unique vertices...`);
+                
+                // DEBUG: Test a few vertices to see if skinning is working
+                log('DEBUG: Testing sample vertices...');
+                const testIndices = [0, 100, 500, 1000, 2000];
+                for (const testIdx of testIndices) {
+                    if (testIdx < geometry.attributes.position.count) {
+                        const bindPos = new THREE.Vector3().fromBufferAttribute(geometry.attributes.position, testIdx);
+                        const skinnedPos = getSkinnedVertexPosition(state.skinnedClothingMesh, testIdx);
+                        const moveDist = bindPos.distanceTo(skinnedPos);
+                        log(`  Vertex ${testIdx}: bind=[${bindPos.x.toFixed(2)},${bindPos.y.toFixed(2)},${bindPos.z.toFixed(2)}] world=[${skinnedPos.x.toFixed(2)},${skinnedPos.y.toFixed(2)},${skinnedPos.z.toFixed(2)}] moved=${moveDist.toFixed(3)}`);
+                    }
+                }
+                
+                // Compute skinned positions for all unique vertices
+                // Try all methods and compare
+                let testVertex = 100;
+                if (testVertex < geometry.attributes.position.count) {
+                    const pos1 = getSkinnedVertexPosition(state.skinnedClothingMesh, testVertex);
+                    const pos2 = getSkinnedVertexPosition_v2(state.skinnedClothingMesh, testVertex);
+                    const pos3 = getSkinnedVertexPosition_v3(state.skinnedClothingMesh, testVertex);
+                    log(`DEBUG: Method comparison for vertex ${testVertex}:`);
+                    log(`  Method 1 (boneMatrices): [${pos1.x.toFixed(3)}, ${pos1.y.toFixed(3)}, ${pos1.z.toFixed(3)}]`);
+                    log(`  Method 2 (bone.matrix):  [${pos2.x.toFixed(3)}, ${pos2.y.toFixed(3)}, ${pos2.z.toFixed(3)}]`);
+                    log(`  Method 3 (bone.world):   [${pos3.x.toFixed(3)}, ${pos3.y.toFixed(3)}, ${pos3.z.toFixed(3)}]`);
+                    log(`  Diff 1-2: ${pos1.distanceTo(pos2).toFixed(6)}, Diff 1-3: ${pos1.distanceTo(pos3).toFixed(6)}, Diff 2-3: ${pos2.distanceTo(pos3).toFixed(6)}`);
+                    
+                    // Check which method shows most deformation
+                    const bindPos = new THREE.Vector3().fromBufferAttribute(geometry.attributes.position, testVertex);
+                    const move1 = bindPos.distanceTo(pos1);
+                    const move2 = bindPos.distanceTo(pos2);
+                    const move3 = bindPos.distanceTo(pos3);
+                    log(`  Movement from bind: m1=${move1.toFixed(3)}, m2=${move2.toFixed(3)}, m3=${move3.toFixed(3)}`);
+                }
+                
+                // Use method 3 (most likely to be correct - uses bone.worldMatrix)
+                for (const vertexIndex of uniqueVertexIndices) {
+                    const pos = getSkinnedVertexPosition_v3(state.skinnedClothingMesh, vertexIndex);
+                    skinnedPositions.set(vertexIndex, pos);
+                }
 
-                log(`Analyzing triangles with threshold: ${threshold.toFixed(2)}`);
+                log('Analyzing triangles...');
 
-                // Analyze all triangles
+                // Analyze all triangles using skinned positions
                 for (let i = 0; i < index.count; i += 3) {
                     const i0 = index.array[i];
                     const i1 = index.array[i + 1];
                     const i2 = index.array[i + 2];
 
-                    // Get vertex positions from the DEFORMED mesh
-                    const v0 = new THREE.Vector3().fromBufferAttribute(positions, i0);
-                    const v1 = new THREE.Vector3().fromBufferAttribute(positions, i1);
-                    const v2 = new THREE.Vector3().fromBufferAttribute(positions, i2);
+                    // Get SKINNED vertex positions (world space)
+                    const v0 = skinnedPositions.get(i0);
+                    const v1 = skinnedPositions.get(i1);
+                    const v2 = skinnedPositions.get(i2);
 
-                    // Calculate edge lengths
+                    // Calculate edge lengths in world space
                     const edge1 = v0.distanceTo(v1);
                     const edge2 = v1.distanceTo(v2);
                     const edge3 = v2.distanceTo(v0);
@@ -1811,8 +2097,20 @@
                     edgeLengths.push(maxEdge);
 
                     // If ANY edge is too long, mark triangle as problematic
-                    if (maxEdge > threshold) {
-                        problematicFaces.add(Math.floor(i / 3));
+                    if (maxEdge > adjustedThreshold) {
+                        const faceIdx = Math.floor(i / 3);
+                        problematicFaces.add(faceIdx);
+                        
+                        // Store longest edge for visualization
+                        let longestEdge = [v0, v1];
+                        if (edge2 > edge1 && edge2 > edge3) longestEdge = [v1, v2];
+                        if (edge3 > edge1 && edge3 > edge2) longestEdge = [v2, v0];
+                        
+                        problematicEdges.push({
+                            faceIdx,
+                            length: maxEdge,
+                            edge: longestEdge
+                        });
                     }
                 }
 
@@ -1821,10 +2119,21 @@
 
                 // Statistics
                 if (edgeLengths.length > 0) {
+                    const sortedEdges = [...edgeLengths].sort((a, b) => a - b);
                     const avgEdge = edgeLengths.reduce((a, b) => a + b, 0) / edgeLengths.length;
                     const maxEdgeLength = Math.max(...edgeLengths);
-                    log(`Average max edge: ${avgEdge.toFixed(3)}, Max edge: ${maxEdgeLength.toFixed(3)}`);
+                    const medianEdge = sortedEdges[Math.floor(sortedEdges.length / 2)];
+                    const p95Edge = sortedEdges[Math.floor(sortedEdges.length * 0.95)];
+                    
+                    log(`Edge length stats:`);
+                    log(`  Average: ${avgEdge.toFixed(3)}`);
+                    log(`  Median: ${medianEdge.toFixed(3)}`);
+                    log(`  95th percentile: ${p95Edge.toFixed(3)}`);
+                    log(`  Maximum: ${maxEdgeLength.toFixed(3)}`);
                 }
+
+                // Sort problematic edges by length for visualization (show longest first)
+                problematicEdges.sort((a, b) => b.length - a.length);
 
                 // Store original indices if not already stored
                 if (!state.originalIndices) {
@@ -1833,6 +2142,12 @@
 
                 // Store problematic faces for later hiding
                 state.stretchedTriangleFaces = problematicFaces;
+
+                // Visualize the most problematic edges BEFORE resetting pose
+                if (problematicEdges.length > 0) {
+                    log(`Visualizing top ${Math.min(20, problematicEdges.length)} longest stretched edges...`);
+                    visualizeStretchedEdges(problematicEdges.slice(0, 20));
+                }
 
                 // Reset to original pose
                 log('Resetting to rest pose...');
@@ -1846,20 +2161,6 @@
 
                 // Restore spine rigid mode setting
                 document.getElementById('chk-spine-rigid').checked = savedSpineRigid;
-
-                // Wait for mesh to return to rest pose
-                await new Promise(resolve => {
-                    let frameCount = 0;
-                    const checkFrame = () => {
-                        frameCount++;
-                        if (frameCount >= 2) {
-                            resolve();
-                        } else {
-                            requestAnimationFrame(checkFrame);
-                        }
-                    };
-                    requestAnimationFrame(checkFrame);
-                });
 
                 // Now hide the problematic triangles
                 log('Hiding stretched triangles...');
@@ -1880,6 +2181,10 @@
 
                 log(`Hidden ${problematicFaces.size} stretched triangles`, 'success');
                 log('Mesh returned to rest pose with problematic triangles hidden', 'success');
+                
+                if (problematicEdges.length > 0) {
+                    log(`Visualization: Showing ${Math.min(20, problematicEdges.length)} longest stretched edges in RED`, 'info');
+                }
 
             } catch (error) {
                 log(`Error during stretched triangle detection: ${error.message}`, 'error');
@@ -1894,6 +2199,39 @@
                 state.spineRigidRotation = savedSpineRigidRotation;
                 state.skeleton.update();
                 document.getElementById('chk-spine-rigid').checked = savedSpineRigid;
+            }
+        }
+
+        // Visualize the most stretched edges as red lines
+        function visualizeStretchedEdges(problematicEdges) {
+            // Remove existing visualizer
+            if (state.stretchedTriangleVisualizer) {
+                state.scene.remove(state.stretchedTriangleVisualizer);
+            }
+
+            const points = [];
+            for (const { edge } of problematicEdges) {
+                points.push(edge[0], edge[1]);
+            }
+
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({ 
+                color: 0xff0000, 
+                linewidth: 3,
+                opacity: 0.8,
+                transparent: true
+            });
+
+            state.stretchedTriangleVisualizer = new THREE.LineSegments(geometry, material);
+            state.scene.add(state.stretchedTriangleVisualizer);
+        }
+
+        // Clear the stretched edge visualization
+        function clearStretchedEdgeVisualization() {
+            if (state.stretchedTriangleVisualizer) {
+                state.scene.remove(state.stretchedTriangleVisualizer);
+                state.stretchedTriangleVisualizer = null;
+                log('Cleared stretched edge visualization');
             }
         }
 
@@ -2002,7 +2340,12 @@
 
         // Stretched triangle threshold slider
         document.getElementById('stretch-threshold').addEventListener('input', (e) => {
-            document.getElementById('stretch-threshold-value').textContent = parseFloat(e.target.value).toFixed(1);
+            document.getElementById('stretch-threshold-value').textContent = parseFloat(e.target.value).toFixed(2);
+        });
+        
+        // Clear visualization button
+        document.getElementById('btn-clear-viz').addEventListener('click', () => {
+            clearStretchedEdgeVisualization();
         });
 
         // Hide stretched triangles checkbox
@@ -2010,11 +2353,12 @@
             if (e.target.checked) {
                 // Re-apply detection with current threshold
                 if (state.skinnedClothingMesh) {
-                    detectAndHideStretchedTriangles();
+                    detectStretchedTrianglesWithTestPose();
                 }
             } else {
                 // Restore all triangles
                 restoreAllTriangles();
+                clearStretchedEdgeVisualization();
             }
         });
 
