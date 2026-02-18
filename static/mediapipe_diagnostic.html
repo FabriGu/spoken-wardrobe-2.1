@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaPipe Pose Diagnostic Tool (with Spine Rigid Transform)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #16213e;
+            padding: 20px;
+            border-bottom: 2px solid #0f3460;
+        }
+
+        .header h1 {
+            color: #e94560;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #0f3460;
+        }
+
+        .panel {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .panel h3 {
+            color: #e94560;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        button {
+            background: #0f3460;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            width: 100%;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #e94560;
+        }
+
+        button.active {
+            background: #e94560;
+        }
+
+        button:disabled {
+            background: #333;
+            cursor: not-allowed;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            display: block;
+            background: #0f3460;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .file-label:hover {
+            background: #e94560;
+        }
+
+        .viewport {
+            position: relative;
+            background: #0f0f23;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .overlay-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            max-width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .overlay-info h4 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            margin-bottom: 8px;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .info-label {
+            color: #888;
+            font-size: 11px;
+        }
+
+        .info-value {
+            color: #fff;
+            font-family: monospace;
+        }
+
+        .info-value.error {
+            color: #e94560;
+        }
+
+        .info-value.warning {
+            color: #ffa500;
+        }
+
+        .info-value.success {
+            color: #4ade80;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .legend h4 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+
+        .log-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 340px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11px;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 2px 5px;
+            border-left: 3px solid #333;
+        }
+
+        .log-entry.error {
+            border-left-color: #e94560;
+            color: #e94560;
+        }
+
+        .log-entry.warning {
+            border-left-color: #ffa500;
+            color: #ffa500;
+        }
+
+        .log-entry.success {
+            border-left-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .log-entry.info {
+            border-left-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .checkbox-group label {
+            display: inline;
+            margin-bottom: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e94560;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎥 MediaPipe Pose Diagnostic Tool</h1>
+        <p style="color: #888; font-size: 14px; margin-top: -10px;">With Spine Rigid Transform & Real-time Body Tracking</p>
+        <p>Diagnose skin weight transfer issues between body mesh and clothing mesh</p>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="panel">
+                <h3>Load Meshes</h3>
+                <label class="file-label" for="body-input">
+                    📁 Load Body Mesh (GLB)
+                </label>
+                <input type="file" id="body-input" accept=".glb,.gltf">
+                
+                <label class="file-label" for="clothing-input">
+                    📁 Load Clothing Mesh (GLB)
+                </label>
+                <input type="file" id="clothing-input" accept=".glb,.gltf">
+
+                <button id="btn-sample-meshes">Use Sample Meshes</button>
+            </div>
+
+            <div class="panel">
+                <h3>Visualization Modes</h3>
+                <button id="btn-weights" class="viz-btn">Show Weight Painting</button>
+                <button id="btn-wireframe" class="viz-btn">Wireframe Mode</button>
+                <button id="btn-bones" class="viz-btn">Show Skeleton</button>
+                <button id="btn-heatmap" class="viz-btn">Distance Heatmap</button>
+                <button id="btn-normals" class="viz-btn">Normal Vectors</button>
+            </div>
+
+            <div class="panel">
+                <h3>Diagnostics</h3>
+                <button id="btn-analyze">Run Full Analysis</button>
+                <button id="btn-check-bind">Check Bind Matrices</button>
+                <button id="btn-check-weights">Validate Weights</button>
+                <button id="btn-check-topology">Check Topology</button>
+            </div>
+
+            <div class="panel">
+                <h3>Manual Alignment</h3>
+                <div class="control-group">
+                    <label>Scale: <span id="scale-value">1.0</span></label>
+                    <input type="range" id="scale-slider" min="0.1" max="3.0" step="0.1" value="1.0" style="width: 100%;">
+                </div>
+                <div class="control-group">
+                    <label>Position X: <span id="posx-value">0.0</span></label>
+                    <input type="range" id="posx-slider" min="-2" max="2" step="0.1" value="0" style="width: 100%;">
+                </div>
+                <div class="control-group">
+                    <label>Position Y: <span id="posy-value">0.0</span></label>
+                    <input type="range" id="posy-slider" min="-2" max="2" step="0.1" value="0" style="width: 100%;">
+                </div>
+                <div class="control-group">
+                    <label>Position Z: <span id="posz-value">0.0</span></label>
+                    <input type="range" id="posz-slider" min="-2" max="2" step="0.1" value="0" style="width: 100%;">
+                </div>
+                <button id="btn-apply-transform">Apply Transform</button>
+                <button id="btn-reset-transform">Reset Transform</button>
+                <button id="btn-auto-align">Auto Align</button>
+            </div>
+
+            <div class="panel">
+                <h3>Test Deformation</h3>
+                <div class="control-group">
+                    <label>Bone Rotation Test</label>
+                    <button id="btn-rotate-arm-l">Rotate Left Arm</button>
+                    <button id="btn-rotate-arm-r">Rotate Right Arm</button>
+                    <button id="btn-reset-pose">Reset to Rest Pose</button>
+                </div>
+                <div class="control-group">
+                    <label>Spine Rotation (Rigid Mode)</label>
+                    <button id="btn-spine-pitch">Pitch (X)</button>
+                    <button id="btn-spine-yaw">Yaw (Y)</button>
+                    <button id="btn-spine-roll">Roll (Z)</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Settings</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-inpainting" checked>
+                    <label for="chk-inpainting">Use Weight Inpainting</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-spine-rigid" checked>
+                    <label for="chk-spine-rigid">Spine Rigid Transform Mode</label>
+                    <p style="font-size: 11px; color: #888; margin: 5px 0 0 20px;">When enabled, spine rotation moves entire mesh without warping</p>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-hide-stretched" checked>
+                    <label for="chk-hide-stretched">Hide Stretched Triangles</label>
+                    <p style="font-size: 11px; color: #888; margin: 5px 0 0 20px;">Auto-detect and hide triangles with very long edges (reduces artifacts)</p>
+                    <label style="font-size: 11px; margin-left: 20px;">Threshold: <span id="stretch-threshold-value">5.0</span></label>
+                    <input type="range" id="stretch-threshold" min="0.1" max="1" step="0.1" value="0.5" style="width: 80%; margin-left: 20px;">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-show-body" checked>
+                    <label for="chk-show-body">Show Body Mesh</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-show-clothing" checked>
+                    <label for="chk-show-clothing">Show Clothing Mesh</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="viewport">
+            <canvas id="canvas"></canvas>
+            
+            <div class="overlay-info" id="info-panel">
+                <h4>Mesh Info</h4>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value" id="info-status">No meshes loaded</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Body Mesh</div>
+                    <div class="info-value" id="info-body">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Clothing Mesh</div>
+                    <div class="info-value" id="info-clothing">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Weight Transfer</div>
+                    <div class="info-value" id="info-transfer">-</div>
+                </div>
+                <div id="diagnostic-results"></div>
+            </div>
+
+            <div class="legend" id="legend-panel" style="display: none;">
+                <h4>Bone Colors</h4>
+                <div id="legend-content"></div>
+            </div>
+
+            <div class="log-container" id="log-container">
+                <div class="log-entry info">Diagnostic tool ready. Load meshes to begin.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js from CDN -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { MeshBVH, acceleratedRaycast } from 'https://unpkg.com/three-mesh-bvh@0.7.0/build/index.module.js';
+        import { MeshAligner } from './js/MeshAligner.js';
+        
+        // Enable BVH acceleration
+        if (THREE && THREE.Mesh && acceleratedRaycast) {
+            THREE.Mesh.prototype.raycast = acceleratedRaycast;
+        }
+
+        // Global state
+        const state = {
+            bodyMesh: null,
+            clothingMesh: null,
+            skinnedClothingMesh: null,
+            skeleton: null,
+            scene: null,
+            camera: null,
+            renderer: null,
+            controls: null,
+            skeletonHelper: null,
+            boneHelpers: [],
+            currentVizMode: 'normal',
+            diagnosticResults: {}
+        };
+
+        // Bone colors for visualization
+        const boneColors = [
+            new THREE.Color(0xff0000), // Red - root/hips
+            new THREE.Color(0x00ff00), // Green - spine
+            new THREE.Color(0x0000ff), // Blue
+            new THREE.Color(0xffff00), // Yellow
+            new THREE.Color(0xff00ff), // Magenta
+            new THREE.Color(0x00ffff), // Cyan
+            new THREE.Color(0xff8000), // Orange
+            new THREE.Color(0x8000ff), // Purple
+            new THREE.Color(0x00ff80), // Teal
+        ];
+
+        // Logger
+        function log(message, type = 'info') {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Initialize Three.js
+        function init() {
+            const canvas = document.getElementById('canvas');
+            
+            // Scene
+            state.scene = new THREE.Scene();
+            state.scene.background = new THREE.Color(0x0f0f23);
+
+            // Camera
+            state.camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.01, 100);
+            state.camera.position.set(0, 1, 3);
+            state.camera.lookAt(0, 1, 0);
+
+            // Renderer
+            state.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            state.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            state.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Controls
+            state.controls = new OrbitControls(state.camera, canvas);
+            state.controls.target.set(0, 1, 0);
+            state.controls.update();
+
+            // Lights
+            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+            state.scene.add(ambient);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+            dirLight.position.set(2, 2, 1);
+            state.scene.add(dirLight);
+
+            const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
+            fillLight.position.set(-1, 1, -1);
+            state.scene.add(fillLight);
+
+            // Grid helper
+            const grid = new THREE.GridHelper(5, 10, 0x444444, 0x222222);
+            state.scene.add(grid);
+
+            // Handle resize
+            window.addEventListener('resize', onResize);
+
+            animate();
+            log('Three.js initialized');
+        }
+
+        function onResize() {
+            const canvas = document.getElementById('canvas');
+            state.camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            state.camera.updateProjectionMatrix();
+            state.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Apply spine rigid transform if enabled
+            if (state.spineRigidRotation && state.skinnedClothingMesh) {
+                // Store original quaternion on first use
+                if (!state.skinnedClothingMesh.userData.originalQuaternion) {
+                    state.skinnedClothingMesh.userData.originalQuaternion = state.skinnedClothingMesh.quaternion.clone();
+                }
+
+                // Apply spine rotation as rigid transform to entire mesh
+                state.skinnedClothingMesh.quaternion.copy(state.skinnedClothingMesh.userData.originalQuaternion);
+                state.skinnedClothingMesh.quaternion.multiply(state.spineRigidRotation);
+            }
+
+            state.controls.update();
+            state.renderer.render(state.scene, state.camera);
+        }
+
+        // Load GLB file
+        async function loadGLB(file) {
+            return new Promise((resolve, reject) => {
+                const loader = new GLTFLoader();
+                const url = URL.createObjectURL(file);
+                loader.load(url, (gltf) => {
+                    URL.revokeObjectURL(url);
+                    resolve(gltf);
+                }, undefined, (error) => {
+                    URL.revokeObjectURL(url);
+                    reject(error);
+                });
+            });
+        }
+
+        // Find skinned mesh in GLTF
+        function findSkinnedMesh(gltf) {
+            let skinnedMesh = null;
+            gltf.scene.traverse((child) => {
+                if (child.isSkinnedMesh && !skinnedMesh) {
+                    skinnedMesh = child;
+                }
+            });
+            return skinnedMesh;
+        }
+
+        // Find any mesh in GLTF
+        function findMesh(gltf) {
+            let mesh = null;
+            gltf.scene.traverse((child) => {
+                if (child.isMesh && !mesh) {
+                    mesh = child;
+                }
+            });
+            return mesh;
+        }
+
+        // Update info panel
+        function updateInfo() {
+            const statusEl = document.getElementById('info-status');
+            const bodyEl = document.getElementById('info-body');
+            const clothingEl = document.getElementById('info-clothing');
+            const transferEl = document.getElementById('info-transfer');
+
+            if (state.bodyMesh && state.clothingMesh) {
+                statusEl.textContent = 'Both meshes loaded';
+                statusEl.className = 'info-value success';
+            } else if (state.bodyMesh) {
+                statusEl.textContent = 'Body mesh loaded, waiting for clothing';
+                statusEl.className = 'info-value warning';
+            } else if (state.clothingMesh) {
+                statusEl.textContent = 'Clothing mesh loaded, waiting for body';
+                statusEl.className = 'info-value warning';
+            } else {
+                statusEl.textContent = 'No meshes loaded';
+                statusEl.className = 'info-value';
+            }
+
+            if (state.bodyMesh) {
+                const bones = state.bodyMesh.skeleton?.bones.length || 0;
+                const verts = state.bodyMesh.geometry?.attributes?.position?.count || 0;
+                bodyEl.innerHTML = `<span class="success">✓ Loaded</span><br>${bones} bones, ${verts} vertices`;
+            } else {
+                bodyEl.textContent = '-';
+            }
+
+            if (state.clothingMesh) {
+                const verts = state.clothingMesh.geometry?.attributes?.position?.count || 0;
+                clothingEl.innerHTML = `<span class="success">✓ Loaded</span><br>${verts} vertices`;
+            } else {
+                clothingEl.textContent = '-';
+            }
+
+            if (state.skinnedClothingMesh) {
+                transferEl.innerHTML = '<span class="success">✓ Complete</span>';
+            } else {
+                transferEl.textContent = 'Not performed';
+            }
+        }
+
+        // Track the loaded body scene for cleanup
+        let currentBodyScene = null;
+
+        // Load body mesh
+        async function loadBodyMesh(file) {
+            try {
+                log('Loading body mesh...');
+                
+                // COMPLETE CLEANUP of old body mesh
+                if (currentBodyScene) {
+                    // Traverse and dispose of all resources
+                    currentBodyScene.traverse((child) => {
+                        if (child.geometry) {
+                            child.geometry.dispose();
+                            log(`Disposed geometry: ${child.name || 'unnamed'}`);
+                        }
+                        if (child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(m => m.dispose());
+                            } else {
+                                child.material.dispose();
+                            }
+                        }
+                    });
+                    state.scene.remove(currentBodyScene);
+                    currentBodyScene = null;
+                    log('Removed old body mesh and disposed resources');
+                }
+                
+                // Clean up skeleton helper
+                if (state.skeletonHelper) {
+                    state.scene.remove(state.skeletonHelper);
+                    state.skeletonHelper.dispose && state.skeletonHelper.dispose();
+                    state.skeletonHelper = null;
+                }
+                
+                // Clean up body points visualization
+                if (state.bodyPoints) {
+                    state.scene.remove(state.bodyPoints);
+                    if (state.bodyPoints.geometry) state.bodyPoints.geometry.dispose();
+                    if (state.bodyPoints.material) state.bodyPoints.material.dispose();
+                    state.bodyPoints = null;
+                }
+                
+                // Reset state
+                state.bodyMesh = null;
+                state.skeleton = null;
+                
+                const gltf = await loadGLB(file);
+                
+                // Store reference to the scene for future cleanup
+                currentBodyScene = gltf.scene;
+
+                const skinnedMesh = findSkinnedMesh(gltf);
+                if (!skinnedMesh) {
+                    log('No SkinnedMesh found in body GLB', 'error');
+                    return;
+                }
+
+                state.bodyMesh = skinnedMesh;
+                state.skeleton = skinnedMesh.skeleton;
+
+                // Add to scene
+                state.scene.add(gltf.scene);
+
+                // Configure visibility
+                const showBody = document.getElementById('chk-show-body').checked;
+                state.bodyMesh.visible = showBody;
+                if (showBody) {
+                    state.bodyMesh.material = new THREE.MeshBasicMaterial({
+                        color: 0xff0000,
+                        wireframe: true,
+                        transparent: true,
+                        opacity: 0.3
+                    });
+                }
+
+                // Add skeleton helper
+                state.skeletonHelper = new THREE.SkeletonHelper(state.bodyMesh);
+                state.skeletonHelper.visible = document.getElementById('btn-bones').classList.contains('active');
+                state.scene.add(state.skeletonHelper);
+
+                log(`Body mesh loaded: ${state.skeleton.bones.length} bones`, 'success');
+                log(`Bone names: ${state.skeleton.bones.map(b => b.name).join(', ')}`);
+                
+                updateInfo();
+                updateLegend();
+
+            } catch (error) {
+                log(`Failed to load body mesh: ${error.message}`, 'error');
+            }
+        }
+
+        // Load clothing mesh
+        async function loadClothingMesh(file) {
+            try {
+                log('Loading clothing mesh...');
+                const gltf = await loadGLB(file);
+                
+                // Remove existing clothing mesh
+                if (state.clothingMesh) {
+                    state.scene.remove(state.clothingMesh.parent || state.clothingMesh);
+                }
+                if (state.skinnedClothingMesh) {
+                    state.scene.remove(state.skinnedClothingMesh);
+                    state.skinnedClothingMesh = null;
+                }
+
+                const mesh = findMesh(gltf);
+                if (!mesh) {
+                    log('No mesh found in clothing GLB', 'error');
+                    return;
+                }
+
+                state.clothingMesh = mesh;
+
+                // Add to scene
+                const showClothing = document.getElementById('chk-show-clothing').checked;
+                mesh.visible = showClothing;
+                
+                // Apply default material if needed
+                if (!mesh.material || mesh.material.opacity === 0) {
+                    mesh.material = new THREE.MeshStandardMaterial({
+                        color: 0x8b5cf6,
+                        metalness: 0.2,
+                        roughness: 0.7,
+                        side: THREE.DoubleSide
+                    });
+                } else {
+                    mesh.material = mesh.material.clone();
+                    mesh.material.side = THREE.DoubleSide;
+                }
+
+                state.scene.add(gltf.scene);
+
+                log(`Clothing mesh loaded: ${mesh.geometry.attributes.position.count} vertices`, 'success');
+                log('Use Manual Alignment sliders to position/scale clothing, then click "Apply Transform" for weight transfer');
+                
+                // Reset sliders
+                scaleSlider.value = 1.0;
+                posXSlider.value = 0;
+                posYSlider.value = 0;
+                posZSlider.value = 0;
+                updateSliderLabels();
+                
+                updateInfo();
+
+            } catch (error) {
+                log(`Failed to load clothing mesh: ${error.message}`, 'error');
+            }
+        }
+
+        // Perform weight transfer (simplified version for diagnostics)
+        async function performWeightTransfer() {
+            if (!state.bodyMesh || !state.clothingMesh) {
+                log('Both meshes must be loaded for weight transfer', 'error');
+                return;
+            }
+
+            try {
+                log('Starting weight transfer...');
+                log(`Using clothing transform: scale=${state.clothingMesh.scale.x.toFixed(3)}, pos=(${state.clothingMesh.position.x.toFixed(3)}, ${state.clothingMesh.position.y.toFixed(3)}, ${state.clothingMesh.position.z.toFixed(3)})`);
+
+                // Remove existing skinned clothing
+                if (state.skinnedClothingMesh) {
+                    state.scene.remove(state.skinnedClothingMesh);
+                }
+
+                // Clone geometries
+                const clothingGeo = state.clothingMesh.geometry.clone();
+                const bodyGeo = state.bodyMesh.geometry.clone();
+
+                // Apply world transforms (includes manual alignment)
+                state.bodyMesh.updateMatrixWorld(true);
+                state.clothingMesh.updateMatrixWorld(true);
+                
+                log(`Body mesh world matrix: ${state.bodyMesh.matrixWorld.elements.slice(12, 15).map(v => v.toFixed(3))}`);
+                log(`Clothing mesh world matrix: ${state.clothingMesh.matrixWorld.elements.slice(12, 15).map(v => v.toFixed(3))}`);
+                
+                bodyGeo.applyMatrix4(state.bodyMesh.matrixWorld);
+                clothingGeo.applyMatrix4(state.clothingMesh.matrixWorld);
+                
+                // Check bounds after transformation
+                const bodyBox = new THREE.Box3().setFromBufferAttribute(bodyGeo.attributes.position);
+                const clothingBox = new THREE.Box3().setFromBufferAttribute(clothingGeo.attributes.position);
+                log(`Body bounds after transform: min=[${bodyBox.min.toArray().map(v => v.toFixed(3))}], max=[${bodyBox.max.toArray().map(v => v.toFixed(3))}]`);
+                log(`Clothing bounds after transform: min=[${clothingBox.min.toArray().map(v => v.toFixed(3))}], max=[${clothingBox.max.toArray().map(v => v.toFixed(3))}]`);
+
+                // Transfer weights
+                const numVerts = clothingGeo.attributes.position.count;
+                const skinIndices = new Uint16Array(numVerts * 4);
+                const skinWeights = new Float32Array(numVerts * 4);
+
+                const bodyPositions = bodyGeo.attributes.position;
+                const bodySkinIndices = bodyGeo.attributes.skinIndex;
+                const bodySkinWeights = bodyGeo.attributes.skinWeight;
+
+                log(`Body geometry: ${bodyPositions.count} vertices`);
+                log(`Body skinIndex: ${bodySkinIndices ? 'present' : 'MISSING'}`);
+                log(`Body skinWeight: ${bodySkinWeights ? 'present' : 'MISSING'}`);
+                
+                // Log sample positions
+                log(`Sample body positions (first 5):`);
+                for (let i = 0; i < Math.min(5, bodyPositions.count); i++) {
+                    const x = bodyPositions.getX(i);
+                    const y = bodyPositions.getY(i);
+                    const z = bodyPositions.getZ(i);
+                    log(`  [${x.toFixed(3)}, ${y.toFixed(3)}, ${z.toFixed(3)}]`);
+                }
+                log(`Sample clothing positions (first 5):`);
+                for (let i = 0; i < Math.min(5, clothingGeo.attributes.position.count); i++) {
+                    const x = clothingGeo.attributes.position.getX(i);
+                    const y = clothingGeo.attributes.position.getY(i);
+                    const z = clothingGeo.attributes.position.getZ(i);
+                    log(`  [${x.toFixed(3)}, ${y.toFixed(3)}, ${z.toFixed(3)}]`);
+                }
+                
+                // Create point cloud visualization of body vertices
+                const bodyPointsGeometry = new THREE.BufferGeometry();
+                const bodyPointsPositions = [];
+                const bodyPointsColors = [];
+                const boneColors = [
+                    [1,0,0], [0,1,0], [0,0,1], [1,1,0], [1,0,1],
+                    [0,1,1], [1,0.5,0], [0.5,0,1], [0,0.5,1], [0.5,0.5,0.5]
+                ];
+                for (let i = 0; i < bodyPositions.count; i++) {
+                    bodyPointsPositions.push(
+                        bodyPositions.getX(i),
+                        bodyPositions.getY(i),
+                        bodyPositions.getZ(i)
+                    );
+                    // Color by dominant bone
+                    let maxW = 0, maxB = 0;
+                    for (let k = 0; k < 4; k++) {
+                        // FIX: Use direct array access instead of getX(i*4+k)
+                        const w = bodySkinWeights.array[i * 4 + k];
+                        const b = bodySkinIndices.array[i * 4 + k];
+                        if (w > maxW) { maxW = w; maxB = b; }
+                    }
+                    const color = boneColors[maxB % 10] || [0.5,0.5,0.5];
+                    bodyPointsColors.push(...color);
+                }
+                bodyPointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(bodyPointsPositions, 3));
+                bodyPointsGeometry.setAttribute('color', new THREE.Float32BufferAttribute(bodyPointsColors, 3));
+                const bodyPoints = new THREE.Points(
+                    bodyPointsGeometry,
+                    new THREE.PointsMaterial({ size: 0.05, vertexColors: true })
+                );
+                state.scene.add(bodyPoints);
+                state.bodyPoints = bodyPoints;
+                log('Added body vertex visualization (colored points)');
+
+                // Diagnostic logging: Analyze body mesh bone distribution
+                log('=== Body Mesh Skinning Data ===');
+                log(`Total vertices: ${bodyPositions.count}`);
+                const bodyboneCounts = {};
+                for (let i = 0; i < bodyPositions.count; i++) {
+                    let maxW = 0, maxB = 0;
+                    for (let k = 0; k < 4; k++) {
+                        const w = bodySkinWeights.array[i * 4 + k];
+                        const b = bodySkinIndices.array[i * 4 + k];
+                        if (w > maxW) { maxW = w; maxB = b; }
+                    }
+                    bodyboneCounts[maxB] = (bodyboneCounts[maxB] || 0) + 1;
+                }
+                log('Body mesh bone distribution:');
+                Object.entries(bodyboneCounts).sort((a, b) => b[1] - a[1]).forEach(([boneIdx, count]) => {
+                    const boneName = state.skeleton.bones[boneIdx]?.name || `bone_${boneIdx}`;
+                    const pct = (count / bodyPositions.count * 100).toFixed(1);
+                    log(`  ${boneName}: ${count} verts (${pct}%)`);
+                });
+
+                // Build BVH for body mesh to find closest point on surface (not just vertices)
+                log('Building BVH for body mesh...');
+                const bodyMeshForBVH = new THREE.Mesh(bodyGeo);
+                const bvh = new MeshBVH(bodyGeo);
+                log('BVH built');
+
+                let matchedCount = 0;
+                let zeroWeightCount = 0;
+                const target = { point: new THREE.Vector3(), distance: Infinity, faceIndex: -1 };
+
+                for (let i = 0; i < numVerts; i++) {
+                    const cx = clothingGeo.attributes.position.getX(i);
+                    const cy = clothingGeo.attributes.position.getY(i);
+                    const cz = clothingGeo.attributes.position.getZ(i);
+                    
+                    // Find closest point on body mesh surface using BVH
+                    target.point.set(0, 0, 0);
+                    target.distance = Infinity;
+                    target.faceIndex = -1;
+                    
+                    bvh.closestPointToPoint(new THREE.Vector3(cx, cy, cz), target);
+                    
+                    if (target.faceIndex === -1) {
+                        // No closest point found - assign to root bone
+                        skinIndices[i * 4] = 0;
+                        skinIndices[i * 4 + 1] = 0;
+                        skinIndices[i * 4 + 2] = 0;
+                        skinIndices[i * 4 + 3] = 0;
+                        skinWeights[i * 4] = 1.0;
+                        skinWeights[i * 4 + 1] = 0;
+                        skinWeights[i * 4 + 2] = 0;
+                        skinWeights[i * 4 + 3] = 0;
+                        zeroWeightCount++;
+                        continue;
+                    }
+
+                    // Get the triangle containing the closest point
+                    const indexAttr = bodyGeo.index;
+                    let i0, i1, i2;
+                    if (indexAttr) {
+                        i0 = indexAttr.getX(target.faceIndex * 3);
+                        i1 = indexAttr.getX(target.faceIndex * 3 + 1);
+                        i2 = indexAttr.getX(target.faceIndex * 3 + 2);
+                    } else {
+                        i0 = target.faceIndex * 3;
+                        i1 = target.faceIndex * 3 + 1;
+                        i2 = target.faceIndex * 3 + 2;
+                    }
+
+                    // Get triangle vertices
+                    const v0 = new THREE.Vector3(bodyPositions.getX(i0), bodyPositions.getY(i0), bodyPositions.getZ(i0));
+                    const v1 = new THREE.Vector3(bodyPositions.getX(i1), bodyPositions.getY(i1), bodyPositions.getZ(i1));
+                    const v2 = new THREE.Vector3(bodyPositions.getX(i2), bodyPositions.getY(i2), bodyPositions.getZ(i2));
+
+                    // Calculate barycentric coordinates of closest point on triangle
+                    const bary = getBarycentric(target.point, v0, v1, v2);
+
+                    // FIX: Proper barycentric interpolation with bone influence aggregation
+                    // Collect bone influences from all 3 triangle vertices
+                    const boneInfluences = new Map();
+
+                    for (const [vertIdx, baryWeight] of [[i0, bary.u], [i1, bary.v], [i2, bary.w]]) {
+                        for (let k = 0; k < 4; k++) {
+                            const boneIdx = bodySkinIndices.array[vertIdx * 4 + k];
+                            const weight = bodySkinWeights.array[vertIdx * 4 + k] * baryWeight;
+
+                            if (weight > 0.001) {
+                                boneInfluences.set(boneIdx, (boneInfluences.get(boneIdx) || 0) + weight);
+                            }
+                        }
+                    }
+
+                    // Sort by weight and take top 4
+                    const sorted = Array.from(boneInfluences.entries())
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 4);
+
+                    // Normalize so weights sum to 1.0
+                    const totalWeight = sorted.reduce((sum, [_, w]) => sum + w, 0);
+
+                    for (let j = 0; j < 4; j++) {
+                        if (j < sorted.length && totalWeight > 0) {
+                            skinIndices[i * 4 + j] = sorted[j][0];
+                            skinWeights[i * 4 + j] = sorted[j][1] / totalWeight;
+                        } else {
+                            skinIndices[i * 4 + j] = 0;
+                            skinWeights[i * 4 + j] = 0;
+                        }
+                    }
+
+                    const hasWeight = skinWeights[i * 4] > 0.001 || skinWeights[i * 4 + 1] > 0.001 || 
+                                     skinWeights[i * 4 + 2] > 0.001 || skinWeights[i * 4 + 3] > 0.001;
+                    if (hasWeight) matchedCount++;
+                    else zeroWeightCount++;
+                }
+
+                function getBarycentric(p, a, b, c) {
+                    const v0 = new THREE.Vector3().subVectors(b, a);
+                    const v1 = new THREE.Vector3().subVectors(c, a);
+                    const v2 = new THREE.Vector3().subVectors(p, a);
+                    
+                    const d00 = v0.dot(v0);
+                    const d01 = v0.dot(v1);
+                    const d11 = v1.dot(v1);
+                    const d20 = v2.dot(v0);
+                    const d21 = v2.dot(v1);
+                    
+                    const denom = d00 * d11 - d01 * d01;
+                    if (Math.abs(denom) < 1e-10) return { u: 1/3, v: 1/3, w: 1/3 };
+                    
+                    const v = (d11 * d20 - d01 * d21) / denom;
+                    const w = (d00 * d21 - d01 * d20) / denom;
+                    const u = 1 - v - w;
+                    
+                    return { u, v, w };
+                }
+
+                log(`Weight transfer: ${matchedCount} vertices with weight, ${zeroWeightCount} with zero weight`);
+                
+                // Log bone distribution in transferred weights
+                const transferredBoneCounts = {};
+                for (let i = 0; i < numVerts; i++) {
+                    let maxW = 0;
+                    let maxB = 0;
+                    for (let k = 0; k < 4; k++) {
+                        const w = skinWeights[i * 4 + k];
+                        const b = skinIndices[i * 4 + k];
+                        if (w > maxW) {
+                            maxW = w;
+                            maxB = b;
+                        }
+                    }
+                    transferredBoneCounts[maxB] = (transferredBoneCounts[maxB] || 0) + 1;
+                }
+                log('Transferred weights bone distribution:');
+                Object.entries(transferredBoneCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .forEach(([boneIdx, count]) => {
+                        const boneName = state.skeleton.bones[boneIdx]?.name || `bone_${boneIdx}`;
+                        const pct = (count / numVerts * 100).toFixed(1);
+                        log(`  ${boneName}: ${count} verts (${pct}%)`);
+                    });
+
+                // CRITICAL FIX: Apply weights to FRESH clone of ORIGINAL geometry (local space)
+                // NOT the world-space geometry we used for matching
+                const finalClothingGeo = state.clothingMesh.geometry.clone();
+                finalClothingGeo.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+                finalClothingGeo.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
+
+                // Create SkinnedMesh with SAME transform as aligned clothing mesh
+                state.skinnedClothingMesh = new THREE.SkinnedMesh(
+                    finalClothingGeo,
+                    state.clothingMesh.material.clone()
+                );
+
+                // Copy transform from clothing mesh (preserves manual alignment)
+                state.skinnedClothingMesh.position.copy(state.clothingMesh.position);
+                state.skinnedClothingMesh.rotation.copy(state.clothingMesh.rotation);
+                state.skinnedClothingMesh.scale.copy(state.clothingMesh.scale);
+                state.skinnedClothingMesh.updateMatrixWorld(true);
+
+                // Bind to skeleton
+                // NOTE: We use the skeleton as-is from the GLB. The bind matrices
+                // in the GLB were calculated for the body mesh in its current pose.
+                state.skinnedClothingMesh.bind(state.skeleton);
+                state.skinnedClothingMesh.frustumCulled = false;
+
+                // Add to scene
+                state.scene.add(state.skinnedClothingMesh);
+
+                // Hide original clothing
+                state.clothingMesh.visible = false;
+
+                // Add summary logging
+                log('=== Weight Transfer Results ===');
+                log(`Vertices with weight: ${matchedCount} (${(matchedCount / numVerts * 100).toFixed(1)}%)`);
+                log(`Vertices with zero weight: ${zeroWeightCount} (${(zeroWeightCount / numVerts * 100).toFixed(1)}%)`);
+                log('Weight transfer complete!', 'success');
+                updateInfo();
+
+                // Validate the transfer
+                validateWeightTransfer();
+
+                // Detect and optionally hide stretched triangles using test poses
+                if (document.getElementById('chk-hide-stretched').checked) {
+                    await detectStretchedTrianglesWithTestPose();
+                }
+
+            } catch (error) {
+                log(`Weight transfer failed: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        // Reset skeleton to rest pose
+        function resetSkeletonToRestPose() {
+            if (!state.skeleton) return;
+
+            state.skeleton.bones.forEach(bone => {
+                bone.position.copy(bone.userData?.restPosition || bone.position);
+                bone.quaternion.copy(bone.userData?.restQuaternion || new THREE.Quaternion());
+                bone.scale.copy(bone.userData?.restScale || new THREE.Vector3(1, 1, 1));
+            });
+            state.skeleton.update();
+        }
+
+        // Validate weight transfer
+        function validateWeightTransfer() {
+            if (!state.skinnedClothingMesh) {
+                log('No skinned clothing mesh to validate', 'error');
+                return;
+            }
+
+            const geo = state.skinnedClothingMesh.geometry;
+            const skinIndices = geo.attributes.skinIndex;
+            const skinWeights = geo.attributes.skinWeight;
+            const numVerts = geo.attributes.position.count;
+
+            let issues = [];
+            let zeroWeightVerts = 0;
+            let unnormalizedVerts = 0;
+
+            // Per-bone vertex counts
+            const boneCounts = {};
+
+            for (let i = 0; i < numVerts; i++) {
+                let totalWeight = 0;
+                let hasWeight = false;
+
+                for (let j = 0; j < 4; j++) {
+                    // FIX: Use direct array access instead of getX(i*4+j)
+                    const weight = skinWeights.array[i * 4 + j];
+                    const boneIdx = skinIndices.array[i * 4 + j];
+                    totalWeight += weight;
+
+                    if (weight > 0.001) {
+                        hasWeight = true;
+                        boneCounts[boneIdx] = (boneCounts[boneIdx] || 0) + 1;
+                    }
+                }
+
+                if (!hasWeight) {
+                    zeroWeightVerts++;
+                }
+
+                if (Math.abs(totalWeight - 1.0) > 0.01 && hasWeight) {
+                    unnormalizedVerts++;
+                }
+            }
+
+            log('--- Weight Validation Results ---');
+            log(`Total vertices: ${numVerts}`);
+            log(`Vertices with zero weight: ${zeroWeightVerts}`, zeroWeightVerts > 0 ? 'warning' : 'success');
+            log(`Vertices with unnormalized weights: ${unnormalizedVerts}`, unnormalizedVerts > 0 ? 'warning' : 'success');
+
+            log('--- Bone Distribution ---');
+            Object.entries(boneCounts)
+                .sort((a, b) => b[1] - a[1])
+                .forEach(([boneIdx, count]) => {
+                    const pct = ((count / numVerts) * 100).toFixed(1);
+                    const boneName = state.skeleton?.bones[boneIdx]?.name || `bone_${boneIdx}`;
+                    log(`  ${boneName}: ${count} verts (${pct}%)`);
+                });
+
+            state.diagnosticResults.weights = {
+                totalVertices: numVerts,
+                zeroWeightVertices: zeroWeightVerts,
+                unnormalizedVertices: unnormalizedVerts,
+                boneDistribution: boneCounts
+            };
+        }
+
+        // Check bind matrices
+        function checkBindMatrices() {
+            if (!state.skeleton) {
+                log('No skeleton loaded', 'error');
+                return;
+            }
+
+            log('--- Bind Matrix Analysis ---');
+
+            const boneInverses = state.skeleton.boneInverses;
+            const bones = state.skeleton.bones;
+
+            bones.forEach((bone, i) => {
+                const matrix = bone.matrix;
+                const inverse = boneInverses[i];
+
+                // Check if matrices are valid
+                const hasNaN = matrix.elements.some(v => isNaN(v));
+                const inverseHasNaN = inverse.elements.some(v => isNaN(v));
+
+                if (hasNaN || inverseHasNaN) {
+                    log(`Bone ${bone.name}: INVALID (NaN detected)`, 'error');
+                }
+
+                // Check if matrix is identity-ish (should be for rest pose)
+                const isIdentity = matrix.elements.every((v, idx) => {
+                    const expected = idx === 0 || idx === 5 || idx === 10 || idx === 15 ? 1 : 0;
+                    return Math.abs(v - expected) < 0.001;
+                });
+
+                log(`Bone ${bone.name}: matrix is ${isIdentity ? 'identity (rest pose ✓)' : 'non-identity (pose applied!)'}`, 
+                    isIdentity ? 'success' : 'warning');
+            });
+        }
+
+        // Update legend
+        function updateLegend() {
+            if (!state.skeleton) return;
+
+            const legendPanel = document.getElementById('legend-panel');
+            const legendContent = document.getElementById('legend-content');
+            
+            legendContent.innerHTML = '';
+            
+            state.skeleton.bones.forEach((bone, i) => {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                
+                const color = document.createElement('div');
+                color.className = 'legend-color';
+                const hex = '#' + boneColors[i % boneColors.length].getHexString();
+                color.style.backgroundColor = hex;
+                
+                const label = document.createElement('span');
+                label.textContent = bone.name;
+                
+                item.appendChild(color);
+                item.appendChild(label);
+                legendContent.appendChild(item);
+            });
+
+            legendPanel.style.display = 'block';
+        }
+
+        // Visualization modes
+        function setVizMode(mode) {
+            state.currentVizMode = mode;
+
+            // Reset all
+            document.querySelectorAll('.viz-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Hide skeleton helper when switching modes (will show again if bones mode)
+            if (state.skeletonHelper) {
+                state.skeletonHelper.visible = false;
+            }
+
+            if (mode === 'weights') {
+                document.getElementById('btn-weights').classList.add('active');
+                applyWeightVisualization();
+            } else if (mode === 'wireframe') {
+                document.getElementById('btn-wireframe').classList.add('active');
+                applyWireframeMode();
+            } else if (mode === 'bones') {
+                document.getElementById('btn-bones').classList.add('active');
+                if (state.skeletonHelper) {
+                    state.skeletonHelper.visible = true;
+                    log('Skeleton visualization enabled');
+                } else {
+                    log('No skeleton helper available. Load body mesh first.', 'error');
+                }
+            } else if (mode === 'heatmap') {
+                document.getElementById('btn-heatmap').classList.add('active');
+                applyDistanceHeatmap();
+            } else if (mode === 'normals') {
+                document.getElementById('btn-normals').classList.add('active');
+                applyNormalVisualization();
+            } else {
+                // Normal mode
+                applyNormalMode();
+            }
+        }
+
+        function applyWeightVisualization() {
+            if (!state.skinnedClothingMesh) {
+                log('No skinned clothing mesh available', 'warning');
+                return;
+            }
+
+            const geo = state.skinnedClothingMesh.geometry;
+            const skinIndices = geo.attributes.skinIndex;
+            const skinWeights = geo.attributes.skinWeight;
+            const numVerts = geo.attributes.position.count;
+
+            const colors = new Float32Array(numVerts * 3);
+
+            for (let i = 0; i < numVerts; i++) {
+                let maxWeight = 0;
+                let dominantBone = 0;
+
+                for (let j = 0; j < 4; j++) {
+                    const weight = skinWeights.getX(i * 4 + j);
+                    if (weight > maxWeight) {
+                        maxWeight = weight;
+                        dominantBone = skinIndices.getX(i * 4 + j);
+                    }
+                }
+
+                const color = boneColors[dominantBone % boneColors.length];
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+            }
+
+            geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            state.skinnedClothingMesh.material = new THREE.MeshBasicMaterial({
+                vertexColors: true,
+                side: THREE.DoubleSide,
+                wireframe: false
+            });
+
+            log('Weight visualization applied');
+        }
+
+        function applyWireframeMode() {
+            const mesh = state.skinnedClothingMesh || state.clothingMesh;
+            if (mesh) {
+                mesh.material = new THREE.MeshBasicMaterial({
+                    color: 0x8b5cf6,
+                    wireframe: true,
+                    side: THREE.DoubleSide
+                });
+            }
+        }
+
+        function applyDistanceHeatmap() {
+            if (!state.skinnedClothingMesh || !state.bodyMesh) return;
+
+            const clothingGeo = state.skinnedClothingMesh.geometry;
+            const numVerts = clothingGeo.attributes.position.count;
+            const colors = new Float32Array(numVerts * 3);
+
+            // Compute distance from each vertex to closest body vertex
+            for (let i = 0; i < numVerts; i++) {
+                const cx = clothingGeo.attributes.position.getX(i);
+                const cy = clothingGeo.attributes.position.getY(i);
+                const cz = clothingGeo.attributes.position.getZ(i);
+
+                let minDist = Infinity;
+                const bodyPos = state.bodyMesh.geometry.attributes.position;
+
+                for (let j = 0; j < bodyPos.count; j++) {
+                    const bx = bodyPos.getX(j);
+                    const by = bodyPos.getY(j);
+                    const bz = bodyPos.getZ(j);
+
+                    const dist = Math.sqrt(
+                        (cx - bx) ** 2 + (cy - by) ** 2 + (cz - bz) ** 2
+                    );
+
+                    if (dist < minDist) {
+                        minDist = dist;
+                    }
+                }
+
+                // Color based on distance (red = far, green = close)
+                const t = Math.min(minDist / 0.5, 1);
+                colors[i * 3] = t;     // R
+                colors[i * 3 + 1] = 1 - t; // G
+                colors[i * 3 + 2] = 0;     // B
+            }
+
+            clothingGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            state.skinnedClothingMesh.material = new THREE.MeshBasicMaterial({
+                vertexColors: true,
+                side: THREE.DoubleSide
+            });
+
+            log('Distance heatmap applied (red = far, green = close)');
+        }
+
+        function applyNormalVisualization() {
+            if (!state.skinnedClothingMesh) return;
+
+            const geo = state.skinnedClothingMesh.geometry;
+            if (!geo.attributes.normal) {
+                geo.computeVertexNormals();
+            }
+
+            const normals = geo.attributes.normal;
+            const numVerts = geo.attributes.position.count;
+            const colors = new Float32Array(numVerts * 3);
+
+            for (let i = 0; i < numVerts; i++) {
+                // Map normal XYZ to RGB
+                colors[i * 3] = (normals.getX(i) + 1) / 2;
+                colors[i * 3 + 1] = (normals.getY(i) + 1) / 2;
+                colors[i * 3 + 2] = (normals.getZ(i) + 1) / 2;
+            }
+
+            geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            state.skinnedClothingMesh.material = new THREE.MeshBasicMaterial({
+                vertexColors: true,
+                side: THREE.DoubleSide
+            });
+
+            log('Normal visualization applied');
+        }
+
+        function applyNormalMode() {
+            if (state.skinnedClothingMesh) {
+                state.skinnedClothingMesh.material = new THREE.MeshStandardMaterial({
+                    color: 0x8b5cf6,
+                    metalness: 0.2,
+                    roughness: 0.7,
+                    side: THREE.DoubleSide
+                });
+            }
+        }
+
+        // Test rotations
+        function rotateBone(boneName, angle) {
+            if (!state.skeleton) {
+                log('No skeleton loaded', 'error');
+                return;
+            }
+
+            const bone = state.skeleton.bones.find(b => b.name === boneName);
+            if (!bone) {
+                log(`Bone "${boneName}" not found`, 'error');
+                return;
+            }
+
+            // Check if this is spine bone and rigid mode is enabled
+            const isSpineRigid = boneName === 'spine' && document.getElementById('chk-spine-rigid').checked;
+
+            if (isSpineRigid) {
+                // Store spine rotation to be applied as rigid transform to mesh
+                if (!state.spineRigidRotation) {
+                    state.spineRigidRotation = new THREE.Quaternion();
+                }
+                const axis = new THREE.Vector3(0, 0, 1);
+                const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+                state.spineRigidRotation.multiply(quaternion);
+
+                log(`Rotated ${boneName} by ${(angle * 180 / Math.PI).toFixed(1)}° (rigid mode)`);
+            } else {
+                // Normal skeletal deformation
+                const axis = new THREE.Vector3(0, 0, 1);
+                const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+                bone.quaternion.multiply(quaternion);
+                state.skeleton.update();
+
+                log(`Rotated ${boneName} by ${(angle * 180 / Math.PI).toFixed(1)}°`);
+            }
+        }
+
+        // Spine rotation around specific axis (for rigid transform mode)
+        function rotateSpineAxis(axis, angle) {
+            if (!state.skeleton) {
+                log('No skeleton loaded', 'error');
+                return;
+            }
+
+            const isSpineRigid = document.getElementById('chk-spine-rigid').checked;
+
+            if (isSpineRigid) {
+                // Store spine rotation to be applied as rigid transform to mesh
+                if (!state.spineRigidRotation) {
+                    state.spineRigidRotation = new THREE.Quaternion();
+                }
+                const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+                state.spineRigidRotation.multiply(quaternion);
+
+                const axisName = axis.x ? 'Pitch (X)' : axis.y ? 'Yaw (Y)' : 'Roll (Z)';
+                log(`Rotated spine ${axisName} by ${(angle * 180 / Math.PI).toFixed(1)}° (rigid mode)`);
+            } else {
+                // Apply to spine bone directly (skeletal deformation)
+                const bone = state.skeleton.bones.find(b => b.name === 'spine');
+                if (bone) {
+                    const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+                    bone.quaternion.multiply(quaternion);
+                    state.skeleton.update();
+
+                    const axisName = axis.x ? 'Pitch (X)' : axis.y ? 'Yaw (Y)' : 'Roll (Z)';
+                    log(`Rotated spine ${axisName} by ${(angle * 180 / Math.PI).toFixed(1)}°`);
+                }
+            }
+        }
+
+        function resetPose() {
+            if (!state.skeleton) return;
+
+            state.skeleton.bones.forEach(bone => {
+                bone.quaternion.set(0, 0, 0, 1);
+            });
+            state.skeleton.update();
+
+            // Reset spine rigid rotation
+            state.spineRigidRotation = null;
+
+            // Reset mesh transforms if rigid mode was active
+            if (state.skinnedClothingMesh && state.skinnedClothingMesh.userData.originalQuaternion) {
+                state.skinnedClothingMesh.quaternion.copy(state.skinnedClothingMesh.userData.originalQuaternion);
+            }
+
+            log('Pose reset to rest');
+        }
+
+        // Full analysis
+        function runFullAnalysis() {
+            log('=== Running Full Diagnostic Analysis ===', 'info');
+
+            if (!state.bodyMesh || !state.clothingMesh) {
+                log('Both meshes required for analysis', 'error');
+                return;
+            }
+
+            // 1. Mesh bounds comparison
+            const bodyBox = new THREE.Box3().setFromObject(state.bodyMesh);
+            const clothingBox = new THREE.Box3().setFromObject(state.clothingMesh);
+
+            const bodySize = bodyBox.getSize(new THREE.Vector3());
+            const clothingSize = clothingBox.getSize(new THREE.Vector3());
+
+            log('--- Mesh Bounds Comparison ---');
+            log(`Body size: ${bodySize.x.toFixed(3)} x ${bodySize.y.toFixed(3)} x ${bodySize.z.toFixed(3)}`);
+            log(`Clothing size: ${clothingSize.x.toFixed(3)} x ${clothingSize.y.toFixed(3)} x ${clothingSize.z.toFixed(3)}`);
+
+            const scaleDiff = Math.max(
+                Math.abs(bodySize.x - clothingSize.x) / bodySize.x,
+                Math.abs(bodySize.y - clothingSize.y) / bodySize.y,
+                Math.abs(bodySize.z - clothingSize.z) / bodySize.z
+            );
+
+            if (scaleDiff > 0.5) {
+                log(`⚠️ Significant size mismatch (${(scaleDiff * 100).toFixed(1)}%)!`, 'warning');
+                log('This can cause weight transfer artifacts.', 'warning');
+            } else {
+                log('✓ Size mismatch within acceptable range', 'success');
+            }
+
+            // 2. Check for degenerate triangles
+            const clothingGeo = state.clothingMesh.geometry;
+            const pos = clothingGeo.attributes.position;
+            let degenerate = 0;
+
+            if (clothingGeo.index) {
+                const indices = clothingGeo.index;
+                for (let i = 0; i < indices.count; i += 3) {
+                    const a = indices.getX(i);
+                    const b = indices.getX(i + 1);
+                    const c = indices.getX(i + 2);
+
+                    if (a === b || b === c || a === c) {
+                        degenerate++;
+                    }
+                }
+            }
+
+            log('--- Topology Check ---');
+            if (degenerate > 0) {
+                log(`⚠️ Found ${degenerate} degenerate triangles`, 'warning');
+            } else {
+                log('✓ No degenerate triangles found', 'success');
+            }
+
+            // 3. Check body mesh skeleton validity
+            log('--- Skeleton Validation ---');
+            checkBindMatrices();
+
+            log('=== Analysis Complete ===', 'success');
+        }
+
+        // Event listeners
+        document.getElementById('body-input').addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                loadBodyMesh(e.target.files[0]);
+            }
+        });
+
+        document.getElementById('clothing-input').addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                loadClothingMesh(e.target.files[0]);
+            }
+        });
+
+        document.getElementById('btn-sample-meshes').addEventListener('click', async () => {
+            log('Loading sample meshes from project...');
+            try {
+                // Load body mesh from project
+                const bodyResponse = await fetch('/models/lowpoly_rigged_full_v1.glb');
+                if (bodyResponse.ok) {
+                    const bodyBlob = await bodyResponse.blob();
+                    const bodyFile = new File([bodyBlob], 'lowpoly_rigged_full_v1.glb');
+                    await loadBodyMesh(bodyFile);
+                } else {
+                    log('Sample body mesh not found at /models/lowpoly_rigged_full_v1.glb', 'error');
+                }
+            } catch (error) {
+                log(`Failed to load sample meshes: ${error.message}`, 'error');
+            }
+        });
+
+        document.getElementById('btn-weights').addEventListener('click', () => setVizMode('weights'));
+        document.getElementById('btn-wireframe').addEventListener('click', () => setVizMode('wireframe'));
+        document.getElementById('btn-bones').addEventListener('click', () => setVizMode('bones'));
+        document.getElementById('btn-heatmap').addEventListener('click', () => setVizMode('heatmap'));
+        document.getElementById('btn-normals').addEventListener('click', () => setVizMode('normals'));
+
+        document.getElementById('btn-analyze').addEventListener('click', runFullAnalysis);
+        document.getElementById('btn-check-bind').addEventListener('click', checkBindMatrices);
+        document.getElementById('btn-check-weights').addEventListener('click', validateWeightTransfer);
+        document.getElementById('btn-check-topology').addEventListener('click', () => {
+            log('Topology check requires full analysis - use "Run Full Analysis"', 'warning');
+        });
+
+        // Detect and hide stretched triangles
+        function detectAndHideStretchedTriangles() {
+            if (!state.skinnedClothingMesh) {
+                log('No skinned clothing mesh to analyze', 'error');
+                return;
+            }
+
+            const geometry = state.skinnedClothingMesh.geometry;
+            const positions = geometry.attributes.position;
+            const index = geometry.index;
+
+            if (!index) {
+                log('Mesh must be indexed for triangle detection', 'error');
+                return;
+            }
+
+            const threshold = parseFloat(document.getElementById('stretch-threshold').value);
+            const problematicFaces = new Set();
+            const edgeLengths = [];
+
+            log(`=== Stretched Triangle Detection ===`);
+            log(`Threshold: ${threshold.toFixed(2)}`);
+
+            // Analyze all triangles
+            for (let i = 0; i < index.count; i += 3) {
+                const i0 = index.array[i];
+                const i1 = index.array[i + 1];
+                const i2 = index.array[i + 2];
+
+                const v0 = new THREE.Vector3().fromBufferAttribute(positions, i0);
+                const v1 = new THREE.Vector3().fromBufferAttribute(positions, i1);
+                const v2 = new THREE.Vector3().fromBufferAttribute(positions, i2);
+
+                // Calculate edge lengths
+                const edge1 = v0.distanceTo(v1);
+                const edge2 = v1.distanceTo(v2);
+                const edge3 = v2.distanceTo(v0);
+
+                const maxEdge = Math.max(edge1, edge2, edge3);
+                edgeLengths.push(maxEdge);
+
+                // If ANY edge is too long, mark triangle as problematic
+                if (maxEdge > threshold) {
+                    problematicFaces.add(Math.floor(i / 3));
+                }
+            }
+
+            log(`Found ${problematicFaces.size} stretched triangles out of ${Math.floor(index.count / 3)}`);
+            log(`Percentage: ${(problematicFaces.size / Math.floor(index.count / 3) * 100).toFixed(1)}%`);
+
+            // Statistics
+            const avgEdge = edgeLengths.reduce((a, b) => a + b, 0) / edgeLengths.length;
+            const maxEdgeLength = Math.max(...edgeLengths);
+            log(`Average max edge: ${avgEdge.toFixed(3)}, Max edge: ${maxEdgeLength.toFixed(3)}`);
+
+            // Store original indices if not already stored
+            if (!state.originalIndices) {
+                state.originalIndices = index.array.slice();
+            }
+
+            // Hide problematic triangles by rebuilding index
+            const newIndices = [];
+            for (let i = 0; i < index.count; i += 3) {
+                const faceIdx = Math.floor(i / 3);
+                if (!problematicFaces.has(faceIdx)) {
+                    newIndices.push(index.array[i], index.array[i + 1], index.array[i + 2]);
+                }
+            }
+
+            geometry.setIndex(newIndices);
+            geometry.computeVertexNormals(); // Recompute normals after removing triangles
+
+            log(`Hidden ${problematicFaces.size} stretched triangles`, 'success');
+        }
+
+        // Restore all triangles
+        function restoreAllTriangles() {
+            if (!state.skinnedClothingMesh || !state.originalIndices) {
+                return;
+            }
+
+            const geometry = state.skinnedClothingMesh.geometry;
+            geometry.setIndex(Array.from(state.originalIndices));
+            geometry.computeVertexNormals();
+
+            log('Restored all triangles');
+        }
+
+        // Detect stretched triangles using test pose (arms raised 45°)
+        async function detectStretchedTrianglesWithTestPose() {
+            if (!state.skinnedClothingMesh || !state.skeleton) {
+                log('Cannot detect stretched triangles: mesh or skeleton not loaded', 'error');
+                return;
+            }
+
+            log('=== Stretched Triangle Detection with Test Pose ===', 'info');
+            log('Raising arms to 45° to detect stretched triangles...');
+
+            // Save current state
+            const savedSpineRigid = document.getElementById('chk-spine-rigid').checked;
+            const savedBoneStates = state.skeleton.bones.map(bone => ({
+                name: bone.name,
+                quaternion: bone.quaternion.clone(),
+                position: bone.position.clone(),
+                scale: bone.scale.clone()
+            }));
+            const savedSpineRigidRotation = state.spineRigidRotation ? state.spineRigidRotation.clone() : null;
+
+            try {
+                // Temporarily disable spine rigid mode for test
+                document.getElementById('chk-spine-rigid').checked = false;
+
+                // Reset to rest pose first
+                state.skeleton.bones.forEach(bone => {
+                    bone.quaternion.set(0, 0, 0, 1);
+                });
+                state.spineRigidRotation = null;
+                state.skeleton.update();
+
+                // Rotate both arms to 45° (Z-axis rotation)
+                const leftArmBone = state.skeleton.bones.find(b => b.name === 'left_upper_arm');
+                const rightArmBone = state.skeleton.bones.find(b => b.name === 'right_upper_arm');
+
+                if (!leftArmBone || !rightArmBone) {
+                    log('Could not find arm bones', 'error');
+                    return;
+                }
+
+                const angle = Math.PI / 4; // 45 degrees
+                const axis = new THREE.Vector3(0, 0, 1);
+
+                leftArmBone.quaternion.setFromAxisAngle(axis, angle);
+                rightArmBone.quaternion.setFromAxisAngle(axis, -angle);
+                state.skeleton.update();
+
+                log('Arms raised to 45°, waiting for mesh update...');
+
+                // Wait for render loop to update skinned mesh (2 frames should be enough)
+                await new Promise(resolve => {
+                    let frameCount = 0;
+                    const checkFrame = () => {
+                        frameCount++;
+                        if (frameCount >= 2) {
+                            resolve();
+                        } else {
+                            requestAnimationFrame(checkFrame);
+                        }
+                    };
+                    requestAnimationFrame(checkFrame);
+                });
+
+                // Now detect stretched triangles on the deformed mesh
+                const geometry = state.skinnedClothingMesh.geometry;
+                const positions = geometry.attributes.position;
+                const index = geometry.index;
+                const threshold = parseFloat(document.getElementById('stretch-threshold').value);
+
+                const problematicFaces = new Set();
+                const edgeLengths = [];
+
+                log(`Analyzing triangles with threshold: ${threshold.toFixed(2)}`);
+
+                // Analyze all triangles
+                for (let i = 0; i < index.count; i += 3) {
+                    const i0 = index.array[i];
+                    const i1 = index.array[i + 1];
+                    const i2 = index.array[i + 2];
+
+                    // Get vertex positions from the DEFORMED mesh
+                    const v0 = new THREE.Vector3().fromBufferAttribute(positions, i0);
+                    const v1 = new THREE.Vector3().fromBufferAttribute(positions, i1);
+                    const v2 = new THREE.Vector3().fromBufferAttribute(positions, i2);
+
+                    // Calculate edge lengths
+                    const edge1 = v0.distanceTo(v1);
+                    const edge2 = v1.distanceTo(v2);
+                    const edge3 = v2.distanceTo(v0);
+
+                    const maxEdge = Math.max(edge1, edge2, edge3);
+                    edgeLengths.push(maxEdge);
+
+                    // If ANY edge is too long, mark triangle as problematic
+                    if (maxEdge > threshold) {
+                        problematicFaces.add(Math.floor(i / 3));
+                    }
+                }
+
+                log(`Found ${problematicFaces.size} stretched triangles out of ${Math.floor(index.count / 3)}`);
+                log(`Percentage: ${(problematicFaces.size / Math.floor(index.count / 3) * 100).toFixed(1)}%`);
+
+                // Statistics
+                if (edgeLengths.length > 0) {
+                    const avgEdge = edgeLengths.reduce((a, b) => a + b, 0) / edgeLengths.length;
+                    const maxEdgeLength = Math.max(...edgeLengths);
+                    log(`Average max edge: ${avgEdge.toFixed(3)}, Max edge: ${maxEdgeLength.toFixed(3)}`);
+                }
+
+                // Store original indices if not already stored
+                if (!state.originalIndices) {
+                    state.originalIndices = index.array.slice();
+                }
+
+                // Store problematic faces for later hiding
+                state.stretchedTriangleFaces = problematicFaces;
+
+                // Reset to original pose
+                log('Resetting to rest pose...');
+                state.skeleton.bones.forEach((bone, idx) => {
+                    bone.quaternion.copy(savedBoneStates[idx].quaternion);
+                    bone.position.copy(savedBoneStates[idx].position);
+                    bone.scale.copy(savedBoneStates[idx].scale);
+                });
+                state.spineRigidRotation = savedSpineRigidRotation;
+                state.skeleton.update();
+
+                // Restore spine rigid mode setting
+                document.getElementById('chk-spine-rigid').checked = savedSpineRigid;
+
+                // Wait for mesh to return to rest pose
+                await new Promise(resolve => {
+                    let frameCount = 0;
+                    const checkFrame = () => {
+                        frameCount++;
+                        if (frameCount >= 2) {
+                            resolve();
+                        } else {
+                            requestAnimationFrame(checkFrame);
+                        }
+                    };
+                    requestAnimationFrame(checkFrame);
+                });
+
+                // Now hide the problematic triangles
+                log('Hiding stretched triangles...');
+                const newIndices = [];
+                for (let i = 0; i < state.originalIndices.length; i += 3) {
+                    const faceIdx = Math.floor(i / 3);
+                    if (!problematicFaces.has(faceIdx)) {
+                        newIndices.push(
+                            state.originalIndices[i],
+                            state.originalIndices[i + 1],
+                            state.originalIndices[i + 2]
+                        );
+                    }
+                }
+
+                geometry.setIndex(newIndices);
+                geometry.computeVertexNormals();
+
+                log(`Hidden ${problematicFaces.size} stretched triangles`, 'success');
+                log('Mesh returned to rest pose with problematic triangles hidden', 'success');
+
+            } catch (error) {
+                log(`Error during stretched triangle detection: ${error.message}`, 'error');
+                console.error(error);
+
+                // Restore state on error
+                state.skeleton.bones.forEach((bone, idx) => {
+                    bone.quaternion.copy(savedBoneStates[idx].quaternion);
+                    bone.position.copy(savedBoneStates[idx].position);
+                    bone.scale.copy(savedBoneStates[idx].scale);
+                });
+                state.spineRigidRotation = savedSpineRigidRotation;
+                state.skeleton.update();
+                document.getElementById('chk-spine-rigid').checked = savedSpineRigid;
+            }
+        }
+
+        document.getElementById('btn-rotate-arm-l').addEventListener('click', () => {
+            rotateBone('left_upper_arm', Math.PI / 4);
+        });
+        document.getElementById('btn-rotate-arm-r').addEventListener('click', () => {
+            rotateBone('right_upper_arm', -Math.PI / 4);
+        });
+
+        // Spine rotation buttons (pitch/yaw/roll)
+        document.getElementById('btn-spine-pitch').addEventListener('click', () => {
+            rotateSpineAxis(new THREE.Vector3(1, 0, 0), Math.PI / 8); // Pitch (X-axis)
+        });
+        document.getElementById('btn-spine-yaw').addEventListener('click', () => {
+            rotateSpineAxis(new THREE.Vector3(0, 1, 0), Math.PI / 8); // Yaw (Y-axis)
+        });
+        document.getElementById('btn-spine-roll').addEventListener('click', () => {
+            rotateSpineAxis(new THREE.Vector3(0, 0, 1), Math.PI / 8); // Roll (Z-axis)
+        });
+
+        document.getElementById('btn-reset-pose').addEventListener('click', resetPose);
+
+        // Manual alignment controls
+        const scaleSlider = document.getElementById('scale-slider');
+        const posXSlider = document.getElementById('posx-slider');
+        const posYSlider = document.getElementById('posy-slider');
+        const posZSlider = document.getElementById('posz-slider');
+
+        function updateSliderLabels() {
+            document.getElementById('scale-value').textContent = parseFloat(scaleSlider.value).toFixed(1);
+            document.getElementById('posx-value').textContent = parseFloat(posXSlider.value).toFixed(1);
+            document.getElementById('posy-value').textContent = parseFloat(posYSlider.value).toFixed(1);
+            document.getElementById('posz-value').textContent = parseFloat(posZSlider.value).toFixed(1);
+        }
+
+        [scaleSlider, posXSlider, posYSlider, posZSlider].forEach(slider => {
+            slider.addEventListener('input', () => {
+                updateSliderLabels();
+                if (state.clothingMesh) {
+                    state.clothingMesh.scale.setScalar(parseFloat(scaleSlider.value));
+                    state.clothingMesh.position.set(
+                        parseFloat(posXSlider.value),
+                        parseFloat(posYSlider.value),
+                        parseFloat(posZSlider.value)
+                    );
+                    state.clothingMesh.updateMatrixWorld(true);
+                }
+            });
+        });
+
+        document.getElementById('btn-apply-transform').addEventListener('click', () => {
+            if (state.clothingMesh) {
+                log(`Applied transform: scale=${scaleSlider.value}, pos=(${posXSlider.value}, ${posYSlider.value}, ${posZSlider.value})`);
+                // Remove and re-add to trigger weight transfer
+                performWeightTransfer();
+            }
+        });
+
+        document.getElementById('btn-reset-transform').addEventListener('click', () => {
+            scaleSlider.value = 1.0;
+            posXSlider.value = 0;
+            posYSlider.value = 0;
+            posZSlider.value = 0;
+            updateSliderLabels();
+            if (state.clothingMesh) {
+                state.clothingMesh.scale.set(1, 1, 1);
+                state.clothingMesh.position.set(0, 0, 0);
+                state.clothingMesh.updateMatrixWorld(true);
+                log('Transform reset');
+            }
+        });
+
+        document.getElementById('btn-auto-align').addEventListener('click', () => {
+            if (state.bodyMesh && state.clothingMesh) {
+                log('Auto-aligning...');
+                const alignment = MeshAligner.calculateAlignment(state.bodyMesh, state.clothingMesh);
+                
+                // Update sliders
+                scaleSlider.value = alignment.scale;
+                posXSlider.value = alignment.translation.x;
+                posYSlider.value = alignment.translation.y;
+                posZSlider.value = alignment.translation.z;
+                updateSliderLabels();
+                
+                // Apply to mesh
+                MeshAligner.applyAlignment(state.clothingMesh, alignment);
+                log(`Auto-aligned: scale=${alignment.scale.toFixed(3)}, pos=(${alignment.translation.x.toFixed(3)}, ${alignment.translation.y.toFixed(3)}, ${alignment.translation.z.toFixed(3)})`);
+            }
+        });
+
+        document.getElementById('chk-show-body').addEventListener('change', (e) => {
+            if (state.bodyMesh) {
+                state.bodyMesh.visible = e.target.checked;
+            }
+        });
+
+        document.getElementById('chk-show-clothing').addEventListener('change', (e) => {
+            if (state.clothingMesh) {
+                state.clothingMesh.visible = e.target.checked && !state.skinnedClothingMesh;
+            }
+            if (state.skinnedClothingMesh) {
+                state.skinnedClothingMesh.visible = e.target.checked;
+            }
+        });
+
+        // Stretched triangle threshold slider
+        document.getElementById('stretch-threshold').addEventListener('input', (e) => {
+            document.getElementById('stretch-threshold-value').textContent = parseFloat(e.target.value).toFixed(1);
+        });
+
+        // Hide stretched triangles checkbox
+        document.getElementById('chk-hide-stretched').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                // Re-apply detection with current threshold
+                if (state.skinnedClothingMesh) {
+                    detectAndHideStretchedTriangles();
+                }
+            } else {
+                // Restore all triangles
+                restoreAllTriangles();
+            }
+        });
+
+        // Initialize
+        init();
+        log('Diagnostic tool ready. Load meshes or click "Use Sample Meshes" to begin.');
+    </script>
+</body>
+</html>
