@@ -1,9 +1,8 @@
 /**
  * AnamorphicScene.js
  *
- * Main Three.js scene manager for the Dreamwear Lookbook.
- * Creates anamorphic compositions where 3D elements align into
- * 2D collages from specific viewpoints.
+ * Enhanced Three.js scene manager for the Dreamwear Lookbook.
+ * Integrates advanced shaders, mesh animation, and chaotic compositions.
  */
 
 import * as THREE from 'three';
@@ -32,6 +31,7 @@ export class AnamorphicScene {
         this.container = container;
         this.elements = [];     // All composition elements
         this.animatedElements = []; // Elements with update() methods
+        this.meshAnimators = []; // MeshAnimator instances
 
         // Initialize Three.js
         this.initScene();
@@ -39,12 +39,16 @@ export class AnamorphicScene {
         this.initRenderer();
         this.initControls();
         this.initLighting();
+        this.initPostProcessing();
 
         // Create projector
         this.projector = new AnamorphicProjector(this.camera);
 
         // Create element factory
         this.elementFactory = new ElementFactory();
+
+        // Track time for animations
+        this.clock = new THREE.Clock();
 
         // Start animation loop
         this.animate();
@@ -80,14 +84,15 @@ export class AnamorphicScene {
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
             alpha: false,
-            preserveDrawingBuffer: true // Needed for screenshots
+            preserveDrawingBuffer: true, // Needed for screenshots
+            powerPreference: 'high-performance'
         });
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         // Color management
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.0;
 
@@ -98,7 +103,11 @@ export class AnamorphicScene {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
-        this.controls.enabled = true; // Start with orbit enabled
+        this.controls.enabled = true;
+        this.controls.enableZoom = true;
+        this.controls.enablePan = false;
+        this.controls.minDistance = 2;
+        this.controls.maxDistance = 30;
 
         // Store initial view
         this.anamorphicPosition = this.camera.position.clone();
@@ -123,6 +132,20 @@ export class AnamorphicScene {
         const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
         fillLight.position.set(-5, 5, -5);
         this.scene.add(fillLight);
+        
+        // Rim light for dramatic edges
+        const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        rimLight.position.set(0, 5, -10);
+        this.scene.add(rimLight);
+    }
+
+    initPostProcessing() {
+        // Store post-processing settings (actual implementation would use EffectComposer)
+        this.postProcessing = {
+            bloom: true,
+            chromaticAberration: 0.5,
+            vignette: true
+        };
     }
 
     /**
@@ -131,7 +154,12 @@ export class AnamorphicScene {
      */
     setBackgroundColor(color) {
         this.scene.background = new THREE.Color(color);
-        this.scene.fog = new THREE.Fog(color, 15, 50);
+        this.scene.fog = new THREE.Fog(color, 10, 60);
+        
+        // Update fog color to match background
+        if (this.scene.fog) {
+            this.scene.fog.color.set(color);
+        }
     }
 
     /**
@@ -193,68 +221,213 @@ export class AnamorphicScene {
                     if (element.userData.update) {
                         this.animatedElements.push(element);
                     }
+                    
+                    // Track mesh animators
+                    if (element.userData.animator) {
+                        this.meshAnimators.push(element.userData.animator);
+                    }
+                    
+                    // Recursively find animated children (for groups)
+                    element.traverse((child) => {
+                        if (child.userData.update && !this.animatedElements.includes(child)) {
+                            this.animatedElements.push(child);
+                        }
+                        if (child.userData.animator) {
+                            this.meshAnimators.push(child.userData.animator);
+                        }
+                    });
                 }
             } catch (error) {
                 console.error('[AnamorphicScene] Failed to create element:', elementConfig, error);
             }
         }
 
-        console.log(`[AnamorphicScene] Loaded ${this.elements.length} elements`);
+        console.log(`[AnamorphicScene] Loaded ${this.elements.length} elements, ${this.animatedElements.length} animated`);
     }
 
     /**
-     * Create a test composition with basic shapes.
-     * Useful for verifying the anamorphic effect works.
+     * Create a MAXIMUM CHAOS test composition.
      */
     createTestComposition() {
-        console.log('[AnamorphicScene] Creating test composition');
+        console.log('[AnamorphicScene] Creating MAXIMUM CHAOS test composition');
 
         this.clearElements();
-        this.setBackgroundColor(0xFF1493); // Deep pink
+        this.setBackgroundColor(0x000000); // Black for high contrast
 
-        // Create test elements at different positions
-        const testPositions = [
-            { target2D: { x: 0.5, y: 0.5 }, color: 0xffffff, size: 0.3 },  // Center
-            { target2D: { x: 0.2, y: 0.2 }, color: 0x00ffff, size: 0.15 }, // Top-left
-            { target2D: { x: 0.8, y: 0.2 }, color: 0xffff00, size: 0.15 }, // Top-right
-            { target2D: { x: 0.2, y: 0.8 }, color: 0xff00ff, size: 0.15 }, // Bottom-left
-            { target2D: { x: 0.8, y: 0.8 }, color: 0x00ff00, size: 0.15 }, // Bottom-right
-        ];
-
-        testPositions.forEach((config, index) => {
-            // Create a simple box
+        // Create MANY overlapping elements
+        const colors = [0xFF1493, 0x00CED1, 0xFFD700, 0xFF4500, 0x9400D3, 0x00FF7F, 0xFF6347, 0x1E90FF];
+        
+        // 1. Center chaotic cluster
+        for (let i = 0; i < 15; i++) {
             const geometry = new THREE.BoxGeometry(1, 1, 1);
             const material = new THREE.MeshStandardMaterial({
-                color: config.color,
-                metalness: 0.3,
-                roughness: 0.7
+                color: colors[i % colors.length],
+                metalness: 0.3 + Math.random() * 0.5,
+                roughness: Math.random(),
+                emissive: colors[i % colors.length],
+                emissiveIntensity: 0.1 + Math.random() * 0.3,
+                wireframe: Math.random() > 0.6
             });
             const mesh = new THREE.Mesh(geometry, material);
 
-            // Position using anamorphic projection
+            // Chaotic positions - overlapping in center
+            const target2D = {
+                x: 0.3 + Math.random() * 0.4,  // 0.3 to 0.7 (center-biased)
+                y: 0.3 + Math.random() * 0.4
+            };
+
             this.projector.positionElement(
                 mesh,
-                config.target2D,
-                { min: 4 + index * 2, max: 6 + index * 2 }, // Vary depth
-                config.size
+                target2D,
+                { min: 3 + Math.random() * 3, max: 6 + Math.random() * 4 },
+                0.1 + Math.random() * 0.25
+            );
+
+            // Random rotation
+            mesh.rotation.set(
+                Math.random() * Math.PI,
+                Math.random() * Math.PI,
+                Math.random() * Math.PI
             );
 
             this.scene.add(mesh);
             this.elements.push(mesh);
-        });
+            
+            // Chaotic animation
+            const originalY = mesh.position.y;
+            const originalRot = mesh.rotation.clone();
+            const floatSpeed = 0.5 + Math.random() * 2;
+            const floatAmp = 0.03 + Math.random() * 0.1;
+            
+            mesh.userData.update = (time) => {
+                mesh.position.y = originalY + Math.sin(time * floatSpeed + i) * floatAmp;
+                mesh.rotation.x = originalRot.x + Math.sin(time * 0.5 + i) * 0.1;
+                mesh.rotation.y = originalRot.y + Math.cos(time * 0.3 + i) * 0.1;
+            };
+            this.animatedElements.push(mesh);
+        }
 
-        // Add a text label at center for reference
-        const textSprite = this.createTextSprite('DREAM', 0xffffff);
+        // 2. MANY shader planes - covering the space
+        const shaderNames = ['dreamBlur', 'glitch', 'kineticLiquid', 'chromatic', 'noiseField', 'scanLine', 'voronoi', 'particleCloud', 'holographic', 'ripple', 'mandala'];
+        
+        for (let i = 0; i < 20; i++) {
+            const geometry = new THREE.PlaneGeometry(1, 1);
+            const material = new THREE.MeshBasicMaterial({
+                color: colors[i % colors.length],
+                transparent: true,
+                opacity: 0.15 + Math.random() * 0.3,
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            
+            // Random positions everywhere
+            const pos = {
+                x: 0.1 + Math.random() * 0.8,
+                y: 0.1 + Math.random() * 0.8
+            };
+            
+            this.projector.positionElement(
+                plane,
+                pos,
+                { min: 2 + Math.random() * 5, max: 8 + Math.random() * 10 },
+                0.2 + Math.random() * 0.4
+            );
+            
+            // Random rotation
+            plane.rotation.z = Math.random() * Math.PI * 2;
+            
+            // Animation
+            const originalRot = plane.rotation.z;
+            const rotSpeed = (Math.random() - 0.5) * 0.5;
+            
+            plane.userData.update = (time) => {
+                plane.rotation.z = originalRot + Math.sin(time * rotSpeed) * 0.2;
+            };
+            
+            this.scene.add(plane);
+            this.elements.push(plane);
+            this.animatedElements.push(plane);
+        }
+
+        // 3. Diagonal strips cutting through
+        for (let i = 0; i < 5; i++) {
+            const geometry = new THREE.PlaneGeometry(15, 0.2 + Math.random() * 0.3);
+            const material = new THREE.MeshBasicMaterial({
+                color: colors[i % colors.length],
+                transparent: true,
+                opacity: 0.3 + Math.random() * 0.4,
+                side: THREE.DoubleSide
+            });
+            const strip = new THREE.Mesh(geometry, material);
+            
+            this.projector.positionElement(
+                strip,
+                { x: 0.5, y: 0.5 },
+                { min: 1 + i * 0.5, max: 2 + i * 0.5 },
+                1.0
+            );
+            
+            strip.rotation.z = (Math.PI / 4) + (Math.random() - 0.5);
+            
+            this.scene.add(strip);
+            this.elements.push(strip);
+        }
+
+        // 4. Text chaos - many labels at all angles
+        const texts = ['CHAOS', 'DREAM', 'NOISE', 'OVERLAP', 'DENSE', 'GLITCH', 'FLOW', 'VOID', 'STATIC', 'BROKEN', 'REPEAT'];
+        const rotations = [0, 0, 90, -90, 45, -45, 180, 30, -30, 60, -60, 120, -120];
+        
+        for (let i = 0; i < 12; i++) {
+            const text = texts[i % texts.length];
+            const sprite = this.createTextSprite(text, colors[i % colors.length]);
+            
+            this.projector.positionElement(
+                sprite,
+                { x: 0.1 + Math.random() * 0.8, y: 0.1 + Math.random() * 0.8 },
+                { min: 3 + Math.random() * 5, max: 6 + Math.random() * 8 },
+                0.15 + Math.random() * 0.2
+            );
+            
+            sprite.material.rotation = rotations[i % rotations.length] * (Math.PI / 180);
+            
+            // Float animation
+            const originalY = sprite.position.y;
+            const floatSpeed = 0.3 + Math.random();
+            
+            sprite.userData.update = (time) => {
+                sprite.position.y = originalY + Math.sin(time * floatSpeed + i) * 0.05;
+            };
+            
+            this.scene.add(sprite);
+            this.elements.push(sprite);
+            this.animatedElements.push(sprite);
+        }
+
+        // 5. Vertical edge text
+        const leftText = this.createTextSprite('MAXIMUM CHAOS DENSITY OVERLAP NOISE', 0xffffff);
         this.projector.positionElement(
-            textSprite,
-            { x: 0.5, y: 0.3 },
-            { min: 3, max: 4 },
-            0.3
+            leftText,
+            { x: 0.05, y: 0.5 },
+            { min: 5, max: 8 },
+            0.15
         );
-        this.scene.add(textSprite);
-        this.elements.push(textSprite);
+        leftText.material.rotation = -Math.PI / 2;
+        this.scene.add(leftText);
+        this.elements.push(leftText);
 
-        console.log('[AnamorphicScene] Test composition created with', this.elements.length, 'elements');
+        const rightText = this.createTextSprite('DREAMWEAR LOOKBOOK 2024', 0xff1493);
+        this.projector.positionElement(
+            rightText,
+            { x: 0.95, y: 0.5 },
+            { min: 6, max: 10 },
+            0.12
+        );
+        rightText.material.rotation = Math.PI / 2;
+        this.scene.add(rightText);
+        this.elements.push(rightText);
+
+        console.log('[AnamorphicScene] MAXIMUM CHAOS test created with', this.elements.length, 'elements');
     }
 
     /**
@@ -290,6 +463,10 @@ export class AnamorphicScene {
      * Clear all composition elements from the scene.
      */
     clearElements() {
+        // Stop any ongoing animations
+        this.animatedElements = [];
+        this.meshAnimators = [];
+
         for (const element of this.elements) {
             this.scene.remove(element);
 
@@ -319,7 +496,6 @@ export class AnamorphicScene {
         }
 
         this.elements = [];
-        this.animatedElements = [];
     }
 
     /**
@@ -373,14 +549,32 @@ export class AnamorphicScene {
     animate() {
         requestAnimationFrame(() => this.animate());
 
+        // Get delta time
+        const deltaTime = this.clock.getDelta();
+        const time = this.clock.getElapsedTime();
+
         // Update controls
         this.controls.update();
 
-        // Update animated elements (shaders, etc.)
-        const time = performance.now() * 0.001;
+        // Update animated elements (shaders, meshes, etc.)
         for (const element of this.animatedElements) {
             if (element.userData.update) {
-                element.userData.update(time);
+                try {
+                    element.userData.update(time, deltaTime);
+                } catch (e) {
+                    console.warn('Animation update error:', e);
+                }
+            }
+        }
+        
+        // Update mesh animators directly
+        for (const animator of this.meshAnimators) {
+            if (animator && animator.update) {
+                try {
+                    animator.update(deltaTime);
+                } catch (e) {
+                    console.warn('Animator update error:', e);
+                }
             }
         }
 
@@ -397,3 +591,5 @@ export class AnamorphicScene {
         this.controls.dispose();
     }
 }
+
+export default AnamorphicScene;

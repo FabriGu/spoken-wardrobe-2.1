@@ -3,126 +3,530 @@
   "transcription": "We want all of the other things.",
   "keywords": [],
   "background": {
-    "color": "#32CD32"
+    "color": "#000000"
   },
   "camera": {
     "position": [
-      0,
-      0,
-      10
+      -1.496163729387514,
+      -0.1789017961869972,
+      11.28911609861552
     ],
-    "fov": 50,
+    "fov": 53,
     "target": [
-      0,
-      0,
+      -0.1272240471966508,
+      -0.35024175885371045,
       0
     ]
   },
   "elements": [
     {
-      "type": "glb_mesh",
-      "path": "/comfyui_generated_mesh/1765586268/clothing_mesh.glb",
-      "target_2d": {
-        "x": 0.5,
-        "y": 0.5
-      },
-      "depth_range": {
-        "min": 4,
-        "max": 6
-      },
-      "scale": 0.35
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765586268/original_frame.png",
-      "target_2d": {
-        "x": 0.7043807441470215,
-        "y": 0.36626888579422046
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 15
-      },
-      "scale": 0.15,
-      "rotation": 15,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765586268/generated_clothing.png",
-      "target_2d": {
-        "x": 0.3870697956874539,
-        "y": 0.1386373138060591
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 12
-      },
-      "scale": 0.2,
-      "rotation": -135
-    },
-    {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765586268/mask.png",
       "target_2d": {
-        "x": 0.5,
-        "y": 0.5
+        "x": 0.30061916231042235,
+        "y": 0.2485237493600911
+      },
+      "depth_range": {
+        "min": 2.7912683114088237,
+        "max": 8.93870367207588
+      },
+      "scale": 0.24380259759965195,
+      "rotation": -15,
+      "opacity": 0.7035478874511549,
+      "billboard": true
+    },
+    {
+      "type": "glb_mesh",
+      "path": "/comfyui_generated_mesh/1765586268/clothing_mesh.glb",
+      "target_2d": {
+        "x": 0.5579051707893337,
+        "y": 0.5960595975085102
       },
       "depth_range": {
         "min": 3,
-        "max": 4
+        "max": 5
       },
-      "scale": 0.4,
-      "opacity": 0.2
+      "scale": 0.31463533880794853,
+      "animation": true,
+      "animationPreset": "meditative",
+      "emissive": "#00FFFF",
+      "wireframe": false
     },
     {
       "type": "shader_plane",
-      "shader": "chromatic",
+      "shader": "glitch",
       "target_2d": {
-        "x": 0.4425791404703683,
-        "y": 0.1096316879143644
+        "x": 0.33944044681533136,
+        "y": 0.5018644618969961
       },
       "depth_range": {
-        "min": 5,
-        "max": 10
+        "min": 1,
+        "max": 3
       },
-      "scale": 0.28240794265002056,
-      "opacity": 0.3
+      "width": 14.227866224287228,
+      "height": 0.14026155187233885,
+      "scale": 1.0,
+      "opacity": 0.6372442617432261,
+      "color": "#000000",
+      "angle": 30,
+      "rotation": 20
+    },
+    {
+      "type": "text_3d",
+      "text": "WANT ALL OF",
+      "target_2d": {
+        "x": 0.6505100981776953,
+        "y": 0.7026851002957296
+      },
+      "depth_range": {
+        "min": 6.1507674062252224,
+        "max": 15.95809368946842
+      },
+      "scale": 0.04988653606392832,
+      "color": "#FF4500",
+      "rotation": -90,
+      "metalness": 0.2136064416796696,
+      "roughness": 0.3104705058824197,
+      "emissive": null
+    },
+    {
+      "type": "text_3d",
+      "text": "ALL OF THE",
+      "target_2d": {
+        "x": 0.43827117259038273,
+        "y": 0.3797577102377346
+      },
+      "depth_range": {
+        "min": 5.344196087318442,
+        "max": 17.7348632132235
+      },
+      "scale": 0.04763495314739175,
+      "color": "#FF6347",
+      "rotation": -30,
+      "metalness": 0.49476076668442137,
+      "roughness": 0.7761802263687649,
+      "emissive": null
     },
     {
       "type": "shader_plane",
       "shader": "glow",
       "target_2d": {
-        "x": 0.10688809252420005,
-        "y": 0.6970578714818477
+        "x": 0.45263532385316907,
+        "y": 0.6641918811353121
       },
       "depth_range": {
-        "min": 8,
-        "max": 15
+        "min": 1.062204925381622,
+        "max": 9.407743411365791
       },
-      "scale": 0.2291037903613523,
-      "opacity": 0.25,
-      "color": "#00FF7F",
-      "color2": "#000000"
+      "scale": 0.21579483129207633,
+      "opacity": 0.2417071218439284,
+      "animated": true,
+      "rotation": 60,
+      "color": "#FFFFFF"
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/mask.png",
+      "target_2d": {
+        "x": 0.6899772041660727,
+        "y": 0.1950203529167615
+      },
+      "depth_range": {
+        "min": 6.6824530577883925,
+        "max": 19.768682676388394
+      },
+      "scale": 0.12785928782705755,
+      "rotation": 30,
+      "opacity": 0.3515665418645866,
+      "billboard": true
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/original_frame.png",
+      "target_2d": {
+        "x": 0.6048938135009808,
+        "y": 0.39889605994451655
+      },
+      "depth_range": {
+        "min": 7.310071808156682,
+        "max": 8.449998887997854
+      },
+      "scale": 0.11957306162369655,
+      "rotation": 45,
+      "opacity": 0.8691362134109679,
+      "billboard": false
+    },
+    {
+      "type": "shader_plane",
+      "shader": "noiseField",
+      "target_2d": {
+        "x": 0.9089599796704582,
+        "y": 0.29746870393727226
+      },
+      "depth_range": {
+        "min": 4.618348585773659,
+        "max": 11.098748133317127
+      },
+      "scale": 0.47674080510154415,
+      "opacity": 0.4204621050088363,
+      "animated": true,
+      "rotation": 0,
+      "color": null
+    },
+    {
+      "type": "shader_plane",
+      "shader": "scanLine",
+      "target_2d": {
+        "x": 0.3460019083402649,
+        "y": 0.3772191246345354
+      },
+      "depth_range": {
+        "min": 1,
+        "max": 3
+      },
+      "width": 10.091131989555153,
+      "height": 0.06092536770888428,
+      "scale": 1.0,
+      "opacity": 0.42774056964277646,
+      "color": "#ec4899",
+      "angle": 20,
+      "rotation": -30
+    },
+    {
+      "type": "shader_plane",
+      "shader": "ripple",
+      "target_2d": {
+        "x": 0.6648112281025651,
+        "y": 0.5006145384617477
+      },
+      "depth_range": {
+        "min": 2.39677619804911,
+        "max": 14.628491880636092
+      },
+      "scale": 0.41570206082825567,
+      "opacity": 0.5611604521261719,
+      "animated": true,
+      "rotation": 90,
+      "color": "#FF69B4"
+    },
+    {
+      "type": "shader_plane",
+      "shader": "mandala",
+      "target_2d": {
+        "x": 0.40681903837460376,
+        "y": 0.36926757187794795
+      },
+      "depth_range": {
+        "min": 2.2527096191976215,
+        "max": 13.814846942184774
+      },
+      "scale": 0.16040473191202845,
+      "opacity": 0.5361668479349345,
+      "animated": true,
+      "rotation": -45,
+      "color": null
     },
     {
       "type": "shader_plane",
       "shader": "diagonal",
       "target_2d": {
-        "x": 0.5,
+        "x": 0.2801527422367162,
+        "y": 0.6177409852691855
+      },
+      "depth_range": {
+        "min": 1,
+        "max": 3
+      },
+      "width": 13.661418894640978,
+      "height": 0.28759869485709955,
+      "scale": 1.0,
+      "opacity": 0.3581338363429942,
+      "color": "#1E90FF",
+      "angle": 60,
+      "rotation": -20
+    },
+    {
+      "type": "shader_plane",
+      "shader": "dataMosh",
+      "target_2d": {
+        "x": 0.5983001212872356,
+        "y": 0.2580165911278321
+      },
+      "depth_range": {
+        "min": 3.5661478000938702,
+        "max": 6.892422783822564
+      },
+      "scale": 0.4311486996018882,
+      "opacity": 0.33669803991145,
+      "animated": true,
+      "rotation": 45,
+      "color": null
+    },
+    {
+      "type": "text_3d",
+      "text": "WE WANT ALL",
+      "target_2d": {
+        "x": 0.5872758807077637,
+        "y": 0.7249501100407856
+      },
+      "depth_range": {
+        "min": 8.038434013818925,
+        "max": 17.635721510948365
+      },
+      "scale": 0.0792474855270691,
+      "color": "#FF6347",
+      "rotation": -45,
+      "metalness": 0.5841821235817126,
+      "roughness": 0.3104450360837425,
+      "emissive": null
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/generated_clothing.png",
+      "target_2d": {
+        "x": 0.21043156836244004,
+        "y": 0.24175197865601628
+      },
+      "depth_range": {
+        "min": 6.934184857242624,
+        "max": 19.69176340749833
+      },
+      "scale": 0.23301594928168498,
+      "rotation": -150,
+      "opacity": 0.4119036574192448,
+      "billboard": false
+    },
+    {
+      "type": "shader_plane",
+      "shader": "glitch",
+      "target_2d": {
+        "x": 0.2644575615784236,
+        "y": 0.6705598060530236
+      },
+      "depth_range": {
+        "min": 1,
+        "max": 3
+      },
+      "width": 9.767889796498173,
+      "height": 0.27473328569602345,
+      "scale": 1.0,
+      "opacity": 0.7984468542979586,
+      "color": "#C0C0C0",
+      "angle": 90,
+      "rotation": -20
+    },
+    {
+      "type": "shader_plane",
+      "shader": "scanLine",
+      "target_2d": {
+        "x": 0.6109005796287743,
+        "y": 0.2458986173924689
+      },
+      "depth_range": {
+        "min": 1,
+        "max": 3
+      },
+      "width": 15.018234153898451,
+      "height": 0.2258812804013433,
+      "scale": 1.0,
+      "opacity": 0.6353467465137623,
+      "color": "#ec4899",
+      "angle": 90,
+      "rotation": 45
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/generated_clothing.png",
+      "target_2d": {
+        "x": 0.24732316845387753,
+        "y": 0.7149348602099289
+      },
+      "depth_range": {
+        "min": 2.4236412649076806,
+        "max": 13.263216987475033
+      },
+      "scale": 0.23858164044957325,
+      "rotation": -45,
+      "opacity": 0.6086221629549924,
+      "billboard": false
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/generated_clothing.png",
+      "target_2d": {
+        "x": 0.8737665141050042,
+        "y": 0.6649504615068866
+      },
+      "depth_range": {
+        "min": 5.01372867807747,
+        "max": 19.310763210563785
+      },
+      "scale": 0.3003130276098349,
+      "rotation": 90,
+      "opacity": 0.8567410427889868,
+      "billboard": true
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/original_frame.png",
+      "target_2d": {
+        "x": 0.8440156783457377,
+        "y": 0.8277935218112179
+      },
+      "depth_range": {
+        "min": 7.016039224663511,
+        "max": 16.233083172435578
+      },
+      "scale": 0.23910127806318804,
+      "rotation": -15,
+      "opacity": 0.375244451672592,
+      "billboard": true
+    },
+    {
+      "type": "shader_plane",
+      "shader": "holographic",
+      "target_2d": {
+        "x": 0.40049044178059456,
+        "y": 0.9117949184690477
+      },
+      "depth_range": {
+        "min": 1.9139556745469146,
+        "max": 14.372814775649884
+      },
+      "scale": 0.3318781110434002,
+      "opacity": 0.4204487567364774,
+      "animated": true,
+      "rotation": -90,
+      "color": null
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/original_frame.png",
+      "target_2d": {
+        "x": 0.3458991514456046,
+        "y": 0.42350485605940413
+      },
+      "depth_range": {
+        "min": 6.200637715713229,
+        "max": 16.68138599873499
+      },
+      "scale": 0.2737540294453009,
+      "rotation": 180,
+      "opacity": 0.38592233671920917,
+      "billboard": true
+    },
+    {
+      "type": "text_3d",
+      "text": ".SGNIHT REHTO EHT FO LLA TNAW EW",
+      "target_2d": {
+        "x": 0.9525280395324767,
         "y": 0.5
       },
       "depth_range": {
-        "min": 2,
-        "max": 3
+        "min": 6,
+        "max": 14
       },
-      "width": 15,
-      "height": 0.3350278465436857,
-      "scale": 1.0,
-      "opacity": 0.7,
-      "color": "#1E90FF",
-      "angle": -60,
-      "rotation": -60
+      "scale": 0.04,
+      "color": "#FF69B4",
+      "rotation": 90
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/generated_clothing.png",
+      "target_2d": {
+        "x": 0.31826166784484206,
+        "y": 0.8785359506840632
+      },
+      "depth_range": {
+        "min": 5.5335603624923815,
+        "max": 15.403890791544775
+      },
+      "scale": 0.3122654139626724,
+      "rotation": 60,
+      "opacity": 0.4604623834094902,
+      "billboard": false
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/original_frame.png",
+      "target_2d": {
+        "x": 0.2804987548462015,
+        "y": 0.05748783233962458
+      },
+      "depth_range": {
+        "min": 2.2935710884211016,
+        "max": 16.30498097112327
+      },
+      "scale": 0.25205242054288723,
+      "rotation": -60,
+      "opacity": 0.7578765649161421,
+      "billboard": false
+    },
+    {
+      "type": "shader_plane",
+      "shader": "noiseField",
+      "target_2d": {
+        "x": 0.8839614398937172,
+        "y": 0.10178422457160063
+      },
+      "depth_range": {
+        "min": 4.230974633895146,
+        "max": 10.054536582553522
+      },
+      "scale": 0.40038031988652945,
+      "opacity": 0.5479965405773937,
+      "animated": true,
+      "rotation": -45,
+      "color": null
+    },
+    {
+      "type": "text_3d",
+      "text": "WE WANT ALL OF THE OTHER THINGS.",
+      "target_2d": {
+        "x": 0.060529199416424595,
+        "y": 0.5
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 12
+      },
+      "scale": 0.05,
+      "color": "#FF1493",
+      "rotation": -90,
+      "depth": 0.02
+    },
+    {
+      "type": "shader_plane",
+      "shader": "ripple",
+      "target_2d": {
+        "x": 0.43039479193954133,
+        "y": 0.20582008446463512
+      },
+      "depth_range": {
+        "min": 4.126026840536574,
+        "max": 6.493850231577692
+      },
+      "scale": 0.40645611763923906,
+      "opacity": 0.6506369891793288,
+      "animated": true,
+      "rotation": -90,
+      "color": "#9400D3"
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765586268/original_frame.png",
+      "target_2d": {
+        "x": 0.1864356474093939,
+        "y": 0.716619098682624
+      },
+      "depth_range": {
+        "min": 4.232242526641443,
+        "max": 10.839502007917527
+      },
+      "scale": 0.314033377175967,
+      "rotation": 30,
+      "opacity": 0.4737549277382102,
+      "billboard": true
     }
   ]
 }

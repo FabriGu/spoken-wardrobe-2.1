@@ -94,6 +94,7 @@
             max-width: 300px;
             z-index: 100;
             opacity: 0.7;
+            pointer-events: none;
         }
 
         #info h2 {
@@ -126,36 +127,67 @@
             letter-spacing: 1px;
         }
 
-        /* Navigation */
-        #nav {
+        /* LARGE SEMI-TRANSPARENT NAVIGATION ARROWS */
+        .nav-arrow {
             position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        #nav.left { left: 20px; }
-        #nav.right { right: 20px; }
-
-        .nav-btn {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            cursor: pointer;
-            font-size: 24px;
+            top: 0;
+            bottom: 0;
+            width: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            cursor: pointer;
+            z-index: 90;
+            transition: all 0.3s ease;
+            background: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0.4) 0%,
+                rgba(0, 0, 0, 0) 100%
+            );
+            opacity: 0.3;
         }
 
-        .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .nav-arrow:hover {
+            opacity: 0.8;
+            width: 140px;
+        }
+
+        .nav-arrow.prev {
+            left: 0;
+            background: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0.5) 0%,
+                rgba(0, 0, 0, 0) 100%
+            );
+        }
+
+        .nav-arrow.next {
+            right: 0;
+            background: linear-gradient(
+                to left,
+                rgba(0, 0, 0, 0.5) 0%,
+                rgba(0, 0, 0, 0) 100%
+            );
+        }
+
+        .nav-arrow svg {
+            width: 60px;
+            height: 60px;
+            fill: white;
+            filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5));
+            transition: transform 0.2s ease;
+        }
+
+        .nav-arrow:hover svg {
+            transform: scale(1.1);
+        }
+
+        .nav-arrow.prev svg {
+            margin-left: -20px;
+        }
+
+        .nav-arrow.next svg {
+            margin-right: -20px;
         }
 
         /* Loading state */
@@ -173,6 +205,17 @@
 
         .hidden {
             display: none !important;
+        }
+
+        /* Composition counter */
+        #counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            z-index: 100;
+            font-family: monospace;
         }
     </style>
 </head>
@@ -193,12 +236,19 @@
         <button class="btn" id="btn-screenshot">Export Print</button>
     </div>
 
-    <div id="nav" class="left hidden">
-        <button class="nav-btn" id="btn-prev">&larr;</button>
+    <!-- LARGE SEMI-TRANSPARENT NAVIGATION ARROWS -->
+    <div class="nav-arrow prev" id="arrow-prev" title="Previous composition">
+        <svg viewBox="0 0 24 24">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
     </div>
-    <div id="nav" class="right hidden">
-        <button class="nav-btn" id="btn-next">&rarr;</button>
+    <div class="nav-arrow next" id="arrow-next" title="Next composition">
+        <svg viewBox="0 0 24 24">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
     </div>
+
+    <div id="counter" class="hidden"></div>
 
     <script type="module">
         import { AnamorphicScene } from './static/js/AnamorphicScene.js';
@@ -207,13 +257,68 @@
 
         // Get composition ID from URL params
         const params = new URLSearchParams(window.location.search);
-        const compositionId = params.get('id') || 'test';
+        let compositionId = params.get('id') || 'test';
+
+        // Store all composition IDs for navigation
+        let allCompositionIds = [];
+        let currentIndex = -1;
 
         // Initialize
         const container = document.getElementById('canvas-container');
         const scene = new AnamorphicScene(container);
         const loader = new CompositionLoader();
         const screenshot = new ScreenshotCapture(scene.renderer, scene.scene, scene.camera);
+
+        // Load composition index
+        async function loadCompositionIndex() {
+            try {
+                const response = await fetch('/compositions/index.json');
+                if (response.ok) {
+                    allCompositionIds = await response.json();
+                    currentIndex = allCompositionIds.indexOf(compositionId);
+                }
+            } catch (e) {
+                console.log('No composition index found');
+            }
+        }
+
+        // Update counter display
+        function updateCounter() {
+            const counter = document.getElementById('counter');
+            if (allCompositionIds.length > 0 && currentIndex >= 0) {
+                counter.textContent = `${currentIndex + 1} / ${allCompositionIds.length}`;
+                counter.classList.remove('hidden');
+            }
+        }
+
+        // Navigate to composition
+        async function navigateTo(index) {
+            if (allCompositionIds.length === 0) return;
+            
+            // Wrap around
+            if (index < 0) index = allCompositionIds.length - 1;
+            if (index >= allCompositionIds.length) index = 0;
+            
+            currentIndex = index;
+            compositionId = allCompositionIds[index];
+            
+            // Update URL without reloading
+            const newUrl = `${window.location.pathname}?id=${compositionId}`;
+            window.history.pushState({ id: compositionId }, '', newUrl);
+            
+            // Load new composition
+            await loadComposition(compositionId);
+        }
+
+        // Previous composition
+        function goToPrev() {
+            navigateTo(currentIndex - 1);
+        }
+
+        // Next composition
+        function goToNext() {
+            navigateTo(currentIndex + 1);
+        }
 
         // Load composition
         async function loadComposition(id) {
@@ -244,12 +349,32 @@
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('info').classList.remove('hidden');
                 document.getElementById('controls').classList.remove('hidden');
+                
+                // Update counter
+                updateCounter();
 
             } catch (error) {
                 console.error('Failed to load composition:', error);
                 document.getElementById('loading').textContent = 'Failed to load composition';
             }
         }
+
+        // Navigation event listeners
+        document.getElementById('arrow-prev').addEventListener('click', goToPrev);
+        document.getElementById('arrow-next').addEventListener('click', goToNext);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                goToPrev();
+            } else if (e.key === 'ArrowRight') {
+                goToNext();
+            } else if (e.key === ' ') {
+                scene.snapToAnamorphicView();
+            } else if (e.key === 'p' || e.key === 'P') {
+                screenshot.captureHighRes(4096, 4096);
+            }
+        });
 
         // Control handlers
         document.getElementById('btn-orbit').addEventListener('click', () => {
@@ -264,17 +389,20 @@
             screenshot.captureHighRes(4096, 4096);
         });
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === ' ') {
-                scene.snapToAnamorphicView();
-            } else if (e.key === 'p' || e.key === 'P') {
-                screenshot.captureHighRes(4096, 4096);
+        // Browser back/forward handling
+        window.addEventListener('popstate', (e) => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (id && id !== compositionId) {
+                compositionId = id;
+                currentIndex = allCompositionIds.indexOf(id);
+                loadComposition(id);
             }
         });
 
         // Start
-        loadComposition(compositionId);
+        await loadCompositionIndex();
+        await loadComposition(compositionId);
     </script>
 </body>
 </html>

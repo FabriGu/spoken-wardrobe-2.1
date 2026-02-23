@@ -1,8 +1,8 @@
 /**
  * ImagePlaneElement.js
  *
- * Creates image planes for anamorphic compositions.
- * Used for found imagery, body frames, generated clothing images, etc.
+ * Enhanced image planes with URL loading and shader effects support.
+ * Handles both local files and on-demand web images.
  */
 
 import * as THREE from 'three';
@@ -15,34 +15,36 @@ export class ImagePlaneElement {
 
     /**
      * Load the image and create a plane mesh.
-     * @returns {Promise<THREE.Mesh>} - The image plane mesh
+     * Supports both local paths and URLs.
+     * @returns {Promise<THREE.Mesh>}
      */
     async load() {
-        const texture = await new THREE.TextureLoader().loadAsync(this.config.path);
+        const path = this.config.path;
+        
+        // Check if it's a URL or local path
+        const isUrl = path.startsWith('http://') || path.startsWith('https://');
+        
+        const texture = await this.loadTexture(path, isUrl);
+        
+        if (!texture) {
+            console.warn('[ImagePlaneElement] Failed to load texture:', path);
+            // Create placeholder
+            return this.createPlaceholder();
+        }
 
         // Calculate aspect ratio
-        const aspect = texture.image.width / texture.image.height;
+        const aspect = texture.image ? (texture.image.width / texture.image.height) : 1;
 
-        // Create plane geometry (1 unit base height)
+        // Create plane geometry
         const geometry = new THREE.PlaneGeometry(aspect, 1);
 
-        // Create material with various options
+        // Create material
         const materialConfig = {
             map: texture,
             side: THREE.DoubleSide,
-            transparent: true
+            transparent: true,
+            opacity: this.config.opacity !== undefined ? this.config.opacity : 1.0
         };
-
-        // Apply visual effects
-        if (this.config.posterize) {
-            // For posterization, we'd use a custom shader
-            // For now, just increase contrast via tone mapping
-            texture.encoding = THREE.sRGBEncoding;
-        }
-
-        if (this.config.opacity !== undefined) {
-            materialConfig.opacity = this.config.opacity;
-        }
 
         // Use basic material for unlit look, or standard for lit
         const MaterialClass = this.config.unlit
@@ -53,21 +55,92 @@ export class ImagePlaneElement {
 
         this.mesh = new THREE.Mesh(geometry, material);
 
-        // Apply initial rotation (Z-axis rotation for 2D plane)
+        // Apply initial rotation
         if (this.config.rotation) {
             this.mesh.rotation.z = THREE.MathUtils.degToRad(this.config.rotation);
         }
 
-        // Store config for reference
+        // Store config
         this.mesh.userData.imageConfig = this.config;
+        
+        // Add floating animation if configured
+        if (this.config.animated !== false) {
+            this.addFloatingAnimation();
+        }
 
         return this.mesh;
     }
 
     /**
-     * Create from base64 data instead of URL.
-     * @param {string} base64Data - Base64-encoded image data
-     * @returns {Promise<THREE.Mesh>}
+     * Load texture from path or URL
+     */
+    loadTexture(path, isUrl) {
+        return new Promise((resolve) => {
+            const loader = new THREE.TextureLoader();
+            
+            // Set crossOrigin for URLs
+            if (isUrl || this.config.crossOrigin) {
+                loader.setCrossOrigin('anonymous');
+            }
+            
+            loader.load(
+                path,
+                (texture) => {
+                    texture.encoding = THREE.SRGBColorSpace;
+                    resolve(texture);
+                },
+                undefined, // onProgress
+                (error) => {
+                    console.warn('[ImagePlaneElement] Load failed:', path, error);
+                    resolve(null);
+                }
+            );
+        });
+    }
+
+    /**
+     * Create placeholder when image fails to load
+     */
+    createPlaceholder() {
+        const geometry = new THREE.PlaneGeometry(1, 1);
+        const material = new THREE.MeshBasicMaterial({
+            color: this.config.placeholderColor || 0x333333,
+            transparent: true,
+            opacity: (this.config.opacity || 0.5) * 0.5,
+            side: THREE.DoubleSide
+        });
+        
+        this.mesh = new THREE.Mesh(geometry, material);
+        
+        if (this.config.rotation) {
+            this.mesh.rotation.z = THREE.MathUtils.degToRad(this.config.rotation);
+        }
+        
+        return this.mesh;
+    }
+
+    /**
+     * Add floating animation
+     */
+    addFloatingAnimation() {
+        const floatSpeed = this.config.floatSpeed || 0.3 + Math.random() * 0.5;
+        const floatAmp = this.config.floatAmplitude || 0.02 + Math.random() * 0.03;
+        const rotSpeed = this.config.rotationSpeed || 0.1 + Math.random() * 0.3;
+        
+        const originalY = this.mesh.position.y;
+        const originalRotZ = this.mesh.rotation.z;
+        
+        this.mesh.userData.update = (time) => {
+            // Float
+            this.mesh.position.y = originalY + Math.sin(time * floatSpeed) * floatAmp;
+            
+            // Gentle rotation drift
+            this.mesh.rotation.z = originalRotZ + Math.sin(time * rotSpeed * 0.5) * 0.02;
+        };
+    }
+
+    /**
+     * Create from base64 data
      */
     async loadFromBase64(base64Data) {
         return new Promise((resolve, reject) => {
@@ -94,9 +167,11 @@ export class ImagePlaneElement {
     }
 
     /**
-     * Get the mesh.
+     * Get the mesh
      */
     getObject() {
         return this.mesh;
     }
 }
+
+export default ImagePlaneElement;
