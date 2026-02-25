@@ -40,10 +40,16 @@ export class MediaPipePoseDriver {
         this.smoothingFactor = 0.3;
         this.previousLandmarks = null;
 
+        // Visibility threshold for joint tracking (0.0 - 1.0)
+        // Joints with visibility below this value will not affect the mesh
+        // CHANGE THIS VALUE to adjust sensitivity (higher = more strict, lower = more permissive)
+        this.visibilityThreshold = 0.7;
+
         // Countdown before skeleton control starts
         this.countdownSeconds = 3;
         this.countdownRemaining = 0;
         this.skeletonControlEnabled = false;
+        this._debugLogged = false;
 
         // 3D keypoint visualization
         this.keypointGroup = null;
@@ -65,7 +71,7 @@ export class MediaPipePoseDriver {
         // Manual adjustment controls (applied on top of calibration)
         // Default values tuned for rigged_full_v1.glb body mesh
         this.manualOffsetY = -0.25;
-        this.manualOffsetZ = 0.1;
+        this.manualOffsetZ = -0.25;  // Z offset for keypoint visualization (negative = closer to camera)
         this.manualScaleMultiplier = 1.0;
 
         // Callbacks
@@ -272,6 +278,7 @@ export class MediaPipePoseDriver {
 
         if (withCountdown) {
             this.countdownRemaining = this.countdownSeconds;
+            this._debugLogged = false;  // Reset debug logging
             console.log(`[MediaPipePoseDriver] Starting with ${this.countdownSeconds}s countdown...`);
             this._startCountdown();
         } else {
@@ -663,37 +670,47 @@ export class MediaPipePoseDriver {
         // - MediaPipe: X+ = person's left, Y+ = DOWN, Z+ = toward camera
         // - Three.js:  X+ = right (viewer), Y+ = UP, Z+ = toward viewer
         //
-        // CRITICAL: Must match keypoint visualization transform (_updateKeypointVisualization)
-        // which uses (-x, -y, -z). If skeleton and visualization use different transforms,
-        // the mesh will deform opposite to what the keypoints show.
-        //
-        // The negation serves two purposes:
-        // 1. Mirror X: person's left (+X) becomes viewer's left (-X in scene)
-        // 2. Flip Y: MediaPipe Y-down becomes Three.js Y-up
-        // 3. Flip Z: MediaPipe Z-toward-camera becomes scene Z-toward-viewer
+        // For BONE ROTATIONS (different from keypoint visualization):
+        // - X: Negate for mirroring (person's left → viewer's left)
+        // - Y: Negate (MediaPipe down → Three.js up)
+        // - Z: DO NOT NEGATE - MediaPipe Z+ (toward camera) = Three.js Z+ (toward viewer)
+        //      Both systems have Z pointing the same way! Negating Z inverts forward/backward.
         //
         const vec = (idx) => new THREE.Vector3(
-            -landmarks[idx].x,   // Mirror X for display
-            -landmarks[idx].y,   // Flip Y (MediaPipe Y is down)
-            -landmarks[idx].z    // Flip Z to match keypoint visualization
+            -landmarks[idx].x,   // Mirror X (person's left → viewer's left)
+            -landmarks[idx].y,   // Flip Y (MediaPipe down → Three.js up)
+            landmarks[idx].z     // Keep Z (both point toward camera/viewer)
         );
 
+        // Helper to check if a landmark is visible enough
+        const isVisible = (idx) => {
+            const visibility = landmarks[idx].visibility;
+            return visibility !== undefined && visibility >= this.visibilityThreshold;
+        };
+
+        // Helper to check if all landmarks in a list are visible
+        const allVisible = (...indices) => indices.every(isVisible);
+
         // Helper to compute rotation from direction
-        const computeRotation = (fromIdx, toIdx, restAxis = new THREE.Vector3(0, -1, 0)) => {
+        const computeRotation = (fromIdx, toIdx, restAxis = new THREE.Vector3(0, -1, 0), debugLabel = '') => {
             const dir = vec(toIdx).sub(vec(fromIdx)).normalize();
             const quat = new THREE.Quaternion();
             quat.setFromUnitVectors(restAxis, dir);
+            if (debugLabel && !this._debugLogged) {
+                console.log(`[MediaPipePoseDriver] ${debugLabel}: restAxis=(${restAxis.x.toFixed(2)},${restAxis.y.toFixed(2)},${restAxis.z.toFixed(2)}) dir=(${dir.x.toFixed(2)},${dir.y.toFixed(2)},${dir.z.toFixed(2)})`);
+            }
             return quat;
         };
 
         // Update spine (based on shoulder and hip orientation)
-        if (this.boneMap.spine) {
+        // Only update if all required joints are visible
+        if (this.boneMap.spine && allVisible(L.leftShoulder, L.rightShoulder, L.leftHip, L.rightHip)) {
             const shoulderCenter = vec(L.leftShoulder).add(vec(L.rightShoulder)).multiplyScalar(0.5);
             const hipCenter = vec(L.leftHip).add(vec(L.rightHip)).multiplyScalar(0.5);
             const spineDir = shoulderCenter.sub(hipCenter).normalize();
 
             // Compute torso twist from shoulders
-            // With negated X: rightShoulder (MediaPipe +right) becomes +X, leftShoulder becomes -X
+            // With vec(-x, -y, z): rightShoulder (MediaPipe +right) becomes +X, leftShoulder becomes -X
             // shoulderVec.x = positive when facing camera → atan2 ≈ 0
             const shoulderVec = vec(L.rightShoulder).sub(vec(L.leftShoulder)).normalize();
 
@@ -709,30 +726,48 @@ export class MediaPipePoseDriver {
         }
 
         // Update arms
-        // Rest axes (after full negation in vec()):
-        // - Left arm in T-pose points to character's left (+X in mesh)
-        //   MediaPipe left arm: +X → vec() → -X, so rest axis must be (-1, 0, 0) to match
-        // - Right arm in T-pose points to character's right (-X in mesh)
-        //   MediaPipe right arm: -X → vec() → +X, so rest axis must be (1, 0, 0) to match
-        if (this.boneMap.leftUpperArm) {
-            const rot = computeRotation(L.leftShoulder, L.leftElbow, new THREE.Vector3(-1, 0, 0));
-            this._applyRotation(this.boneMap.leftUpperArm, rot);
+        // NOTE: Webcam is mirrored (like looking in a mirror), so MediaPipe's "left" 
+        // corresponds to the user's RIGHT side. We swap landmark indices to map correctly:
+        // - User's left arm = MediaPipe RIGHT landmarks → mesh leftUpperArm bone
+        // - User's right arm = MediaPipe LEFT landmarks → mesh rightUpperArm bone
+        //
+        // Rest axes with vec(-x, -y, z):
+        // - User's left arm (MediaPipe RIGHT): MediaPipe -X → vec() → +X, so rest axis = (1, 0, 0)
+        // - User's right arm (MediaPipe LEFT): MediaPipe +X → vec() → -X, so rest axis = (-1, 0, 0)
+        if (!this._debugLogged) {
+            console.log('[MediaPipePoseDriver] Bone map:', {
+                leftUpperArm: this.boneMap.leftUpperArm?.name,
+                leftLowerArm: this.boneMap.leftLowerArm?.name,
+                rightUpperArm: this.boneMap.rightUpperArm?.name,
+                rightLowerArm: this.boneMap.rightLowerArm?.name
+            });
         }
 
-        if (this.boneMap.leftLowerArm) {
-            const rot = computeRotation(L.leftElbow, L.leftWrist, new THREE.Vector3(-1, 0, 0));
-            this._applyRotation(this.boneMap.leftLowerArm, rot);
+        // User's LEFT arm uses MediaPipe RIGHT landmarks (mirrored webcam)
+        // MediaPipe right arm points -X → vec() → +X, so rest axis = (1, 0, 0)
+        if (this.boneMap.leftUpperArm && allVisible(L.rightShoulder, L.rightElbow)) {
+            const rot = computeRotation(L.rightShoulder, L.rightElbow, new THREE.Vector3(1, 0, 0), 'leftUpperArm');
+            this._applyRotation(this.boneMap.leftUpperArm, rot, 'leftUpperArm');
         }
 
-        if (this.boneMap.rightUpperArm) {
-            const rot = computeRotation(L.rightShoulder, L.rightElbow, new THREE.Vector3(1, 0, 0));
-            this._applyRotation(this.boneMap.rightUpperArm, rot);
+        if (this.boneMap.leftLowerArm && allVisible(L.rightElbow, L.rightWrist)) {
+            const rot = computeRotation(L.rightElbow, L.rightWrist, new THREE.Vector3(1, 0, 0), 'leftLowerArm');
+            this._applyRotation(this.boneMap.leftLowerArm, rot, 'leftLowerArm');
         }
 
-        if (this.boneMap.rightLowerArm) {
-            const rot = computeRotation(L.rightElbow, L.rightWrist, new THREE.Vector3(1, 0, 0));
-            this._applyRotation(this.boneMap.rightLowerArm, rot);
+        // User's RIGHT arm uses MediaPipe LEFT landmarks (mirrored webcam)
+        // MediaPipe left arm points +X → vec() → -X, so rest axis = (-1, 0, 0)
+        if (this.boneMap.rightUpperArm && allVisible(L.leftShoulder, L.leftElbow)) {
+            const rot = computeRotation(L.leftShoulder, L.leftElbow, new THREE.Vector3(-1, 0, 0), 'rightUpperArm');
+            this._applyRotation(this.boneMap.rightUpperArm, rot, 'rightUpperArm');
         }
+
+        if (this.boneMap.rightLowerArm && allVisible(L.leftElbow, L.leftWrist)) {
+            const rot = computeRotation(L.leftElbow, L.leftWrist, new THREE.Vector3(-1, 0, 0), 'rightLowerArm');
+            this._applyRotation(this.boneMap.rightLowerArm, rot, 'rightLowerArm');
+        }
+
+        this._debugLogged = true;
 
         // Update debug arrows if visible
         if (this.showDebugArrows && this.debugArrowGroup) {
@@ -803,22 +838,23 @@ export class MediaPipePoseDriver {
         }
 
         // Update legs
-        if (this.boneMap.leftUpperLeg) {
+        // Only update if joints are visible
+        if (this.boneMap.leftUpperLeg && allVisible(L.leftHip, L.leftKnee)) {
             const rot = computeRotation(L.leftHip, L.leftKnee, new THREE.Vector3(0, -1, 0));
             this._applyRotation(this.boneMap.leftUpperLeg, rot);
         }
 
-        if (this.boneMap.leftLowerLeg) {
+        if (this.boneMap.leftLowerLeg && allVisible(L.leftKnee, L.leftAnkle)) {
             const rot = computeRotation(L.leftKnee, L.leftAnkle, new THREE.Vector3(0, -1, 0));
             this._applyRotation(this.boneMap.leftLowerLeg, rot);
         }
 
-        if (this.boneMap.rightUpperLeg) {
+        if (this.boneMap.rightUpperLeg && allVisible(L.rightHip, L.rightKnee)) {
             const rot = computeRotation(L.rightHip, L.rightKnee, new THREE.Vector3(0, -1, 0));
             this._applyRotation(this.boneMap.rightUpperLeg, rot);
         }
 
-        if (this.boneMap.rightLowerLeg) {
+        if (this.boneMap.rightLowerLeg && allVisible(L.rightKnee, L.rightAnkle)) {
             const rot = computeRotation(L.rightKnee, L.rightAnkle, new THREE.Vector3(0, -1, 0));
             this._applyRotation(this.boneMap.rightLowerLeg, rot);
         }
@@ -832,12 +868,14 @@ export class MediaPipePoseDriver {
     /**
      * Apply rotation with smoothing
      */
-    _applyRotation(bone, targetQuat) {
+    _applyRotation(bone, targetQuat, debugName = '') {
         if (!bone) return;
 
         // Store rest pose if not already stored
         if (!bone.userData.restQuaternion) {
             bone.userData.restQuaternion = bone.quaternion.clone();
+            console.log(`[MediaPipePoseDriver] Stored rest pose for ${bone.name || debugName}:`, 
+                bone.userData.restQuaternion);
         }
 
         // Combine rest pose with target rotation
@@ -845,6 +883,11 @@ export class MediaPipePoseDriver {
 
         // Smooth application
         bone.quaternion.slerp(finalQuat, this.smoothingFactor);
+
+        // Debug logging
+        if (debugName && !this._debugLogged) {
+            console.log(`[MediaPipePoseDriver] ${debugName}: targetQuat=`, targetQuat, 'finalQuat=', finalQuat);
+        }
     }
 
     /**
