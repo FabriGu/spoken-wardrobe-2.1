@@ -38,6 +38,22 @@ BOLD_COLORS = [
 # Rotation angles for chaotic layout
 ROTATION_ANGLES = [0, 15, -15, 30, -30, 45, -45, 90, -90, 135, -135, 180]
 
+# All available shaders for variety
+ALL_SHADERS = [
+    "dreamBlur", "glitch", "kineticLiquid", "chromatic", "noiseField",
+    "scanLine", "voronoi", "particleCloud", "holographic", "dataMosh",
+    "ripple", "mandala", "glow", "diagonal"
+]
+
+# Shader moods for thematic selection
+SHADER_MOODS = {
+    "chaotic": ["glitch", "dataMosh", "voronoi", "scanLine"],
+    "dreamy": ["dreamBlur", "kineticLiquid", "holographic", "ripple"],
+    "digital": ["scanLine", "glitch", "dataMosh", "chromatic"],
+    "organic": ["kineticLiquid", "particleCloud", "ripple", "noiseField"],
+    "geometric": ["voronoi", "mandala", "diagonal", "holographic"]
+}
+
 
 @dataclass
 class CompositionConfig:
@@ -172,53 +188,58 @@ class CompositionGenerator:
         # Paths will be relative to lookbook/ directory
         session_rel_path = f"comfyui_generated_mesh/{session.id}"
 
-        # 1. Primary: Clothing mesh (center)
+        # 1. Primary: Clothing mesh (CENTER, FRONT, LARGE, NO SHADERS)
+        # Mesh is placed at the front (lowest depth) so nothing obstructs it
         if session.files.get('clothing_mesh'):
             elements.append({
                 "type": "glb_mesh",
                 "path": f"/{session_rel_path}/clothing_mesh.glb",
                 "target_2d": {"x": 0.5, "y": 0.5},
-                "depth_range": {"min": 4, "max": 6},
-                "scale": 0.35
+                "depth_range": {"min": 3, "max": 4},  # Front - closest to camera
+                "scale": 0.45,  # Larger scale
+                "plain": True,  # No shader effects, plain material
+                "animation": True,
+                "animationPreset": random.choice(["dreamy", "flow", "aggressive"])
             })
 
-        # 2. Original body frame (positioned randomly)
+        # 2. Original body frame (positioned randomly, BEHIND mesh)
         if session.files.get('original_frame'):
             pos = self._random_edge_position()
             elements.append({
                 "type": "image_plane",
                 "path": f"/{session_rel_path}/original_frame.png",
                 "target_2d": pos,
-                "depth_range": {"min": 8, "max": 15},
+                "depth_range": {"min": 10, "max": 18},  # Far behind mesh
                 "scale": 0.15,
                 "rotation": random.choice(ROTATION_ANGLES),
                 "opacity": 0.7
             })
 
-        # 3. Generated clothing image
+        # 3. Generated clothing image (BEHIND mesh)
         if session.files.get('generated_clothing'):
             pos = self._random_edge_position()
             elements.append({
                 "type": "image_plane",
                 "path": f"/{session_rel_path}/generated_clothing.png",
                 "target_2d": pos,
-                "depth_range": {"min": 6, "max": 12},
+                "depth_range": {"min": 8, "max": 14},  # Behind mesh
                 "scale": 0.2,
                 "rotation": random.choice(ROTATION_ANGLES)
             })
 
-        # 4. Mask as ghost overlay
+        # 4. Mask as ghost overlay (BEHIND mesh, not blocking)
         if session.files.get('mask'):
+            pos = self._random_edge_position()  # Not centered, to avoid blocking
             elements.append({
                 "type": "image_plane",
                 "path": f"/{session_rel_path}/mask.png",
-                "target_2d": {"x": 0.5, "y": 0.5},
-                "depth_range": {"min": 3, "max": 4},
-                "scale": 0.4,
-                "opacity": 0.2
+                "target_2d": pos,
+                "depth_range": {"min": 12, "max": 16},  # Far behind
+                "scale": 0.3,
+                "opacity": 0.15
             })
 
-        # 5. 3D Text keywords
+        # 5. 3D Text keywords (BEHIND mesh)
         for i, keyword in enumerate(keywords[:3]):
             if len(keyword) > 2:
                 pos = self._random_position()
@@ -226,60 +247,71 @@ class CompositionGenerator:
                     "type": "text_3d",
                     "text": keyword.upper(),
                     "target_2d": pos,
-                    "depth_range": {"min": 6 + i*2, "max": 10 + i*2},
+                    "depth_range": {"min": 8 + i*3, "max": 14 + i*3},  # Behind mesh
                     "scale": random.uniform(0.08, 0.15),
                     "color": self._random_text_color(),
                     "rotation": random.choice(ROTATION_ANGLES)
                 })
 
-        # 6. Found imagery
+        # 6. Found imagery (BEHIND mesh) - use LOCAL paths only
         for i, img_path in enumerate(found_images[:5]):
+            # Convert absolute paths to relative web paths
+            if img_path.startswith('http'):
+                # Skip external URLs (CORS issues in browser)
+                print(f"  Skipping external URL (CORS): {img_path}")
+                continue
+
+            # Convert to web-relative path
+            web_path = img_path
+            if '/found_images/' in img_path:
+                # Extract relative path from found_images directory
+                web_path = '/found_images/' + img_path.split('/found_images/')[-1]
+            elif not img_path.startswith('/'):
+                web_path = '/' + img_path
+
             pos = self._random_position()
             elements.append({
                 "type": "image_plane",
-                "path": img_path,
+                "path": web_path,
                 "target_2d": pos,
-                "depth_range": {"min": 10 + i*2, "max": 20 + i*2},
+                "depth_range": {"min": 12 + i*2, "max": 22 + i*2},  # Far back
                 "scale": random.uniform(0.1, 0.25),
                 "rotation": random.choice(ROTATION_ANGLES),
                 "opacity": random.uniform(0.5, 0.9)
             })
 
-        # 7. Shader effects
-        # Distortion effect
-        elements.append({
-            "type": "shader_plane",
-            "shader": "chromatic",
-            "target_2d": self._random_position(),
-            "depth_range": {"min": 5, "max": 10},
-            "scale": random.uniform(0.15, 0.3),
-            "opacity": 0.3
-        })
+        # 7. Shader effects - SELECT UNIQUE RANDOM SHADERS for variety
+        # Each composition gets a different set of shaders
+        num_shaders = random.randint(3, 6)  # 3-6 shader planes
+        selected_shaders = random.sample(ALL_SHADERS, min(num_shaders, len(ALL_SHADERS)))
 
-        # Glow effect
-        elements.append({
-            "type": "shader_plane",
-            "shader": "glow",
-            "target_2d": self._random_position(),
-            "depth_range": {"min": 8, "max": 15},
-            "scale": random.uniform(0.2, 0.4),
-            "opacity": 0.25,
-            "color": random.choice(BOLD_COLORS),
-            "color2": "#000000"
-        })
+        for shader_name in selected_shaders:
+            # Position shaders at edges, NOT blocking center mesh
+            pos = self._random_edge_position()
+            elements.append({
+                "type": "shader_plane",
+                "shader": shader_name,
+                "target_2d": pos,
+                "depth_range": {"min": 6, "max": 15},  # Behind mesh
+                "scale": random.uniform(0.15, 0.35),
+                "opacity": random.uniform(0.2, 0.5),
+                "color": random.choice(BOLD_COLORS),
+                "animated": True
+            })
 
-        # 8. Diagonal cut (like reference images)
-        if random.random() > 0.5:
+        # 8. Optional diagonal accent (BEHIND mesh, edge positioned)
+        if random.random() > 0.6:
             angle = random.choice([30, 45, 60, -30, -45, -60])
+            edge_pos = self._random_edge_position()
             elements.append({
                 "type": "shader_plane",
                 "shader": "diagonal",
-                "target_2d": {"x": 0.5, "y": 0.5},
-                "depth_range": {"min": 2, "max": 3},
-                "width": 15,
-                "height": random.uniform(0.2, 0.5),
-                "scale": 1.0,
-                "opacity": 0.7,
+                "target_2d": edge_pos,  # Edge, not center
+                "depth_range": {"min": 5, "max": 8},  # Behind mesh
+                "width": 10,
+                "height": random.uniform(0.2, 0.4),
+                "scale": 0.8,
+                "opacity": 0.5,
                 "color": random.choice(BOLD_COLORS),
                 "angle": angle,
                 "rotation": angle

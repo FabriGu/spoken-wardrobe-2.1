@@ -56,12 +56,19 @@ export class GLBMeshElement {
      * Apply visual style to the mesh.
      */
     applyStyle() {
-        const { wireframe, color, opacity, emissive, metalness, roughness } = this.config;
+        const { wireframe, color, opacity, emissive, metalness, roughness, plain } = this.config;
 
         this.mesh.traverse((child) => {
             if (child.isMesh) {
+                // Plain mode: keep original material unchanged (no shader effects)
+                if (plain) {
+                    if (child.material) {
+                        child.material.side = THREE.DoubleSide;
+                        child.material.needsUpdate = true;
+                    }
+                }
                 // Option: wireframe mode for ethereal look
-                if (wireframe) {
+                else if (wireframe) {
                     child.material = new THREE.MeshBasicMaterial({
                         color: color || 0xffffff,
                         wireframe: true,
@@ -72,7 +79,7 @@ export class GLBMeshElement {
                     // Enhance existing material
                     if (child.material) {
                         child.material.side = THREE.DoubleSide;
-                        
+
                         // Apply custom material properties
                         if (metalness !== undefined) {
                             child.material.metalness = metalness;
@@ -89,12 +96,12 @@ export class GLBMeshElement {
                             child.material.emissive.set(emissive);
                             child.material.emissiveIntensity = 0.3;
                         }
-                        
+
                         // Apply base color if specified
                         if (color) {
                             child.material.color.set(color);
                         }
-                        
+
                         // Apply opacity
                         if (opacity !== undefined) {
                             child.material.transparent = true;

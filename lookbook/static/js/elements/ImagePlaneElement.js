@@ -86,7 +86,7 @@ export class ImagePlaneElement {
             loader.load(
                 path,
                 (texture) => {
-                    texture.encoding = THREE.SRGBColorSpace;
+                    texture.colorSpace = THREE.SRGBColorSpace;
                     resolve(texture);
                 },
                 undefined, // onProgress
