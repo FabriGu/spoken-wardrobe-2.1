@@ -50,6 +50,11 @@ export class MediaPipePoseDriver {
         this.showKeypoints = true;
         this.keypointColor = 0x9933ff; // Purple
 
+        // Debug visualization for direction vectors
+        this.showDebugArrows = false;
+        this.debugArrowGroup = null;
+        this.debugArrows = {};
+
         // Calibration for matching body mesh
         this.calibrated = false;
         this.keypointScale = 1.0;
@@ -318,6 +323,7 @@ export class MediaPipePoseDriver {
     setScene(scene) {
         this.scene = scene;
         this._createKeypointGroup();
+        this._createDebugArrows();
     }
 
     /**
@@ -365,6 +371,76 @@ export class MediaPipePoseDriver {
         }
 
         this.scene.add(this.keypointGroup);
+    }
+
+    /**
+     * Create debug arrow helpers for direction vectors
+     */
+    _createDebugArrows() {
+        if (!this.scene) return;
+
+        // Remove existing group
+        if (this.debugArrowGroup) {
+            this.scene.remove(this.debugArrowGroup);
+        }
+
+        this.debugArrowGroup = new THREE.Group();
+        this.debugArrowGroup.name = 'DebugArrows';
+        this.debugArrowGroup.visible = this.showDebugArrows;
+
+        // Create arrows for arm directions (actual computed direction)
+        // Green = left arm direction, Blue = right arm direction
+        const arrowLength = 0.3;
+        const arrowHeadLength = 0.05;
+        const arrowHeadWidth = 0.03;
+
+        this.debugArrows.leftArmDir = new THREE.ArrowHelper(
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            arrowLength, 0x00ff00, arrowHeadLength, arrowHeadWidth
+        );
+        this.debugArrows.leftArmDir.name = 'leftArmDir';
+
+        this.debugArrows.rightArmDir = new THREE.ArrowHelper(
+            new THREE.Vector3(-1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            arrowLength, 0x0088ff, arrowHeadLength, arrowHeadWidth
+        );
+        this.debugArrows.rightArmDir.name = 'rightArmDir';
+
+        // Create arrows for rest axes (for comparison)
+        // Red = left rest axis, Cyan = right rest axis
+        this.debugArrows.leftRestAxis = new THREE.ArrowHelper(
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            arrowLength * 0.7, 0xff0000, arrowHeadLength, arrowHeadWidth
+        );
+        this.debugArrows.leftRestAxis.name = 'leftRestAxis';
+
+        this.debugArrows.rightRestAxis = new THREE.ArrowHelper(
+            new THREE.Vector3(-1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            arrowLength * 0.7, 0x00ffff, arrowHeadLength, arrowHeadWidth
+        );
+        this.debugArrows.rightRestAxis.name = 'rightRestAxis';
+
+        // Add all arrows to group
+        for (const arrow of Object.values(this.debugArrows)) {
+            this.debugArrowGroup.add(arrow);
+        }
+
+        this.scene.add(this.debugArrowGroup);
+        console.log('[MediaPipePoseDriver] Debug arrows created (toggle with setDebugArrowsVisible)');
+    }
+
+    /**
+     * Toggle debug arrow visibility
+     */
+    setDebugArrowsVisible(visible) {
+        this.showDebugArrows = visible;
+        if (this.debugArrowGroup) {
+            this.debugArrowGroup.visible = visible;
+        }
     }
 
     /**
@@ -582,10 +658,24 @@ export class MediaPipePoseDriver {
         };
 
         // Helper to create vector from landmarks
+        //
+        // Coordinate system analysis:
+        // - MediaPipe: X+ = person's left, Y+ = DOWN, Z+ = toward camera
+        // - Three.js:  X+ = right (viewer), Y+ = UP, Z+ = toward viewer
+        //
+        // CRITICAL: Must match keypoint visualization transform (_updateKeypointVisualization)
+        // which uses (-x, -y, -z). If skeleton and visualization use different transforms,
+        // the mesh will deform opposite to what the keypoints show.
+        //
+        // The negation serves two purposes:
+        // 1. Mirror X: person's left (+X) becomes viewer's left (-X in scene)
+        // 2. Flip Y: MediaPipe Y-down becomes Three.js Y-up
+        // 3. Flip Z: MediaPipe Z-toward-camera becomes scene Z-toward-viewer
+        //
         const vec = (idx) => new THREE.Vector3(
-            -landmarks[idx].x,  // Mirror X for screen
-            -landmarks[idx].y,  // Flip Y (MediaPipe Y is down)
-            -landmarks[idx].z
+            -landmarks[idx].x,   // Mirror X for display
+            -landmarks[idx].y,   // Flip Y (MediaPipe Y is down)
+            -landmarks[idx].z    // Flip Z to match keypoint visualization
         );
 
         // Helper to compute rotation from direction
@@ -603,6 +693,8 @@ export class MediaPipePoseDriver {
             const spineDir = shoulderCenter.sub(hipCenter).normalize();
 
             // Compute torso twist from shoulders
+            // With negated X: rightShoulder (MediaPipe +right) becomes +X, leftShoulder becomes -X
+            // shoulderVec.x = positive when facing camera → atan2 ≈ 0
             const shoulderVec = vec(L.rightShoulder).sub(vec(L.leftShoulder)).normalize();
 
             const spineQuat = new THREE.Quaternion();
@@ -617,24 +709,97 @@ export class MediaPipePoseDriver {
         }
 
         // Update arms
+        // Rest axes (after full negation in vec()):
+        // - Left arm in T-pose points to character's left (+X in mesh)
+        //   MediaPipe left arm: +X → vec() → -X, so rest axis must be (-1, 0, 0) to match
+        // - Right arm in T-pose points to character's right (-X in mesh)
+        //   MediaPipe right arm: -X → vec() → +X, so rest axis must be (1, 0, 0) to match
         if (this.boneMap.leftUpperArm) {
-            const rot = computeRotation(L.leftShoulder, L.leftElbow, new THREE.Vector3(1, 0, 0));
+            const rot = computeRotation(L.leftShoulder, L.leftElbow, new THREE.Vector3(-1, 0, 0));
             this._applyRotation(this.boneMap.leftUpperArm, rot);
         }
 
         if (this.boneMap.leftLowerArm) {
-            const rot = computeRotation(L.leftElbow, L.leftWrist, new THREE.Vector3(1, 0, 0));
+            const rot = computeRotation(L.leftElbow, L.leftWrist, new THREE.Vector3(-1, 0, 0));
             this._applyRotation(this.boneMap.leftLowerArm, rot);
         }
 
         if (this.boneMap.rightUpperArm) {
-            const rot = computeRotation(L.rightShoulder, L.rightElbow, new THREE.Vector3(-1, 0, 0));
+            const rot = computeRotation(L.rightShoulder, L.rightElbow, new THREE.Vector3(1, 0, 0));
             this._applyRotation(this.boneMap.rightUpperArm, rot);
         }
 
         if (this.boneMap.rightLowerArm) {
-            const rot = computeRotation(L.rightElbow, L.rightWrist, new THREE.Vector3(-1, 0, 0));
+            const rot = computeRotation(L.rightElbow, L.rightWrist, new THREE.Vector3(1, 0, 0));
             this._applyRotation(this.boneMap.rightLowerArm, rot);
+        }
+
+        // Update debug arrows if visible
+        if (this.showDebugArrows && this.debugArrowGroup) {
+            // Transform to scene-space (same as keypoint visualization)
+            const scale = this.keypointScale * this.manualScaleMultiplier;
+            const offsetX = this.keypointOffsetX;
+            const offsetY = this.keypointOffsetY + this.manualOffsetY;
+            const offsetZ = this.keypointOffsetZ + this.manualOffsetZ;
+
+            // Position transform (matches keypoint visualization)
+            const scenePos = (lm) => new THREE.Vector3(
+                -lm.x * scale + offsetX,
+                -lm.y * scale + offsetY,
+                -lm.z * scale + offsetZ
+            );
+
+            // Direction transform (flip X to match scene mirroring)
+            const sceneDir = (fromLm, toLm) => {
+                const dir = new THREE.Vector3(
+                    -(toLm.x - fromLm.x),
+                    -(toLm.y - fromLm.y),
+                    -(toLm.z - fromLm.z)
+                );
+                return dir.normalize();
+            };
+
+            // Get landmark data
+            const leftShoulder = landmarks[L.leftShoulder];
+            const rightShoulder = landmarks[L.rightShoulder];
+            const leftElbow = landmarks[L.leftElbow];
+            const rightElbow = landmarks[L.rightElbow];
+
+            // Calculate shoulder positions in scene-space
+            const leftShoulderScene = scenePos(leftShoulder);
+            const rightShoulderScene = scenePos(rightShoulder);
+
+            // Calculate actual arm directions in scene-space
+            const leftArmDirScene = sceneDir(leftShoulder, leftElbow);
+            const rightArmDirScene = sceneDir(rightShoulder, rightElbow);
+
+            // Also compute world-space directions for logging (what skeleton sees)
+            const leftArmDirWorld = vec(L.leftElbow).sub(vec(L.leftShoulder)).normalize();
+            const rightArmDirWorld = vec(L.rightElbow).sub(vec(L.rightShoulder)).normalize();
+
+            // Update left arm direction arrow (GREEN)
+            this.debugArrows.leftArmDir.position.copy(leftShoulderScene);
+            this.debugArrows.leftArmDir.setDirection(leftArmDirScene);
+
+            // Update right arm direction arrow (BLUE)
+            this.debugArrows.rightArmDir.position.copy(rightShoulderScene);
+            this.debugArrows.rightArmDir.setDirection(rightArmDirScene);
+
+            // Update rest axis arrows (RED and CYAN) - in scene-space, +X is left (mirrored)
+            this.debugArrows.leftRestAxis.position.copy(leftShoulderScene);
+            this.debugArrows.leftRestAxis.setDirection(new THREE.Vector3(-1, 0, 0)); // Scene-space rest
+
+            this.debugArrows.rightRestAxis.position.copy(rightShoulderScene);
+            this.debugArrows.rightRestAxis.setDirection(new THREE.Vector3(1, 0, 0)); // Scene-space rest
+
+            // Log both scene and world directions for debugging
+            if (!this._lastDebugLog || Date.now() - this._lastDebugLog > 1000) {
+                console.log('[Debug] Left arm (scene):', leftArmDirScene.x.toFixed(2), leftArmDirScene.y.toFixed(2), leftArmDirScene.z.toFixed(2));
+                console.log('[Debug] Left arm (world):', leftArmDirWorld.x.toFixed(2), leftArmDirWorld.y.toFixed(2), leftArmDirWorld.z.toFixed(2));
+                console.log('[Debug] Right arm (scene):', rightArmDirScene.x.toFixed(2), rightArmDirScene.y.toFixed(2), rightArmDirScene.z.toFixed(2));
+                console.log('[Debug] Right arm (world):', rightArmDirWorld.x.toFixed(2), rightArmDirWorld.y.toFixed(2), rightArmDirWorld.z.toFixed(2));
+                this._lastDebugLog = Date.now();
+            }
         }
 
         // Update legs

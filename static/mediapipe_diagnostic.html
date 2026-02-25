@@ -386,6 +386,11 @@
                     <label for="chk-show-keypoints">Show 3D Keypoints (Purple)</label>
                     <p style="font-size: 11px; color: #888; margin: 2px 0 0 20px;">Display MediaPipe landmarks in scene</p>
                 </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-show-debug-arrows">
+                    <label for="chk-show-debug-arrows">Show Debug Arrows</label>
+                    <p style="font-size: 11px; color: #888; margin: 2px 0 0 20px;">Green=Left arm dir, Blue=Right arm dir, Red/Cyan=Rest axes</p>
+                </div>
                 <div class="control-group" style="margin-top: 10px;">
                     <label>Keypoint Y Offset: <span id="keypoint-y-offset-value">-0.25</span></label>
                     <input type="range" id="keypoint-y-offset-slider" min="-2" max="2" step="0.05" value="-0.25" style="width: 100%;">
@@ -2571,6 +2576,13 @@
         document.getElementById('chk-show-keypoints').addEventListener('change', (e) => {
             if (poseDriver) {
                 poseDriver.setKeypointsVisible(e.target.checked);
+            }
+        });
+
+        document.getElementById('chk-show-debug-arrows').addEventListener('change', (e) => {
+            if (poseDriver) {
+                poseDriver.setDebugArrowsVisible(e.target.checked);
+                log(e.target.checked ? 'Debug arrows enabled - Green/Blue=Arm directions, Red/Cyan=Rest axes' : 'Debug arrows disabled');
             }
         });
 
