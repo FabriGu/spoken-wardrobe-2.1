@@ -19,9 +19,9 @@
     "word_count": 8,
     "has_mesh": true
   },
-  "palette": "sunset",
+  "palette": "forest",
   "background": {
-    "color": "#1a0f0a"
+    "color": "#0a1a0f"
   },
   "camera": {
     "position": [
@@ -40,13 +40,13 @@
     "postProcessing": "raw",
     "bloom": {
       "enabled": true,
-      "strength": 0.9668177265103503,
-      "radius": 0.49313139757681446
+      "strength": 0.751260849481876,
+      "radius": 0.33257159345379916
     },
     "film": {
       "enabled": true,
-      "grainIntensity": 0.034408900876385165,
-      "vignetteIntensity": 0.2578153173973672
+      "grainIntensity": 0.051098665871684296,
+      "vignetteIntensity": 0.2900047665501857
     }
   },
   "elements": [
@@ -63,11 +63,11 @@
       },
       "scale": 0.4,
       "animation": true,
-      "animationPreset": "ethereal",
+      "animationPreset": "dreamy",
       "pointCloud": {
         "enabled": true,
         "particleSize": 0.012,
-        "particleColor": "#fb923c",
+        "particleColor": "#4ade80",
         "scatterRadius": 1.2,
         "turbulence": 0.25
       }
@@ -90,7 +90,7 @@
         "z": 0
       },
       "fontSize": 0.1,
-      "textColor": "#fff7ed",
+      "textColor": "#dcfce7",
       "orbitSpeed": 0.06,
       "numCurves": 2,
       "curveRadius": 1.4,
@@ -99,18 +99,81 @@
     },
     {
       "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765665304/original_frame.png",
+      "target_2d": {
+        "x": 0.15,
+        "y": 0.35
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 7
+      },
+      "scale": 0.12,
+      "opacity": 0.35,
+      "rotation": -10,
+      "spotlight": {
+        "enabled": true,
+        "intensity": 0.4,
+        "distance": 5
+      },
+      "bobAnimation": {
+        "enabled": true,
+        "amplitude": 0.02,
+        "speed": 0.3,
+        "offset": 0.0
+      }
+    },
+    {
+      "type": "image_plane",
+      "path": "/comfyui_generated_mesh/1765665304/mask.png",
+      "target_2d": {
+        "x": 0.18,
+        "y": 0.65
+      },
+      "depth_range": {
+        "min": 5,
+        "max": 7
+      },
+      "scale": 0.12,
+      "opacity": 0.35,
+      "rotation": 10,
+      "spotlight": {
+        "enabled": true,
+        "intensity": 0.4,
+        "distance": 5
+      },
+      "bobAnimation": {
+        "enabled": true,
+        "amplitude": 0.02,
+        "speed": 0.4,
+        "offset": 1.5
+      }
+    },
+    {
+      "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765665304/generated_clothing.png",
       "target_2d": {
         "x": 0.85,
-        "y": 0.85
+        "y": 0.5
       },
       "depth_range": {
-        "min": 6,
-        "max": 8
+        "min": 5,
+        "max": 7
       },
-      "scale": 0.08,
-      "opacity": 0.15,
-      "rotation": 15
+      "scale": 0.12,
+      "opacity": 0.35,
+      "rotation": 0,
+      "spotlight": {
+        "enabled": true,
+        "intensity": 0.4,
+        "distance": 5
+      },
+      "bobAnimation": {
+        "enabled": true,
+        "amplitude": 0.02,
+        "speed": 0.5,
+        "offset": 3.0
+      }
     }
   ]
 }

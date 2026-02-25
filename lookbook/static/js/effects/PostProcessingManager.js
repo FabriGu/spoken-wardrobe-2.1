@@ -24,7 +24,7 @@ const FilmShader = {
         'time': { value: 0.0 },
         'intensity': { value: 0.5 },           // Overall effect intensity
         'grainIntensity': { value: 0.08 },     // Film grain strength
-        'scanlineIntensity': { value: 0.05 },  // Scanline visibility
+        'scanlineIntensity': { value: 0.0 },   // Scanline visibility (disabled)
         'scanlineCount': { value: 800.0 },     // Number of scanlines
         'vignetteIntensity': { value: 0.3 },   // Vignette darkness
         'vignetteRadius': { value: 0.8 },      // Vignette radius
@@ -178,7 +178,7 @@ export class PostProcessingManager {
                 enabled: true,
                 intensity: 0.6,
                 grainIntensity: 0.06,
-                scanlineIntensity: 0.03,
+                scanlineIntensity: 0.0,
                 vignetteIntensity: 0.25,
                 chromaticAberration: 0.002
             },
@@ -368,7 +368,7 @@ export class PostProcessingManager {
             // Raw, unfinished look
             raw: {
                 bloom: { enabled: true, strength: 0.5, radius: 0.3, threshold: 0.7 },
-                film: { enabled: true, intensity: 0.8, grainIntensity: 0.1, scanlineIntensity: 0.06, vignetteIntensity: 0.2, chromaticAberration: 0.004 },
+                film: { enabled: true, intensity: 0.8, grainIntensity: 0.1, scanlineIntensity: 0.0, vignetteIntensity: 0.2, chromaticAberration: 0.004 },
                 focus: { enabled: false }
             },
 
@@ -382,14 +382,14 @@ export class PostProcessingManager {
             // VHS/analog aesthetic
             vhs: {
                 bloom: { enabled: true, strength: 0.6, radius: 0.5, threshold: 0.5 },
-                film: { enabled: true, intensity: 1.0, grainIntensity: 0.12, scanlineIntensity: 0.1, vignetteIntensity: 0.3, chromaticAberration: 0.006 },
+                film: { enabled: true, intensity: 1.0, grainIntensity: 0.12, scanlineIntensity: 0.0, vignetteIntensity: 0.3, chromaticAberration: 0.006 },
                 focus: { enabled: false }
             },
 
             // Glitch/digital corruption
             glitch: {
                 bloom: { enabled: true, strength: 0.9, radius: 0.7, threshold: 0.3 },
-                film: { enabled: true, intensity: 0.9, grainIntensity: 0.15, scanlineIntensity: 0.08, vignetteIntensity: 0.1, chromaticAberration: 0.01 },
+                film: { enabled: true, intensity: 0.9, grainIntensity: 0.15, scanlineIntensity: 0.0, vignetteIntensity: 0.1, chromaticAberration: 0.01 },
                 focus: { enabled: false }
             },
 

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamwear - Create</title>
+
+    <!-- Three.js from CDN -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: white;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        /* Info panel - matches composition.html style */
+        #info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            max-width: 400px;
+            z-index: 100;
+            opacity: 0.7;
+        }
+
+        #title {
+            font-size: 24px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            min-height: 30px;
+        }
+
+        /* Prompt input - styled like transcription quote */
+        #prompt-container {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        #prompt-container::before {
+            content: '"';
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            font-style: italic;
+            margin-right: 2px;
+        }
+
+        #prompt-container::after {
+            content: '"';
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            font-style: italic;
+            margin-left: 2px;
+        }
+
+        #prompt-input {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: inherit;
+            font-size: 14px;
+            font-style: italic;
+            line-height: 1.4;
+            width: 100%;
+            outline: none;
+            resize: none;
+            padding: 0;
+        }
+
+        #prompt-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        #prompt-input:focus {
+            caret-color: white;
+        }
+
+        /* Mic button */
+        #mic-btn {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        #mic-btn:hover {
+            background: white;
+            color: black;
+        }
+
+        #mic-btn.recording {
+            background: rgba(255, 80, 80, 0.3);
+            border-color: rgba(255, 80, 80, 0.8);
+            animation: pulse 1s infinite;
+        }
+
+        #mic-btn.recording:hover {
+            background: rgba(255, 80, 80, 0.5);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 80, 80, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(255, 80, 80, 0); }
+        }
+
+        /* Instructions - white text on slight opacity bg */
+        .instruction {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 16px 32px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+        }
+
+        .instruction small {
+            display: block;
+            margin-top: 8px;
+            font-size: 11px;
+            opacity: 0.6;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .instruction.hidden { display: none; }
+
+        /* Standard buttons */
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover,
+        .btn.selected {
+            background: white;
+            color: black;
+            border-color: white;
+        }
+
+        /* Controls */
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+            opacity: 0.8;
+        }
+
+        #controls.hidden { display: none; }
+
+        /* Navigation arrows - hidden until complete */
+        .nav-arrow {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            background: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0.4) 0%,
+                rgba(0, 0, 0, 0) 100%
+            );
+        }
+
+        .nav-arrow.visible {
+            opacity: 0.3;
+            pointer-events: auto;
+        }
+
+        .nav-arrow.visible:hover {
+            opacity: 0.8;
+            width: 140px;
+        }
+
+        .nav-arrow.prev {
+            left: 0;
+            background: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0.5) 0%,
+                rgba(0, 0, 0, 0) 100%
+            );
+        }
+
+        .nav-arrow.next {
+            right: 0;
+            background: linear-gradient(
+                to left,
+                rgba(0, 0, 0, 0.5) 0%,
+                rgba(0, 0, 0, 0) 100%
+            );
+        }
+
+        .nav-arrow svg {
+            width: 60px;
+            height: 60px;
+            fill: white;
+            filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5));
+            transition: transform 0.2s ease;
+        }
+
+        .nav-arrow:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* Generated image preview */
+        #preview-image {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 400px;
+            max-height: 400px;
+            opacity: 0;
+            transition: all 1s ease;
+            z-index: 50;
+        }
+
+        #preview-image.visible {
+            opacity: 1;
+        }
+
+        #preview-image.aside {
+            left: 15%;
+            top: 40%;
+            max-width: 150px;
+            max-height: 150px;
+            opacity: 0.4;
+        }
+
+        /* Progress indicator */
+        #progress {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 100;
+        }
+
+        #progress.hidden { display: none; }
+
+        /* Back button */
+        #back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="info">
+        <div id="title"></div>
+        <div id="prompt-container">
+            <textarea id="prompt-input"
+                      rows="3"
+                      placeholder="Describe your dream clothing..."
+                      maxlength="200"></textarea>
+        </div>
+    </div>
+
+    <button id="mic-btn" title="Click to speak">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/>
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+    </button>
+
+    <button id="back-btn" class="btn" onclick="window.location.href='/'">Back</button>
+
+    <!-- Instructions -->
+    <div id="instruction-pose" class="instruction hidden">
+        Stand in A-pose<br>
+        Arms extended to the sides
+        <small>Press SPACE when ready</small>
+    </div>
+
+    <div id="instruction-generating" class="instruction hidden">
+        Generating your dream...
+        <small>This may take a moment</small>
+    </div>
+
+    <div id="instruction-mesh" class="instruction hidden">
+        Creating 3D form...
+        <small>Transforming 2D to 3D</small>
+    </div>
+
+    <!-- Preview image (shown during generation) -->
+    <img id="preview-image" src="" alt="Generated clothing" />
+
+    <!-- Progress text -->
+    <div id="progress" class="hidden"></div>
+
+    <!-- Navigation arrows (hidden until complete) -->
+    <div class="nav-arrow prev" id="arrow-prev">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </div>
+    <div class="nav-arrow next" id="arrow-next">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </div>
+
+    <!-- Controls (hidden until complete) -->
+    <div id="controls" class="hidden">
+        <button class="btn" id="btn-orbit">Free Orbit</button>
+        <button class="btn selected" id="btn-snap">Snap to View</button>
+        <button class="btn" id="btn-screenshot">Export Print</button>
+    </div>
+
+    <script type="module">
+        import { AnamorphicScene } from './static/js/AnamorphicScene.js';
+
+        // ==========================================
+        // STATE MACHINE
+        // ==========================================
+        const STATES = {
+            INPUT: 'input',           // User typing/speaking prompt
+            POSE: 'pose',             // Waiting for A-pose
+            CAPTURE: 'capture',       // Capturing frame
+            GENERATE_2D: 'generate_2d',  // ComfyUI generating
+            GENERATE_3D: 'generate_3d',  // Rodin generating mesh
+            COMPLETE: 'complete'      // Done, can browse
+        };
+
+        let currentState = STATES.INPUT;
+        let scene = null;
+        let recognition = null;
+        let isRecording = false;
+        let prompt = '';
+        let generatedTitle = '';
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        function initScene() {
+            const container = document.getElementById('canvas-container');
+            scene = new AnamorphicScene(container);
+            scene.setBackgroundColor(0x000000);
+            scene.setPostProcessingPreset('dreamy');
+            scene.setFilmEffect({ scanlineIntensity: 0 }); // No TV lines
+        }
+
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                console.warn('Speech recognition not supported');
+                document.getElementById('mic-btn').style.display = 'none';
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                document.getElementById('prompt-input').value = transcript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech error:', event.error);
+                stopRecording();
+            };
+
+            recognition.onend = () => {
+                if (isRecording) {
+                    // Restart if still recording
+                    recognition.start();
+                }
+            };
+        }
+
+        // ==========================================
+        // RECORDING CONTROLS
+        // ==========================================
+        function startRecording() {
+            if (!recognition) return;
+            isRecording = true;
+            document.getElementById('mic-btn').classList.add('recording');
+            document.getElementById('mic-btn').title = 'Click to stop';
+            try {
+                recognition.start();
+            } catch (e) {
+                console.warn('Recognition already started');
+            }
+        }
+
+        function stopRecording() {
+            if (!recognition) return;
+            isRecording = false;
+            document.getElementById('mic-btn').classList.remove('recording');
+            document.getElementById('mic-btn').title = 'Click to speak';
+            recognition.stop();
+        }
+
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        // ==========================================
+        // TITLE GENERATION
+        // ==========================================
+        function generateTitle(promptText) {
+            const stopwords = ['a', 'an', 'the', 'is', 'it', 'to', 'of', 'and', 'or', 'in', 'on', 'for', 'with', 'me', 'my', 'i', 'make', 'want', 'like', 'would', 'please', 'can', 'get', 'some'];
+            const words = promptText.toLowerCase()
+                .replace(/[^\w\s]/g, '')
+                .split(/\s+/)
+                .filter(w => w.length > 2 && !stopwords.includes(w));
+
+            if (words.length === 0) return 'Untitled Dream';
+
+            const titleWords = words.slice(0, 3);
+            return titleWords.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        function setState(newState) {
+            console.log(`[Create] State: ${currentState} → ${newState}`);
+            currentState = newState;
+
+            // Hide all instructions
+            document.querySelectorAll('.instruction').forEach(el => el.classList.add('hidden'));
+            document.getElementById('progress').classList.add('hidden');
+
+            switch (newState) {
+                case STATES.INPUT:
+                    document.getElementById('prompt-input').disabled = false;
+                    document.getElementById('prompt-input').focus();
+                    break;
+
+                case STATES.POSE:
+                    document.getElementById('prompt-input').disabled = true;
+                    document.getElementById('mic-btn').style.display = 'none';
+                    document.getElementById('instruction-pose').classList.remove('hidden');
+                    break;
+
+                case STATES.CAPTURE:
+                    document.getElementById('instruction-pose').classList.add('hidden');
+                    setProgress('Capturing...');
+                    // Simulate capture delay
+                    setTimeout(() => setState(STATES.GENERATE_2D), 1500);
+                    break;
+
+                case STATES.GENERATE_2D:
+                    document.getElementById('instruction-generating').classList.remove('hidden');
+                    setProgress('Generating 2D clothing...');
+                    // TODO: Call actual ComfyUI API
+                    simulateGeneration2D();
+                    break;
+
+                case STATES.GENERATE_3D:
+                    document.getElementById('instruction-generating').classList.add('hidden');
+                    document.getElementById('instruction-mesh').classList.remove('hidden');
+                    setProgress('Creating 3D mesh...');
+                    // TODO: Call actual Rodin API
+                    simulateGeneration3D();
+                    break;
+
+                case STATES.COMPLETE:
+                    document.getElementById('instruction-mesh').classList.add('hidden');
+                    document.getElementById('progress').classList.add('hidden');
+                    // Show navigation arrows
+                    document.getElementById('arrow-prev').classList.add('visible');
+                    document.getElementById('arrow-next').classList.add('visible');
+                    // Show controls
+                    document.getElementById('controls').classList.remove('hidden');
+                    break;
+            }
+        }
+
+        function setProgress(text) {
+            document.getElementById('progress').textContent = text;
+            document.getElementById('progress').classList.remove('hidden');
+        }
+
+        // ==========================================
+        // SUBMIT PROMPT
+        // ==========================================
+        function submitPrompt() {
+            prompt = document.getElementById('prompt-input').value.trim();
+            if (!prompt) {
+                document.getElementById('prompt-input').focus();
+                return;
+            }
+
+            // Stop recording if active
+            if (isRecording) stopRecording();
+
+            // Generate and display title
+            generatedTitle = generateTitle(prompt);
+            document.getElementById('title').textContent = generatedTitle;
+
+            // Move to pose state
+            setState(STATES.POSE);
+        }
+
+        // ==========================================
+        // SIMULATION (Replace with actual API calls)
+        // ==========================================
+        async function simulateGeneration2D() {
+            // Simulate 2D generation delay
+            await new Promise(r => setTimeout(r, 3000));
+
+            // TODO: Replace with actual ComfyUI call
+            // For now, show a placeholder or skip
+
+            // Show preview image (would be the generated image)
+            // document.getElementById('preview-image').src = generatedImageUrl;
+            // document.getElementById('preview-image').classList.add('visible');
+
+            // After showing center, move to side
+            // await new Promise(r => setTimeout(r, 2000));
+            // document.getElementById('preview-image').classList.add('aside');
+
+            // Move to 3D generation
+            setState(STATES.GENERATE_3D);
+        }
+
+        async function simulateGeneration3D() {
+            // Simulate 3D generation delay
+            await new Promise(r => setTimeout(r, 3000));
+
+            // TODO: Replace with actual Rodin API call
+            // Then load the mesh and trigger reformation
+
+            // For now, just complete
+            setState(STATES.COMPLETE);
+        }
+
+        // ==========================================
+        // EVENT LISTENERS
+        // ==========================================
+        document.getElementById('mic-btn').addEventListener('click', toggleRecording);
+
+        document.getElementById('prompt-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                submitPrompt();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' && currentState === STATES.POSE) {
+                e.preventDefault();
+                setState(STATES.CAPTURE);
+            }
+        });
+
+        // Navigation arrows (when complete)
+        document.getElementById('arrow-prev').addEventListener('click', () => {
+            window.location.href = '/composition.html';
+        });
+
+        document.getElementById('arrow-next').addEventListener('click', () => {
+            window.location.href = '/composition.html';
+        });
+
+        // Control buttons
+        document.getElementById('btn-orbit').addEventListener('click', () => {
+            scene.enableOrbit(true);
+            document.getElementById('btn-orbit').classList.add('selected');
+            document.getElementById('btn-snap').classList.remove('selected');
+        });
+
+        document.getElementById('btn-snap').addEventListener('click', () => {
+            scene.snapToAnamorphicView();
+            document.getElementById('btn-snap').classList.add('selected');
+            document.getElementById('btn-orbit').classList.remove('selected');
+        });
+
+        document.getElementById('btn-screenshot').addEventListener('click', () => {
+            // TODO: Implement screenshot
+            console.log('Screenshot not implemented yet');
+        });
+
+        // ==========================================
+        // INITIALIZE
+        // ==========================================
+        initScene();
+        initSpeechRecognition();
+        document.getElementById('prompt-input').focus();
+    </script>
+</body>
+</html>

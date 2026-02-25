@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dreamwear Lookbook - Gallery</title>
+    <title>Dreamwear Lookbook</title>
     <style>
         * {
             margin: 0;
@@ -12,222 +12,260 @@
         }
 
         body {
-            background: #0a0a0a;
+            background: #000;
             color: white;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             min-height: 100vh;
-            padding: 40px;
+            overflow: hidden;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 60px;
+        #gallery-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
         }
 
-        h1 {
-            font-size: 48px;
+        .gallery-title {
+            position: absolute;
+            font-size: 14px;
             font-weight: 300;
             text-transform: uppercase;
-            letter-spacing: 8px;
-            background: linear-gradient(135deg, #ec4899, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 16px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
         }
 
-        .subtitle {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.5);
+        .gallery-title:hover {
+            color: rgba(255, 255, 255, 1);
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.6),
+                         0 0 80px rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%) scale(1.15);
+        }
+
+        /* Header - minimal */
+        #header {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            opacity: 0.4;
+        }
+
+        #header h1 {
+            font-size: 12px;
+            font-weight: 300;
             text-transform: uppercase;
             letter-spacing: 4px;
         }
 
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .composition-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: all 0.3s ease;
+        /* Create button */
+        #create-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
             cursor: pointer;
-        }
-
-        .composition-card:hover {
-            border-color: rgba(139, 92, 246, 0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
-        }
-
-        .card-preview {
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 64px;
-            background: linear-gradient(135deg, var(--card-color, #ec4899), #1a1a1a);
-        }
-
-        .card-info {
-            padding: 20px;
-        }
-
-        .card-id {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        #create-btn:hover {
+            background: white;
+            color: black;
+            border-color: white;
+        }
+
+        /* Counter */
+        #counter {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 11px;
             font-family: monospace;
+            z-index: 100;
         }
 
-        .card-transcription {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.5;
-            margin-bottom: 12px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .card-keywords {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .keyword {
-            background: rgba(236, 72, 153, 0.2);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
+        /* Loading state */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .error {
-            text-align: center;
-            padding: 60px;
-            color: #ff6b6b;
-        }
-
-        .test-card {
-            border: 2px dashed rgba(139, 92, 246, 0.5);
-        }
-
-        .test-card .card-preview {
-            background: linear-gradient(135deg, #8b5cf6, #1a1a1a);
-        }
-
-        .test-badge {
-            background: rgba(139, 92, 246, 0.5);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            text-transform: uppercase;
-            margin-left: 8px;
+            letter-spacing: 2px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Dreamwear Lookbook</h1>
-        <p class="subtitle">Anamorphic Fashion Dreams</p>
-    </header>
-
-    <div class="gallery" id="gallery">
-        <div class="loading">Loading compositions...</div>
+    <div id="header">
+        <h1>Dreamwear</h1>
     </div>
 
+    <div id="gallery-container">
+        <div id="loading">Loading dreams...</div>
+    </div>
+
+    <button id="create-btn">Create Your Own</button>
+    <div id="counter"></div>
+
     <script>
-        const BOLD_COLORS = [
-            '#FF1493', '#00CED1', '#FFD700', '#FF4500', '#9400D3',
-            '#00FF7F', '#FF6347', '#1E90FF', '#FF69B4', '#32CD32'
-        ];
+        let compositions = [];
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let targetMouseX = mouseX;
+        let targetMouseY = mouseY;
+
+        // Smooth mouse tracking
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        // Animation loop for smooth parallax
+        function animate() {
+            // Smooth interpolation
+            mouseX += (targetMouseX - mouseX) * 0.08;
+            mouseY += (targetMouseY - mouseY) * 0.08;
+
+            updateTitlePositions();
+            requestAnimationFrame(animate);
+        }
 
         async function loadGallery() {
-            const gallery = document.getElementById('gallery');
+            const container = document.getElementById('gallery-container');
 
-            // Always show test composition first
-            const testCard = createCard({
-                id: 'test',
-                transcription: 'Test composition with floating dreams and chaotic elements',
-                keywords: ['test', 'dream', 'chaos'],
-                isTest: true
-            });
-            gallery.innerHTML = '';
-            gallery.appendChild(testCard);
-
-            // Try to load composition index
             try {
-                const response = await fetch('/compositions/index.json');
-                if (response.ok) {
-                    const compositionIds = await response.json();
+                // Load index
+                const indexRes = await fetch('/compositions/index.json');
+                const ids = await indexRes.json();
 
-                    for (const id of compositionIds) {
-                        // Load each composition config
-                        try {
-                            const configResponse = await fetch(`/compositions/${id}.json`);
-                            if (configResponse.ok) {
-                                const config = await configResponse.json();
-                                const card = createCard(config);
-                                gallery.appendChild(card);
-                            }
-                        } catch (e) {
-                            console.warn(`Failed to load composition ${id}:`, e);
-                        }
+                // Load all compositions
+                for (const id of ids) {
+                    try {
+                        const res = await fetch(`/compositions/${id}.json`);
+                        const config = await res.json();
+                        compositions.push(config);
+                    } catch (e) {
+                        console.warn(`Failed to load ${id}`);
                     }
                 }
+
+                // Remove loading text
+                document.getElementById('loading').remove();
+
+                // Update counter
+                document.getElementById('counter').textContent = `${compositions.length} dreams`;
+
+                // Distribute titles across screen
+                compositions.forEach((comp, i) => {
+                    createTitle(comp, i, container);
+                });
+
+                // Start animation loop
+                animate();
+
             } catch (e) {
-                console.log('No compositions index found, showing test only');
+                console.error('Failed to load gallery:', e);
+                document.getElementById('loading').textContent = 'Failed to load';
             }
         }
 
-        function createCard(config) {
-            const card = document.createElement('div');
-            card.className = 'composition-card' + (config.isTest ? ' test-card' : '');
+        function createTitle(config, index, container) {
+            const title = document.createElement('div');
+            title.className = 'gallery-title';
 
-            const color = config.background?.color || BOLD_COLORS[Math.floor(Math.random() * BOLD_COLORS.length)];
+            // Always use title field
+            const displayTitle = config.title || 'Untitled';
+            title.textContent = displayTitle;
+            title.dataset.index = index;
 
-            card.innerHTML = `
-                <div class="card-preview" style="--card-color: ${color}">
-                    ${config.isTest ? '✨' : '👗'}
-                </div>
-                <div class="card-info">
-                    <div class="card-id">
-                        #${config.id}
-                        ${config.isTest ? '<span class="test-badge">Test</span>' : ''}
-                    </div>
-                    <div class="card-transcription">"${config.transcription || 'No transcription'}"</div>
-                    <div class="card-keywords">
-                        ${(config.keywords || []).slice(0, 4).map(kw =>
-                            `<span class="keyword">${kw}</span>`
-                        ).join('')}
-                    </div>
-                </div>
-            `;
+            // Distribute in grid pattern with randomness
+            const cols = Math.ceil(Math.sqrt(compositions.length * 1.5));
+            const rows = Math.ceil(compositions.length / cols);
 
-            card.addEventListener('click', () => {
+            const col = index % cols;
+            const row = Math.floor(index / cols);
+
+            // Add padding from edges
+            const padding = 100;
+            const usableWidth = window.innerWidth - padding * 2;
+            const usableHeight = window.innerHeight - padding * 2;
+
+            const cellWidth = usableWidth / cols;
+            const cellHeight = usableHeight / rows;
+
+            // Base position (center of cell) with randomness
+            const baseX = padding + cellWidth * col + cellWidth / 2 + (Math.random() - 0.5) * cellWidth * 0.4;
+            const baseY = padding + cellHeight * row + cellHeight / 2 + (Math.random() - 0.5) * cellHeight * 0.4;
+
+            title.style.left = `${baseX}px`;
+            title.style.top = `${baseY}px`;
+
+            // Store base position for parallax
+            title.dataset.baseX = baseX;
+            title.dataset.baseY = baseY;
+            title.dataset.depth = (0.3 + Math.random() * 1.2).toFixed(2); // Parallax depth
+
+            title.addEventListener('click', () => {
                 window.location.href = `/composition.html?id=${config.id}`;
             });
 
-            return card;
+            container.appendChild(title);
         }
 
-        // Load on page load
+        function updateTitlePositions() {
+            const titles = document.querySelectorAll('.gallery-title');
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            // Mouse offset from center (normalized -1 to 1)
+            const offsetX = (mouseX - centerX) / centerX;
+            const offsetY = (mouseY - centerY) / centerY;
+
+            titles.forEach(title => {
+                const baseX = parseFloat(title.dataset.baseX);
+                const baseY = parseFloat(title.dataset.baseY);
+                const depth = parseFloat(title.dataset.depth);
+
+                // Parallax effect - deeper items move more
+                const parallaxX = offsetX * 25 * depth;
+                const parallaxY = offsetY * 18 * depth;
+
+                title.style.left = `${baseX + parallaxX}px`;
+                title.style.top = `${baseY + parallaxY}px`;
+            });
+        }
+
+        // Create button handler
+        document.getElementById('create-btn').addEventListener('click', () => {
+            window.location.href = '/create.html';
+        });
+
+        // Handle resize - redistribute titles
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('gallery-container');
+            // Remove existing titles
+            container.querySelectorAll('.gallery-title').forEach(t => t.remove());
+            // Recreate
+            compositions.forEach((comp, i) => createTitle(comp, i, container));
+        });
+
+        // Start loading
         loadGallery();
     </script>
 </body>

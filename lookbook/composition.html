@@ -71,17 +71,16 @@
         }
 
         .btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
+            background: white;
+            border-color: white;
+            color: black;
         }
 
-        .btn.primary {
-            background: rgba(139, 92, 246, 0.5);
-            border-color: rgba(139, 92, 246, 0.8);
-        }
-
-        .btn.primary:hover {
-            background: rgba(139, 92, 246, 0.7);
+        .btn.primary,
+        .btn.selected {
+            background: white;
+            border-color: white;
+            color: black;
         }
 
         /* Info panel */
@@ -292,22 +291,35 @@
         }
 
         // Navigate to composition
+        // NOTE: Dissolution transitions disabled - see plan Part 12 for fix
+        let isNavigating = false;
         async function navigateTo(index) {
             if (allCompositionIds.length === 0) return;
-            
+            if (isNavigating) return; // Prevent rapid navigation during transition
+
+            isNavigating = true;
+
             // Wrap around
             if (index < 0) index = allCompositionIds.length - 1;
             if (index >= allCompositionIds.length) index = 0;
-            
+
+            // DISSOLUTION DISABLED - uncomment when fixed:
+            // await scene.transitionOut();
+
             currentIndex = index;
             compositionId = allCompositionIds[index];
-            
+
             // Update URL without reloading
             const newUrl = `${window.location.pathname}?id=${compositionId}`;
             window.history.pushState({ id: compositionId }, '', newUrl);
-            
+
             // Load new composition
             await loadComposition(compositionId);
+
+            // DISSOLUTION DISABLED - uncomment when fixed:
+            // scene.transitionIn();
+
+            isNavigating = false;
         }
 
         // Previous composition
@@ -330,9 +342,9 @@
                 const config = await loader.loadConfig(id);
                 await scene.loadComposition(config);
 
-                // Update info panel
+                // Update info panel - always use title field
                 document.getElementById('composition-title').textContent =
-                    config.keywords?.[0]?.toUpperCase() || 'DREAMWEAR';
+                    (config.title || 'Untitled').toUpperCase();
                 document.getElementById('transcription').textContent =
                     `"${config.transcription}"`;
 

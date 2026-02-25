@@ -236,16 +236,13 @@ class ArtisticCompositionGenerator:
     def _generate_title(self, words: List[str], transcription: str) -> str:
         """Generate an artistic title from words."""
         if not words:
-            return "Untitled Dream"
+            return "Untitled"
 
         # Take first 2-3 meaningful words
         title_words = words[:3]
         title = ' '.join(w.capitalize() for w in title_words)
 
-        # If too short, add context
-        if len(title) < 5:
-            title = f"Dream: {title}"
-
+        # Always return the title as-is, even if short
         return title
 
     def _choose_palette(self, words: List[str]) -> str:
@@ -318,26 +315,40 @@ class ArtisticCompositionGenerator:
                 "staggerDelay": 0.25
             })
 
-        # 3. Subtle accent - small generated image echo (optional, 50% chance)
-        if session.files.get('generated_clothing') and random.random() > 0.5:
-            # Position at edge, very subtle
-            edge = random.choice(['top-right', 'bottom-left', 'top-left', 'bottom-right'])
-            pos = {
-                'top-right': {"x": 0.85, "y": 0.15},
-                'bottom-left': {"x": 0.15, "y": 0.85},
-                'top-left': {"x": 0.15, "y": 0.15},
-                'bottom-right': {"x": 0.85, "y": 0.85}
-            }[edge]
+        # 3. Data images cluster - show all available process images
+        # These are arranged around the mesh to show the creation journey
+        data_images = [
+            ('original_frame.png', 'original_frame', {"x": 0.15, "y": 0.35}),
+            ('mask.png', 'mask', {"x": 0.18, "y": 0.65}),
+            ('generated_clothing.png', 'generated_clothing', {"x": 0.85, "y": 0.50}),
+        ]
 
-            elements.append({
-                "type": "image_plane",
-                "path": f"{session_path}/generated_clothing.png",
-                "target_2d": pos,
-                "depth_range": {"min": 6, "max": 8},
-                "scale": 0.08,
-                "opacity": 0.15,
-                "rotation": random.choice([-15, 15, -30, 30])
-            })
+        for i, (filename, file_key, position) in enumerate(data_images):
+            # Check if file exists (file_key without extension and underscores)
+            lookup_key = file_key.replace('_', '')
+            if session.files.get(lookup_key) or session.files.get(file_key):
+                elements.append({
+                    "type": "image_plane",
+                    "path": f"{session_path}/{filename}",
+                    "target_2d": position,
+                    "depth_range": {"min": 5, "max": 7},
+                    "scale": 0.12,
+                    "opacity": 0.35,
+                    "rotation": random.choice([-10, 0, 10]),
+                    # Spotlight effect for visibility
+                    "spotlight": {
+                        "enabled": True,
+                        "intensity": 0.4,
+                        "distance": 5
+                    },
+                    # Subtle bob animation
+                    "bobAnimation": {
+                        "enabled": True,
+                        "amplitude": 0.02,
+                        "speed": 0.3 + i * 0.1,  # Slightly different speeds
+                        "offset": i * 1.5  # Phase offset
+                    }
+                })
 
         return elements
 

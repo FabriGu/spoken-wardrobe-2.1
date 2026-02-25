@@ -747,6 +747,76 @@ export class AnamorphicScene {
     }
 
     /**
+     * Transition OUT of current composition (dissolve mesh into particles).
+     * Used when navigating away from a composition.
+     * @returns {Promise} Resolves when dissolution is complete
+     */
+    async transitionOut() {
+        return new Promise((resolve) => {
+            let hasDissolvers = false;
+            let pendingDissolves = 0;
+
+            for (const element of this.elements) {
+                if (element.userData.dissolver) {
+                    hasDissolvers = true;
+                    pendingDissolves++;
+
+                    const dissolver = element.userData.dissolver;
+                    const pointCloud = element.userData.pointCloud;
+
+                    // Show point cloud, hide mesh
+                    element.visible = false;
+                    if (pointCloud) pointCloud.visible = true;
+
+                    // Start dissolution
+                    dissolver.onDissolveComplete = () => {
+                        pendingDissolves--;
+                        if (pendingDissolves <= 0) {
+                            resolve();
+                        }
+                    };
+                    dissolver.dissolve();
+                }
+            }
+
+            // If no dissolvers, resolve immediately
+            if (!hasDissolvers) {
+                resolve();
+            }
+        });
+    }
+
+    /**
+     * Transition IN to composition (reform particles into mesh).
+     * Used when entering a new composition.
+     */
+    transitionIn() {
+        for (const element of this.elements) {
+            if (element.userData.dissolver) {
+                const dissolver = element.userData.dissolver;
+                const pointCloud = element.userData.pointCloud;
+
+                // Ensure point cloud is visible at start
+                element.visible = false;
+                if (pointCloud) pointCloud.visible = true;
+
+                // Set to dissolved state first
+                dissolver.setProgress(1);
+
+                // Start reformation
+                dissolver.reform();
+
+                dissolver.onReformComplete = () => {
+                    element.visible = true;
+                    if (pointCloud) {
+                        pointCloud.visible = false;
+                    }
+                };
+            }
+        }
+    }
+
+    /**
      * Get current composition metadata.
      */
     getCompositionInfo() {
