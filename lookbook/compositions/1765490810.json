@@ -1,15 +1,26 @@
 {
   "id": "1765490810",
+  "title": "Dream: Hmm",
   "transcription": "Hmm.",
-  "keywords": [],
+  "words": [
+    "hmm"
+  ],
+  "metadata": {
+    "timestamp": 1765490810,
+    "created_date": "2025-12-11 17:06",
+    "transcription": "Hmm.",
+    "word_count": 1,
+    "has_mesh": true
+  },
+  "palette": "dawn",
   "background": {
-    "color": "#FFD700"
+    "color": "#1a0a0a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -17,6 +28,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "raw",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.6609512519548141,
+      "radius": 0.3748805884211848
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.03054885252097451,
+      "vignetteIntensity": 0.207307096352429
+    }
   },
   "elements": [
     {
@@ -27,136 +51,37 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "flow"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f472b6",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765490810/original_frame.png",
-      "target_2d": {
-        "x": 0.2755134355019636,
-        "y": 0.7386216935872333
+      "type": "curve_text",
+      "words": [
+        "hmm"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -15,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765490810/generated_clothing.png",
-      "target_2d": {
-        "x": 0.3167230433829593,
-        "y": 0.8739282846709663
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -135
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765490810/mask.png",
-      "target_2d": {
-        "x": 0.20459275902485105,
-        "y": 0.6948778395625428
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "shader_plane",
-      "shader": "mandala",
-      "target_2d": {
-        "x": 0.8506611633963391,
-        "y": 0.6888886963900965
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.3447262041931901,
-      "opacity": 0.4955493866069934,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.6711188123067753,
-        "y": 0.7623584323314591
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.31727830815903035,
-      "opacity": 0.2543952914415216,
-      "color": "#FF69B4",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.747910361564259,
-        "y": 0.8033262254188352
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.20761071384375537,
-      "opacity": 0.23197692771125994,
-      "color": "#ec4899",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glow",
-      "target_2d": {
-        "x": 0.28488143444382374,
-        "y": 0.7577460740557646
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.16137054514511776,
-      "opacity": 0.2994071978460511,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.7681703157472795,
-        "y": 0.1819327172630006
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.1913485488158083,
-      "opacity": 0.24985794543786702,
-      "color": "#32CD32",
-      "animated": true
+      "fontSize": 0.1,
+      "textColor": "#fce7f3",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }

@@ -1,15 +1,24 @@
 {
   "id": "1765678899",
+  "title": "Untitled Dream",
   "transcription": "I'm",
-  "keywords": [],
+  "words": [],
+  "metadata": {
+    "timestamp": 1765678899,
+    "created_date": "2025-12-13 21:21",
+    "transcription": "I'm",
+    "word_count": 0,
+    "has_mesh": true
+  },
+  "palette": "dawn",
   "background": {
-    "color": "#ec4899"
+    "color": "#1a0a0a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -17,6 +26,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "dreamy",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.8650081679115453,
+      "radius": 0.44507394385133264
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.075910854545089,
+      "vignetteIntensity": 0.23981231829635657
+    }
   },
   "elements": [
     {
@@ -27,139 +49,34 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "dreamy"
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765678899/original_frame.png",
-      "target_2d": {
-        "x": 0.29961674752856204,
-        "y": 0.688002482597407
-      },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 15,
-      "opacity": 0.7
+      "animationPreset": "ethereal",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f472b6",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765678899/generated_clothing.png",
       "target_2d": {
-        "x": 0.8152936644006193,
-        "y": 0.2430563162030658
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 90
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765678899/mask.png",
-      "target_2d": {
-        "x": 0.1734966815625315,
-        "y": 0.5621708745012771
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glow",
-      "target_2d": {
-        "x": 0.5587935704410871,
-        "y": 0.7119112031978044
+        "x": 0.85,
+        "y": 0.15
       },
       "depth_range": {
         "min": 6,
-        "max": 15
-      },
-      "scale": 0.23718821657879677,
-      "opacity": 0.4890607947443159,
-      "color": "#00CED1",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "kineticLiquid",
-      "target_2d": {
-        "x": 0.7538746694698895,
-        "y": 0.29699386171493186
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.15628912182861412,
-      "opacity": 0.43214148382833595,
-      "color": "#ec4899",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "particleCloud",
-      "target_2d": {
-        "x": 0.33664263255798543,
-        "y": 0.7385666903771311
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2980962519429561,
-      "opacity": 0.4164360324541617,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.6752376079022079,
-        "y": 0.7134130022809708
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.1924607503816981,
-      "opacity": 0.4979091856882699,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.7409714220209137,
-        "y": 0.708302858007756
-      },
-      "depth_range": {
-        "min": 5,
         "max": 8
       },
-      "width": 10,
-      "height": 0.317470796898711,
-      "scale": 0.8,
-      "opacity": 0.5,
-      "color": "#FF6347",
-      "angle": 45,
-      "rotation": 45
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": -15
     }
   ]
 }

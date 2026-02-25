@@ -1,17 +1,33 @@
 {
   "id": "1765745617",
+  "title": "Now You Have",
   "transcription": "So now you have to like speak your vision. Bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bung",
-  "keywords": [
-    "bunga"
+  "words": [
+    "now",
+    "you",
+    "have",
+    "speak",
+    "your",
+    "vision",
+    "bunga",
+    "bung"
   ],
+  "metadata": {
+    "timestamp": 1765745617,
+    "created_date": "2025-12-14 15:53",
+    "transcription": "So now you have to like speak your vision. Bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bunga bung",
+    "word_count": 8,
+    "has_mesh": true
+  },
+  "palette": "ocean",
   "background": {
-    "color": "#ec4899"
+    "color": "#0a1a1a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +35,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "raw",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7257284102650162,
+      "radius": 0.3984364818757742
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.07505829711977792,
+      "vignetteIntensity": 0.28201753107436295
+    }
   },
   "elements": [
     {
@@ -29,154 +58,44 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "meditative",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#22d3ee",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765745617/original_frame.png",
-      "target_2d": {
-        "x": 0.7685451318449387,
-        "y": 0.7075864026774109
+      "type": "curve_text",
+      "words": [
+        "now",
+        "you",
+        "have",
+        "speak",
+        "your",
+        "vision",
+        "bunga",
+        "bung"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -30,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765745617/generated_clothing.png",
-      "target_2d": {
-        "x": 0.7193269928250179,
-        "y": 0.4419044715671955
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 180
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765745617/mask.png",
-      "target_2d": {
-        "x": 0.8567127503015097,
-        "y": 0.7919651755899605
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "BUNGA",
-      "target_2d": {
-        "x": 0.19271569219217144,
-        "y": 0.20139011540532678
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.11475676574259161,
-      "color": "#FFFFFF",
-      "rotation": 135
-    },
-    {
-      "type": "shader_plane",
-      "shader": "mandala",
-      "target_2d": {
-        "x": 0.15076521934568815,
-        "y": 0.7808589664926301
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2680802799402456,
-      "opacity": 0.2652541712636185,
-      "color": "#FF4500",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glow",
-      "target_2d": {
-        "x": 0.4024014387485554,
-        "y": 0.8273397305871928
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.24207015025296735,
-      "opacity": 0.39310959790340205,
-      "color": "#FF6347",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "dreamBlur",
-      "target_2d": {
-        "x": 0.5467808185094936,
-        "y": 0.25536026544466195
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.19472926140736913,
-      "opacity": 0.3953949113187838,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.8862622549293248,
-        "y": 0.8435014472859177
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.31296165843580914,
-      "opacity": 0.29344587878613243,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.7876079283237327,
-        "y": 0.8047827220777294
-      },
-      "depth_range": {
-        "min": 5,
-        "max": 8
-      },
-      "width": 10,
-      "height": 0.33335974037197197,
-      "scale": 0.8,
-      "opacity": 0.5,
-      "color": "#32CD32",
-      "angle": -45,
-      "rotation": -45
+      "fontSize": 0.1,
+      "textColor": "#ecfeff",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }

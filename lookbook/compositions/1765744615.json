@@ -1,19 +1,32 @@
 {
   "id": "1765744615",
+  "title": "Wear Say Something",
   "transcription": "So I want to wear, I want to wear, say something. I want to dress like Kpop. Kpop theme in hundreds.",
-  "keywords": [
-    "dress",
+  "words": [
     "wear",
-    "kpop"
+    "say",
+    "something",
+    "dress",
+    "kpop",
+    "theme",
+    "hundreds"
   ],
+  "metadata": {
+    "timestamp": 1765744615,
+    "created_date": "2025-12-14 15:36",
+    "transcription": "So I want to wear, I want to wear, say something. I want to dress like Kpop. Kpop theme in hundreds.",
+    "word_count": 7,
+    "has_mesh": true
+  },
+  "palette": "forest",
   "background": {
-    "color": "#9400D3"
+    "color": "#0a1a0f"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -21,6 +34,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "clean",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7206394187910159,
+      "radius": 0.43102597435810586
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.032162854195437504,
+      "vignetteIntensity": 0.33198270484852266
+    }
   },
   "elements": [
     {
@@ -31,165 +57,43 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#4ade80",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765744615/original_frame.png",
-      "target_2d": {
-        "x": 0.8528820205789662,
-        "y": 0.16821833728021052
+      "type": "curve_text",
+      "words": [
+        "wear",
+        "say",
+        "something",
+        "dress",
+        "kpop",
+        "theme",
+        "hundreds"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 90,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765744615/generated_clothing.png",
-      "target_2d": {
-        "x": 0.1159986550168159,
-        "y": 0.3424081743394133
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -135
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765744615/mask.png",
-      "target_2d": {
-        "x": 0.14499316583932503,
-        "y": 0.11408403660159205
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "DRESS",
-      "target_2d": {
-        "x": 0.10401332392627927,
-        "y": 0.29744013947491454
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.08849770054044233,
-      "color": "#FFFFFF",
-      "rotation": 90
-    },
-    {
-      "type": "text_3d",
-      "text": "WEAR",
-      "target_2d": {
-        "x": 0.631808939435138,
-        "y": 0.18423665999936115
-      },
-      "depth_range": {
-        "min": 11,
-        "max": 17
-      },
-      "scale": 0.11902953232279687,
-      "color": "#9400D3",
-      "rotation": 180
-    },
-    {
-      "type": "text_3d",
-      "text": "KPOP",
-      "target_2d": {
-        "x": 0.7848767052089024,
-        "y": 0.37039501079594306
-      },
-      "depth_range": {
-        "min": 14,
-        "max": 20
-      },
-      "scale": 0.08296114869990806,
-      "color": "#FFFFFF",
-      "rotation": 0
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.16222349203480138,
-        "y": 0.7802652970619843
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.23150023095455102,
-      "opacity": 0.27002800027540447,
-      "color": "#00CED1",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.6889500059763539,
-        "y": 0.22101270119242908
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.21620426852458474,
-      "opacity": 0.2803223978952572,
-      "color": "#9400D3",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "particleCloud",
-      "target_2d": {
-        "x": 0.8772250192915041,
-        "y": 0.2679626663791422
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.3424333313989855,
-      "opacity": 0.23342123759732344,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glow",
-      "target_2d": {
-        "x": 0.12731611851487995,
-        "y": 0.5877874949316234
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2220239848738894,
-      "opacity": 0.42091791821471713,
-      "color": "#9400D3",
-      "animated": true
+      "fontSize": 0.1,
+      "textColor": "#dcfce7",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }

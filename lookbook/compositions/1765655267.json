@@ -1,15 +1,30 @@
 {
   "id": "1765655267",
+  "title": "Okay Mean See",
   "transcription": "Okay, I mean see it slightly misaligned",
-  "keywords": [],
+  "words": [
+    "okay",
+    "mean",
+    "see",
+    "slightly",
+    "misaligned"
+  ],
+  "metadata": {
+    "timestamp": 1765655267,
+    "created_date": "2025-12-13 14:47",
+    "transcription": "Okay, I mean see it slightly misaligned",
+    "word_count": 5,
+    "has_mesh": true
+  },
+  "palette": "ocean",
   "background": {
-    "color": "#FF69B4"
+    "color": "#0a1a1a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -17,6 +32,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "raw",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.8928009811753634,
+      "radius": 0.3106367862367448
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.07709928210960323,
+      "vignetteIntensity": 0.29266480792409255
+    }
   },
   "elements": [
     {
@@ -27,120 +55,41 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "dreamy",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#22d3ee",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765655267/original_frame.png",
-      "target_2d": {
-        "x": 0.780860180490254,
-        "y": 0.893332197446179
+      "type": "curve_text",
+      "words": [
+        "okay",
+        "mean",
+        "see",
+        "slightly",
+        "misaligned"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -90,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765655267/generated_clothing.png",
-      "target_2d": {
-        "x": 0.7937690939950159,
-        "y": 0.11189124372331359
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 0
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765655267/mask.png",
-      "target_2d": {
-        "x": 0.6008626727877922,
-        "y": 0.1817203460364879
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.7845402345942531,
-        "y": 0.15312554271877538
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.17915959948431937,
-      "opacity": 0.2801184708593197,
-      "color": "#9400D3",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "noiseField",
-      "target_2d": {
-        "x": 0.23744102975409362,
-        "y": 0.49930855399005114
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.18904291082091185,
-      "opacity": 0.21765107714449033,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "dreamBlur",
-      "target_2d": {
-        "x": 0.6105267730197776,
-        "y": 0.7636482001904303
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2271359652793493,
-      "opacity": 0.20752329925744867,
-      "color": "#FF69B4",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "holographic",
-      "target_2d": {
-        "x": 0.4790831497013459,
-        "y": 0.2646913077739771
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.3285812778198256,
-      "opacity": 0.2159623503184472,
-      "color": "#1E90FF",
-      "animated": true
+      "fontSize": 0.1,
+      "textColor": "#ecfeff",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }

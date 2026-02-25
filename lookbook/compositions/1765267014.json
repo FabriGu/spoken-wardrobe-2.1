@@ -1,17 +1,37 @@
 {
   "id": "1765267014",
+  "title": "Danish Yeah Have",
   "transcription": "Or Danish? Yeah, we have some community use at the hotel. Cool. I'm not sure about that. Everything, does this shit fucking work in there?",
-  "keywords": [
-    "cool"
+  "words": [
+    "danish",
+    "yeah",
+    "have",
+    "some",
+    "community",
+    "use",
+    "hotel",
+    "cool",
+    "not",
+    "sure",
+    "about",
+    "that"
   ],
+  "metadata": {
+    "timestamp": 1765267014,
+    "created_date": "2025-12-09 02:56",
+    "transcription": "Or Danish? Yeah, we have some community use at the hotel. Cool. I'm not sure about that. Everything, does this shit fucking work in there?",
+    "word_count": 12,
+    "has_mesh": true
+  },
+  "palette": "ocean",
   "background": {
-    "color": "#32CD32"
+    "color": "#0a1a1a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +39,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "clean",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.6263059206152061,
+      "radius": 0.3923557562082924
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.07679452260110992,
+      "vignetteIntensity": 0.20045663794079946
+    }
   },
   "elements": [
     {
@@ -29,138 +62,63 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "dreamy"
+      "animationPreset": "ethereal",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#22d3ee",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765267014/original_frame.png",
-      "target_2d": {
-        "x": 0.8090108241040286,
-        "y": 0.4323232339911981
+      "type": "curve_text",
+      "words": [
+        "danish",
+        "yeah",
+        "have",
+        "some",
+        "community",
+        "use",
+        "hotel",
+        "cool",
+        "not",
+        "sure",
+        "about",
+        "that"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -30,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#ecfeff",
+      "orbitSpeed": 0.06,
+      "numCurves": 3,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765267014/generated_clothing.png",
       "target_2d": {
-        "x": 0.5632300316992402,
-        "y": 0.7047883614349321
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -30
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765267014/mask.png",
-      "target_2d": {
-        "x": 0.6446205986980958,
-        "y": 0.2236460711159812
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "COOL",
-      "target_2d": {
-        "x": 0.8632079516006619,
-        "y": 0.6691034977824484
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.1280419681605179,
-      "color": "#32CD32",
-      "rotation": 30
-    },
-    {
-      "type": "shader_plane",
-      "shader": "noiseField",
-      "target_2d": {
-        "x": 0.8782179895119421,
-        "y": 0.7606651867346682
+        "x": 0.15,
+        "y": 0.85
       },
       "depth_range": {
         "min": 6,
-        "max": 15
-      },
-      "scale": 0.19245780437859727,
-      "opacity": 0.2494502140539412,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.819914664015941,
-        "y": 0.6990964433132633
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.33429720422659276,
-      "opacity": 0.31862952516704235,
-      "color": "#FF4500",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.19097456944145885,
-        "y": 0.41593583138360524
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.297319736463595,
-      "opacity": 0.4357848906655015,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.228614978936215,
-        "y": 0.8490135875553703
-      },
-      "depth_range": {
-        "min": 5,
         "max": 8
       },
-      "width": 10,
-      "height": 0.35920848581234277,
-      "scale": 0.8,
-      "opacity": 0.5,
-      "color": "#00CED1",
-      "angle": -30,
-      "rotation": -30
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": 30
     }
   ]
 }

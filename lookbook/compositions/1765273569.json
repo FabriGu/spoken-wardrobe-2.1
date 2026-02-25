@@ -1,18 +1,31 @@
 {
   "id": "1765273569",
+  "title": "Can Get Some",
   "transcription": "Can I get like some sort of red t-shirt?",
-  "keywords": [
+  "words": [
+    "can",
+    "get",
+    "some",
+    "sort",
     "red",
     "t-shirt"
   ],
+  "metadata": {
+    "timestamp": 1765273569,
+    "created_date": "2025-12-09 04:46",
+    "transcription": "Can I get like some sort of red t-shirt?",
+    "word_count": 6,
+    "has_mesh": true
+  },
+  "palette": "ember",
   "background": {
-    "color": "#8b5cf6"
+    "color": "#1a0505"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -20,6 +33,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "raw",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.663020675238475,
+      "radius": 0.36782626923563116
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.05189827024764952,
+      "vignetteIntensity": 0.2892768651765707
+    }
   },
   "elements": [
     {
@@ -30,201 +56,57 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "dreamy"
+      "animationPreset": "ethereal",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f87171",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765273569/original_frame.png",
-      "target_2d": {
-        "x": 0.14295841436318835,
-        "y": 0.6831373672996776
+      "type": "curve_text",
+      "words": [
+        "can",
+        "get",
+        "some",
+        "sort",
+        "red",
+        "t-shirt"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -30,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#fef2f2",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765273569/generated_clothing.png",
       "target_2d": {
-        "x": 0.29801494588009536,
-        "y": 0.15172179944088474
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -90
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765273569/mask.png",
-      "target_2d": {
-        "x": 0.3432356048020896,
-        "y": 0.8550062629281006
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "RED",
-      "target_2d": {
-        "x": 0.7275465604076107,
-        "y": 0.3328677506090199
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.12386446073439684,
-      "color": "#FFFFFF",
-      "rotation": -90
-    },
-    {
-      "type": "text_3d",
-      "text": "T-SHIRT",
-      "target_2d": {
-        "x": 0.44618954781426257,
-        "y": 0.7676114989188167
-      },
-      "depth_range": {
-        "min": 11,
-        "max": 17
-      },
-      "scale": 0.11840852676842849,
-      "color": "#FFFFFF",
-      "rotation": -90
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.8394509535498438,
-        "y": 0.8812994244370809
+        "x": 0.85,
+        "y": 0.85
       },
       "depth_range": {
         "min": 6,
-        "max": 15
-      },
-      "scale": 0.16940633921228912,
-      "opacity": 0.2211428960643838,
-      "color": "#FFD700",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "scanLine",
-      "target_2d": {
-        "x": 0.13611634310534024,
-        "y": 0.8291996223028645
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.17191040880863573,
-      "opacity": 0.424505189499096,
-      "color": "#FF6347",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "holographic",
-      "target_2d": {
-        "x": 0.8549494709308474,
-        "y": 0.39348722600670627
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.1766412447845051,
-      "opacity": 0.4691379134514028,
-      "color": "#FF6347",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.16242505548354202,
-        "y": 0.45042753086763054
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.15759850163789638,
-      "opacity": 0.4675795090783172,
-      "color": "#FF6347",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "kineticLiquid",
-      "target_2d": {
-        "x": 0.8868342246302836,
-        "y": 0.26826456896693873
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2911975635820486,
-      "opacity": 0.24445519559383816,
-      "color": "#FF69B4",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.839998638851238,
-        "y": 0.40438962309352344
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.24790220416178116,
-      "opacity": 0.34715577643113604,
-      "color": "#FFD700",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.39398853511542986,
-        "y": 0.1318925160590724
-      },
-      "depth_range": {
-        "min": 5,
         "max": 8
       },
-      "width": 10,
-      "height": 0.2066551614468366,
-      "scale": 0.8,
-      "opacity": 0.5,
-      "color": "#FF6347",
-      "angle": -60,
-      "rotation": -60
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": -30
     }
   ]
 }

@@ -1,17 +1,32 @@
 {
   "id": "1765588013",
+  "title": "Could Start Lot",
   "transcription": "I could start a lot. I'm like right at the right beach. Make him a clown, make him a clown.",
-  "keywords": [
+  "words": [
+    "could",
+    "start",
+    "lot",
+    "right",
+    "beach",
+    "him",
     "clown"
   ],
+  "metadata": {
+    "timestamp": 1765588013,
+    "created_date": "2025-12-12 20:06",
+    "transcription": "I could start a lot. I'm like right at the right beach. Make him a clown, make him a clown.",
+    "word_count": 7,
+    "has_mesh": true
+  },
+  "palette": "midnight",
   "background": {
-    "color": "#00CED1"
+    "color": "#0a0a1a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +34,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "clean",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.8469343172695915,
+      "radius": 0.44197542014776225
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.07524996612592755,
+      "vignetteIntensity": 0.3107737345874906
+    }
   },
   "elements": [
     {
@@ -29,154 +57,58 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "dreamy"
+      "animationPreset": "meditative",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#a78bfa",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765588013/original_frame.png",
-      "target_2d": {
-        "x": 0.8995136570850908,
-        "y": 0.2865847256944657
+      "type": "curve_text",
+      "words": [
+        "could",
+        "start",
+        "lot",
+        "right",
+        "beach",
+        "him",
+        "clown"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 30,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#ffffff",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765588013/generated_clothing.png",
       "target_2d": {
-        "x": 0.27492716362619146,
-        "y": 0.8090627368784558
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -90
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765588013/mask.png",
-      "target_2d": {
-        "x": 0.20346167432337164,
-        "y": 0.11870332881096567
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "CLOWN",
-      "target_2d": {
-        "x": 0.2521265054358116,
-        "y": 0.89263001546986
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.1459035394422366,
-      "color": "#FFFFFF",
-      "rotation": 30
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.5029606570473583,
-        "y": 0.147011486117981
+        "x": 0.85,
+        "y": 0.85
       },
       "depth_range": {
         "min": 6,
-        "max": 15
-      },
-      "scale": 0.28213989727701994,
-      "opacity": 0.2038860672950874,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "noiseField",
-      "target_2d": {
-        "x": 0.8681042272022556,
-        "y": 0.7770354400836051
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.21196578215205553,
-      "opacity": 0.4849694628806532,
-      "color": "#00CED1",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "chromatic",
-      "target_2d": {
-        "x": 0.26704858862623615,
-        "y": 0.2737868803483952
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.24383070886287977,
-      "opacity": 0.29640548471304506,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "dataMosh",
-      "target_2d": {
-        "x": 0.8020625189153614,
-        "y": 0.2900681599779218
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.33041293852974907,
-      "opacity": 0.27747221303216696,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.7018528912474726,
-        "y": 0.20890379065154985
-      },
-      "depth_range": {
-        "min": 5,
         "max": 8
       },
-      "width": 10,
-      "height": 0.39270879556475924,
-      "scale": 0.8,
-      "opacity": 0.5,
-      "color": "#32CD32",
-      "angle": 60,
-      "rotation": 60
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": -30
     }
   ]
 }

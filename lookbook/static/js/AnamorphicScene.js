@@ -9,6 +9,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { AnamorphicProjector } from './AnamorphicProjector.js';
 import { ElementFactory } from './ElementFactory.js';
+import { PostProcessingManager } from './effects/PostProcessingManager.js';
+import { PointCloudDissolver } from './effects/PointCloudDissolver.js';
 
 // Bold color palette from reference images
 const BOLD_COLORS = [
@@ -140,7 +142,17 @@ export class AnamorphicScene {
     }
 
     initPostProcessing() {
-        // Store post-processing settings (actual implementation would use EffectComposer)
+        // Create post-processing manager with bloom, film grain, vignette
+        this.postProcessingManager = new PostProcessingManager(
+            this.renderer,
+            this.scene,
+            this.camera
+        );
+
+        // Apply dreamy preset by default
+        this.postProcessingManager.applyPreset('dreamy');
+
+        // Legacy settings object for compatibility
         this.postProcessing = {
             bloom: true,
             chromaticAberration: 0.5,
@@ -169,6 +181,9 @@ export class AnamorphicScene {
     async loadComposition(config) {
         console.log('[AnamorphicScene] Loading composition:', config.id);
 
+        // Store composition metadata
+        this.currentComposition = config;
+
         // Clear existing elements
         this.clearElements();
 
@@ -185,6 +200,11 @@ export class AnamorphicScene {
         if (config.camera?.position) {
             this.anamorphicPosition = new THREE.Vector3(...config.camera.position);
             this.camera.position.copy(this.anamorphicPosition);
+        }
+
+        // Apply global effects configuration
+        if (config.effects) {
+            this._applyEffectsConfig(config.effects);
         }
 
         // Load all elements
@@ -213,6 +233,11 @@ export class AnamorphicScene {
                         this.projector.makeBillboard(element);
                     }
 
+                    // Apply point cloud effect to meshes if configured
+                    if (elementConfig.type === 'glb_mesh' && elementConfig.pointCloud?.enabled) {
+                        await this._applyPointCloudEffect(element, elementConfig.pointCloud);
+                    }
+
                     // Add to scene
                     this.scene.add(element);
                     this.elements.push(element);
@@ -221,12 +246,12 @@ export class AnamorphicScene {
                     if (element.userData.update) {
                         this.animatedElements.push(element);
                     }
-                    
+
                     // Track mesh animators
                     if (element.userData.animator) {
                         this.meshAnimators.push(element.userData.animator);
                     }
-                    
+
                     // Recursively find animated children (for groups)
                     element.traverse((child) => {
                         if (child.userData.update && !this.animatedElements.includes(child)) {
@@ -243,6 +268,83 @@ export class AnamorphicScene {
         }
 
         console.log(`[AnamorphicScene] Loaded ${this.elements.length} elements, ${this.animatedElements.length} animated`);
+
+        // Log composition info
+        if (config.title) {
+            console.log(`[AnamorphicScene] "${config.title}" - ${config.words?.length || 0} words`);
+        }
+    }
+
+    /**
+     * Apply global effects configuration from composition.
+     */
+    _applyEffectsConfig(effects) {
+        if (!this.postProcessingManager) return;
+
+        // Apply preset if specified
+        if (effects.postProcessing) {
+            this.postProcessingManager.applyPreset(effects.postProcessing);
+        }
+
+        // Override specific bloom settings
+        if (effects.bloom) {
+            this.postProcessingManager.setBloom(effects.bloom);
+        }
+
+        // Override specific film settings
+        if (effects.film) {
+            this.postProcessingManager.setFilm(effects.film);
+        }
+    }
+
+    /**
+     * Apply point cloud dissolution effect to a mesh.
+     */
+    async _applyPointCloudEffect(meshGroup, config) {
+        // Find the actual mesh within the group
+        let targetMesh = null;
+        meshGroup.traverse((child) => {
+            if (child.isMesh && !targetMesh) {
+                targetMesh = child;
+            }
+        });
+
+        if (!targetMesh) {
+            console.warn('[AnamorphicScene] No mesh found for point cloud effect');
+            return;
+        }
+
+        // Create point cloud dissolver
+        const dissolver = new PointCloudDissolver({
+            particleSize: config.particleSize || 0.015,
+            particleColor: config.particleColor ? new THREE.Color(config.particleColor).getHex() : 0xffffff,
+            scatterRadius: config.scatterRadius || 1.5,
+            turbulence: config.turbulence || 0.3,
+            dissolveDuration: config.dissolveDuration || 2.5,
+            reformDuration: config.reformDuration || 3.0
+        });
+
+        // Create point cloud from mesh
+        const pointCloud = dissolver.createFromMesh(targetMesh);
+
+        // Position at same location as mesh
+        pointCloud.position.copy(meshGroup.position);
+        pointCloud.rotation.copy(meshGroup.rotation);
+        pointCloud.scale.copy(meshGroup.scale);
+
+        // Add to scene and track
+        this.scene.add(pointCloud);
+        this.elements.push(pointCloud);
+        this.animatedElements.push(pointCloud);
+
+        // Store reference to dissolver for external control
+        meshGroup.userData.dissolver = dissolver;
+        meshGroup.userData.pointCloud = pointCloud;
+
+        // Start with point cloud invisible, mesh visible
+        pointCloud.visible = false;
+
+        console.log('[AnamorphicScene] Point cloud effect attached to mesh');
     }
 
     /**
@@ -535,12 +637,143 @@ export class AnamorphicScene {
     }
 
     /**
+     * Set post-processing preset.
+     * @param {string} presetName - 'dreamy', 'raw', 'clean', 'vhs', 'glitch', 'none'
+     */
+    setPostProcessingPreset(presetName) {
+        if (this.postProcessingManager) {
+            this.postProcessingManager.applyPreset(presetName);
+        }
+    }
+
+    /**
+     * Enable/disable post-processing.
+     */
+    setPostProcessingEnabled(enabled) {
+        if (this.postProcessingManager) {
+            this.postProcessingManager.setEnabled(enabled);
+        }
+    }
+
+    /**
+     * Configure bloom effect.
+     * @param {object} options - { enabled, strength, radius, threshold }
+     */
+    setBloom(options) {
+        if (this.postProcessingManager) {
+            this.postProcessingManager.setBloom(options);
+        }
+    }
+
+    /**
+     * Configure film effect (grain, vignette, chromatic aberration).
+     * @param {object} options - { enabled, intensity, grainIntensity, vignetteIntensity, chromaticAberration }
+     */
+    setFilmEffect(options) {
+        if (this.postProcessingManager) {
+            this.postProcessingManager.setFilm(options);
+        }
+    }
+
+    /**
+     * Trigger point cloud dissolution on all meshes with the effect.
+     */
+    dissolveAllMeshes() {
+        for (const element of this.elements) {
+            if (element.userData.dissolver) {
+                const dissolver = element.userData.dissolver;
+                const pointCloud = element.userData.pointCloud;
+
+                // Hide mesh, show point cloud
+                element.visible = false;
+                if (pointCloud) pointCloud.visible = true;
+
+                // Start dissolution
+                dissolver.dissolve();
+            }
+        }
+    }
+
+    /**
+     * Trigger point cloud reformation on all meshes with the effect.
+     */
+    reformAllMeshes() {
+        for (const element of this.elements) {
+            if (element.userData.dissolver) {
+                const dissolver = element.userData.dissolver;
+
+                // Start reformation
+                dissolver.reform();
+
+                // When complete, show mesh and hide point cloud
+                dissolver.onReformComplete = () => {
+                    element.visible = true;
+                    if (element.userData.pointCloud) {
+                        element.userData.pointCloud.visible = false;
+                    }
+                };
+            }
+        }
+    }
+
+    /**
+     * Toggle point cloud effect on all meshes.
+     */
+    togglePointCloud() {
+        for (const element of this.elements) {
+            if (element.userData.dissolver) {
+                const dissolver = element.userData.dissolver;
+                const state = dissolver.getState();
+
+                if (state === 'solid' || state === 'reforming') {
+                    // Show point cloud and dissolve
+                    element.visible = false;
+                    if (element.userData.pointCloud) {
+                        element.userData.pointCloud.visible = true;
+                    }
+                    dissolver.dissolve();
+                } else {
+                    // Reform
+                    dissolver.reform();
+                    dissolver.onReformComplete = () => {
+                        element.visible = true;
+                        if (element.userData.pointCloud) {
+                            element.userData.pointCloud.visible = false;
+                        }
+                    };
+                }
+            }
+        }
+    }
+
+    /**
+     * Get current composition metadata.
+     */
+    getCompositionInfo() {
+        if (!this.currentComposition) return null;
+
+        return {
+            id: this.currentComposition.id,
+            title: this.currentComposition.title,
+            transcription: this.currentComposition.transcription,
+            words: this.currentComposition.words,
+            palette: this.currentComposition.palette,
+            metadata: this.currentComposition.metadata
+        };
+    }
+
+    /**
      * Handle window resize.
      */
     onResize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Resize post-processing
+        if (this.postProcessingManager) {
+            this.postProcessingManager.resize(window.innerWidth, window.innerHeight);
+        }
     }
 
     /**
@@ -578,8 +811,13 @@ export class AnamorphicScene {
             }
         }
 
-        // Render
-        this.renderer.render(this.scene, this.camera);
+        // Update and render with post-processing
+        if (this.postProcessingManager) {
+            this.postProcessingManager.update(time);
+            this.postProcessingManager.render();
+        } else {
+            this.renderer.render(this.scene, this.camera);
+        }
     }
 
     /**
@@ -587,6 +825,9 @@ export class AnamorphicScene {
      */
     dispose() {
         this.clearElements();
+        if (this.postProcessingManager) {
+            this.postProcessingManager.dispose();
+        }
         this.renderer.dispose();
         this.controls.dispose();
     }

@@ -1,17 +1,37 @@
 {
   "id": "1765656044",
+  "title": "Tell Different You",
   "transcription": "Tell me if I'm like like a different and you say like red, red something. More than just the thing is here, right?",
-  "keywords": [
-    "red"
+  "words": [
+    "tell",
+    "different",
+    "you",
+    "say",
+    "red",
+    "something",
+    "more",
+    "than",
+    "just",
+    "thing",
+    "here",
+    "right"
   ],
+  "metadata": {
+    "timestamp": 1765656044,
+    "created_date": "2025-12-13 15:00",
+    "transcription": "Tell me if I'm like like a different and you say like red, red something. More than just the thing is here, right?",
+    "word_count": 12,
+    "has_mesh": true
+  },
+  "palette": "ember",
   "background": {
-    "color": "#FF4500"
+    "color": "#1a0505"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +39,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "clean",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7864226656838312,
+      "radius": 0.4502750225058062
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.03795251642730959,
+      "vignetteIntensity": 0.24698486344443527
+    }
   },
   "elements": [
     {
@@ -29,135 +62,48 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "dreamy"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f87171",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765656044/original_frame.png",
-      "target_2d": {
-        "x": 0.17920210916432375,
-        "y": 0.4928459571058911
+      "type": "curve_text",
+      "words": [
+        "tell",
+        "different",
+        "you",
+        "say",
+        "red",
+        "something",
+        "more",
+        "than",
+        "just",
+        "thing",
+        "here",
+        "right"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -15,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765656044/generated_clothing.png",
-      "target_2d": {
-        "x": 0.8425168545011118,
-        "y": 0.42279253228355196
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 135
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765656044/mask.png",
-      "target_2d": {
-        "x": 0.1952899237591069,
-        "y": 0.32390505994107244
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "RED",
-      "target_2d": {
-        "x": 0.42723792946058725,
-        "y": 0.6865280638158681
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.0919595106789623,
-      "color": "#FFFFFF",
-      "rotation": 15
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.8962167883443384,
-        "y": 0.3753081360283804
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.17399271476761524,
-      "opacity": 0.2240111594194424,
-      "color": "#00CED1",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glow",
-      "target_2d": {
-        "x": 0.8198503232807687,
-        "y": 0.7982785749035615
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2817653568576096,
-      "opacity": 0.24521461444185974,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.7959755722435882,
-        "y": 0.2849131008734843
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.25045188719332667,
-      "opacity": 0.3742035833504342,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "dataMosh",
-      "target_2d": {
-        "x": 0.8588411479036854,
-        "y": 0.18525494604256132
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.26820931161806494,
-      "opacity": 0.21107109950604536,
-      "color": "#FF1493",
-      "animated": true
+      "fontSize": 0.1,
+      "textColor": "#fef2f2",
+      "orbitSpeed": 0.06,
+      "numCurves": 3,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }

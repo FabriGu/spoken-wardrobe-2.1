@@ -1,17 +1,37 @@
 {
   "id": "1765689400",
+  "title": "Marlin Here This",
   "transcription": "I'm like a Marlin. I'm like a Marlin. And here, like this TV just hangs out here, doesn't it? Yeah. Nobody does anything about that. Yeah. It's here for ITP Camp. Yeah.",
-  "keywords": [
-    "marlin"
+  "words": [
+    "marlin",
+    "here",
+    "this",
+    "just",
+    "hangs",
+    "out",
+    "doesnt",
+    "yeah",
+    "nobody",
+    "does",
+    "anything",
+    "about"
   ],
+  "metadata": {
+    "timestamp": 1765689400,
+    "created_date": "2025-12-14 00:16",
+    "transcription": "I'm like a Marlin. I'm like a Marlin. And here, like this TV just hangs out here, doesn't it? Yeah. Nobody does anything about that. Yeah. It's here for ITP Camp. Yeah.",
+    "word_count": 12,
+    "has_mesh": true
+  },
+  "palette": "dream",
   "background": {
-    "color": "#FF4500"
+    "color": "#0f0a1a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +39,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "dreamy",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7200633411471915,
+      "radius": 0.37620968554957857
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.06612661005422983,
+      "vignetteIntensity": 0.3036219371446728
+    }
   },
   "elements": [
     {
@@ -29,135 +62,63 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "ethereal",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#e879f9",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765689400/original_frame.png",
-      "target_2d": {
-        "x": 0.7851191579168401,
-        "y": 0.2192037774164467
+      "type": "curve_text",
+      "words": [
+        "marlin",
+        "here",
+        "this",
+        "just",
+        "hangs",
+        "out",
+        "doesnt",
+        "yeah",
+        "nobody",
+        "does",
+        "anything",
+        "about"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -135,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#f3e8ff",
+      "orbitSpeed": 0.06,
+      "numCurves": 3,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765689400/generated_clothing.png",
       "target_2d": {
-        "x": 0.40134766907064057,
-        "y": 0.7046035972893402
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -45
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765689400/mask.png",
-      "target_2d": {
-        "x": 0.7948639806601767,
-        "y": 0.11328429648245052
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "MARLIN",
-      "target_2d": {
-        "x": 0.14915874167166443,
-        "y": 0.8996599012173271
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.11466886193535775,
-      "color": "#FFFFFF",
-      "rotation": -135
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.42125631136397546,
-        "y": 0.14950146711802553
+        "x": 0.85,
+        "y": 0.15
       },
       "depth_range": {
         "min": 6,
-        "max": 15
+        "max": 8
       },
-      "scale": 0.2782118292386562,
-      "opacity": 0.20873248567278402,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.25977435604811616,
-        "y": 0.18752239570211177
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.1641391069851168,
-      "opacity": 0.4184112429111482,
-      "color": "#1E90FF",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "holographic",
-      "target_2d": {
-        "x": 0.22477148758690998,
-        "y": 0.5623662311840252
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.26658767821646107,
-      "opacity": 0.2729123210291631,
-      "color": "#1E90FF",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "dataMosh",
-      "target_2d": {
-        "x": 0.21643150442426212,
-        "y": 0.7275547899165308
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2310711582822942,
-      "opacity": 0.4474993666488827,
-      "color": "#9400D3",
-      "animated": true
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": 30
     }
   ]
 }

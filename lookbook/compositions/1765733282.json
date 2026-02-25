@@ -1,17 +1,27 @@
 {
   "id": "1765733282",
+  "title": "Cant Believe",
   "transcription": "I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like,",
-  "keywords": [
+  "words": [
+    "cant",
     "believe"
   ],
+  "metadata": {
+    "timestamp": 1765733282,
+    "created_date": "2025-12-14 12:28",
+    "transcription": "I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like, I can't believe I'm like,",
+    "word_count": 2,
+    "has_mesh": true
+  },
+  "palette": "dawn",
   "background": {
-    "color": "#FF6347"
+    "color": "#1a0a0a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +29,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "dreamy",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7220462029371366,
+      "radius": 0.49812034716343223
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.044550082991102635,
+      "vignetteIntensity": 0.23281655521930728
+    }
   },
   "elements": [
     {
@@ -29,119 +52,53 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "flow"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f472b6",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765733282/original_frame.png",
-      "target_2d": {
-        "x": 0.19391403012921188,
-        "y": 0.546418869671252
+      "type": "curve_text",
+      "words": [
+        "cant",
+        "believe"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -90,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#fce7f3",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765733282/generated_clothing.png",
       "target_2d": {
-        "x": 0.8811097015309942,
-        "y": 0.2587846904316342
+        "x": 0.15,
+        "y": 0.85
       },
       "depth_range": {
-        "min": 8,
-        "max": 14
+        "min": 6,
+        "max": 8
       },
-      "scale": 0.2,
+      "scale": 0.08,
+      "opacity": 0.15,
       "rotation": -30
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765733282/mask.png",
-      "target_2d": {
-        "x": 0.3867274511558866,
-        "y": 0.1992243399073747
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "BELIEVE",
-      "target_2d": {
-        "x": 0.310091785311983,
-        "y": 0.8878687992646491
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.1267829824644567,
-      "color": "#00CED1",
-      "rotation": 0
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glow",
-      "target_2d": {
-        "x": 0.23105554552248725,
-        "y": 0.17718804802032811
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.17757832346836552,
-      "opacity": 0.39723293941319515,
-      "color": "#8b5cf6",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "mandala",
-      "target_2d": {
-        "x": 0.7790501876939206,
-        "y": 0.23456511633389798
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.3437622271545293,
-      "opacity": 0.4625434610653635,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.2899808823884319,
-        "y": 0.3044918487452448
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.3006184040259793,
-      "opacity": 0.4258518192221973,
-      "color": "#00CED1",
-      "animated": true
     }
   ]
 }

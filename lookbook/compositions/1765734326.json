@@ -1,18 +1,27 @@
 {
   "id": "1765734326",
+  "title": "Wedding Dress",
   "transcription": "wedding dress?",
-  "keywords": [
+  "words": [
     "wedding",
     "dress"
   ],
+  "metadata": {
+    "timestamp": 1765734326,
+    "created_date": "2025-12-14 12:45",
+    "transcription": "wedding dress?",
+    "word_count": 2,
+    "has_mesh": true
+  },
+  "palette": "forest",
   "background": {
-    "color": "#1E90FF"
+    "color": "#0a1a0f"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -20,6 +29,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "clean",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7397804428760905,
+      "radius": 0.4558278262191488
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.0786656765649069,
+      "vignetteIntensity": 0.30969092324692427
+    }
   },
   "elements": [
     {
@@ -30,134 +52,38 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "meditative",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#4ade80",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765734326/original_frame.png",
-      "target_2d": {
-        "x": 0.231255908662146,
-        "y": 0.2666286400917586
+      "type": "curve_text",
+      "words": [
+        "wedding",
+        "dress"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 15,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765734326/generated_clothing.png",
-      "target_2d": {
-        "x": 0.2452644022772785,
-        "y": 0.8116646820983044
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -30
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765734326/mask.png",
-      "target_2d": {
-        "x": 0.22132641794886282,
-        "y": 0.27963543762874166
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "WEDDING",
-      "target_2d": {
-        "x": 0.23223876346366037,
-        "y": 0.31533469700217714
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.09136331249363186,
-      "color": "#FFFFFF",
-      "rotation": 0
-    },
-    {
-      "type": "text_3d",
-      "text": "DRESS",
-      "target_2d": {
-        "x": 0.512086712912271,
-        "y": 0.8176643662742961
-      },
-      "depth_range": {
-        "min": 11,
-        "max": 17
-      },
-      "scale": 0.12128026232636052,
-      "color": "#FFFFFF",
-      "rotation": 180
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.812264567419521,
-        "y": 0.8098462512403425
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.22975504395138924,
-      "opacity": 0.3265593744090801,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.14867237690787144,
-        "y": 0.11861386286310537
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.24054918957432714,
-      "opacity": 0.22298670747763086,
-      "color": "#9400D3",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.4413448759128321,
-        "y": 0.799993721400919
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.32751531301164466,
-      "opacity": 0.2724146747700666,
-      "color": "#1E90FF",
-      "animated": true
+      "fontSize": 0.1,
+      "textColor": "#dcfce7",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }

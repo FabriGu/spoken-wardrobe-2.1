@@ -1,18 +1,27 @@
 {
   "id": "1765729395",
+  "title": "Warrior Armor",
   "transcription": "Warrior Armor",
-  "keywords": [
+  "words": [
     "warrior",
     "armor"
   ],
+  "metadata": {
+    "timestamp": 1765729395,
+    "created_date": "2025-12-14 11:23",
+    "transcription": "Warrior Armor",
+    "word_count": 2,
+    "has_mesh": true
+  },
+  "palette": "dawn",
   "background": {
-    "color": "#FF6347"
+    "color": "#1a0a0a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -20,6 +29,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "dreamy",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7043770965724883,
+      "radius": 0.38536673202372224
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.07187450665689821,
+      "vignetteIntensity": 0.25387219248140547
+    }
   },
   "elements": [
     {
@@ -30,166 +52,38 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f472b6",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765729395/original_frame.png",
-      "target_2d": {
-        "x": 0.8804505530699147,
-        "y": 0.5299977162992614
+      "type": "curve_text",
+      "words": [
+        "warrior",
+        "armor"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -30,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765729395/generated_clothing.png",
-      "target_2d": {
-        "x": 0.8211197642728606,
-        "y": 0.8506582791740503
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 0
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765729395/mask.png",
-      "target_2d": {
-        "x": 0.2497622445117982,
-        "y": 0.682170858304086
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "WARRIOR",
-      "target_2d": {
-        "x": 0.36611650891186454,
-        "y": 0.653065314209702
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.10080850020695295,
-      "color": "#FFFFFF",
-      "rotation": 90
-    },
-    {
-      "type": "text_3d",
-      "text": "ARMOR",
-      "target_2d": {
-        "x": 0.6733825364386654,
-        "y": 0.12449116903382428
-      },
-      "depth_range": {
-        "min": 11,
-        "max": 17
-      },
-      "scale": 0.10962254704836649,
-      "color": "#FFFFFF",
-      "rotation": -135
-    },
-    {
-      "type": "shader_plane",
-      "shader": "holographic",
-      "target_2d": {
-        "x": 0.12158500309880756,
-        "y": 0.25648058054990164
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.1945868576438948,
-      "opacity": 0.3258781650653005,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.2009511636344602,
-        "y": 0.2795749752847203
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2595551399837762,
-      "opacity": 0.45744874864541835,
-      "color": "#FF4500",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.5174955979473616,
-        "y": 0.2170296089656374
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.3432611678673509,
-      "opacity": 0.4333365737910524,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "chromatic",
-      "target_2d": {
-        "x": 0.5218592896417532,
-        "y": 0.15344678912494936
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.34848182854633974,
-      "opacity": 0.2321317705240522,
-      "color": "#FF6347",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "kineticLiquid",
-      "target_2d": {
-        "x": 0.2236067505346847,
-        "y": 0.771699438247744
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.21272087268120532,
-      "opacity": 0.28174724466037093,
-      "color": "#ec4899",
-      "animated": true
+      "fontSize": 0.1,
+      "textColor": "#fce7f3",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }

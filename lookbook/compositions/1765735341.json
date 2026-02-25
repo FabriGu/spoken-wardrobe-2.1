@@ -1,19 +1,37 @@
 {
   "id": "1765735341",
+  "title": "Yeah This Okay",
   "transcription": "Yeah, this is okay. It's not very bad. What do you want? Sorry. Sorry? Sorry? Indian Wear. Indian Wear.",
-  "keywords": [
+  "words": [
+    "yeah",
+    "this",
+    "okay",
+    "its",
+    "not",
+    "very",
+    "bad",
+    "what",
+    "you",
     "sorry",
     "indian",
     "wear"
   ],
+  "metadata": {
+    "timestamp": 1765735341,
+    "created_date": "2025-12-14 13:02",
+    "transcription": "Yeah, this is okay. It's not very bad. What do you want? Sorry. Sorry? Sorry? Indian Wear. Indian Wear.",
+    "word_count": 12,
+    "has_mesh": true
+  },
+  "palette": "sunset",
   "background": {
-    "color": "#FFD700"
+    "color": "#1a0f0a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -21,6 +39,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "dreamy",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.9730542195545158,
+      "radius": 0.37344493946642493
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.0743906595717409,
+      "vignetteIntensity": 0.3481196668486835
+    }
   },
   "elements": [
     {
@@ -31,181 +62,63 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "dreamy"
+      "animationPreset": "meditative",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#fb923c",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765735341/original_frame.png",
-      "target_2d": {
-        "x": 0.11004768852439561,
-        "y": 0.12250054891876304
+      "type": "curve_text",
+      "words": [
+        "yeah",
+        "this",
+        "okay",
+        "its",
+        "not",
+        "very",
+        "bad",
+        "what",
+        "you",
+        "sorry",
+        "indian",
+        "wear"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 0,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#fff7ed",
+      "orbitSpeed": 0.06,
+      "numCurves": 3,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765735341/generated_clothing.png",
       "target_2d": {
-        "x": 0.6254024967651217,
-        "y": 0.8187892189735948
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -30
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765735341/mask.png",
-      "target_2d": {
-        "x": 0.7746028081199297,
-        "y": 0.5806167041998993
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "SORRY",
-      "target_2d": {
-        "x": 0.36031270553063777,
-        "y": 0.3070103566077865
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.13861639251080043,
-      "color": "#FFFFFF",
-      "rotation": 30
-    },
-    {
-      "type": "text_3d",
-      "text": "INDIAN",
-      "target_2d": {
-        "x": 0.6588439854870369,
-        "y": 0.6744345954086933
-      },
-      "depth_range": {
-        "min": 11,
-        "max": 17
-      },
-      "scale": 0.09139339877390149,
-      "color": "#FF6347",
-      "rotation": -30
-    },
-    {
-      "type": "text_3d",
-      "text": "WEAR",
-      "target_2d": {
-        "x": 0.5010455658924485,
-        "y": 0.1692839791530929
-      },
-      "depth_range": {
-        "min": 14,
-        "max": 20
-      },
-      "scale": 0.09255448509084492,
-      "color": "#00CED1",
-      "rotation": -30
-    },
-    {
-      "type": "shader_plane",
-      "shader": "kineticLiquid",
-      "target_2d": {
-        "x": 0.14230497527744063,
-        "y": 0.24291783742897405
+        "x": 0.85,
+        "y": 0.85
       },
       "depth_range": {
         "min": 6,
-        "max": 15
+        "max": 8
       },
-      "scale": 0.1657370440096303,
-      "opacity": 0.39918465166429673,
-      "color": "#1E90FF",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "chromatic",
-      "target_2d": {
-        "x": 0.8925274231310802,
-        "y": 0.38183657489643064
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.20118941413190253,
-      "opacity": 0.21400052548837525,
-      "color": "#FF69B4",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.39409132691822746,
-        "y": 0.7468641799534789
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.30710918183201524,
-      "opacity": 0.42793487615262277,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "noiseField",
-      "target_2d": {
-        "x": 0.2446684767403923,
-        "y": 0.1307718426525742
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.24121577344971934,
-      "opacity": 0.4415495813690202,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "scanLine",
-      "target_2d": {
-        "x": 0.2996428291204255,
-        "y": 0.727831974390327
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2995682559817907,
-      "opacity": 0.25328192826259166,
-      "color": "#32CD32",
-      "animated": true
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": 15
     }
   ]
 }

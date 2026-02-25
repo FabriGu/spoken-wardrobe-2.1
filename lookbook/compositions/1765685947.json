@@ -1,15 +1,27 @@
 {
   "id": "1765685947",
+  "title": "Going Bathroom",
   "transcription": "I'm going to go to the bathroom.",
-  "keywords": [],
+  "words": [
+    "going",
+    "bathroom"
+  ],
+  "metadata": {
+    "timestamp": 1765685947,
+    "created_date": "2025-12-13 23:19",
+    "transcription": "I'm going to go to the bathroom.",
+    "word_count": 2,
+    "has_mesh": true
+  },
+  "palette": "midnight",
   "background": {
-    "color": "#1E90FF"
+    "color": "#0a0a1a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -17,6 +29,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "clean",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7050978615100092,
+      "radius": 0.42186441977347
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.06776690766668214,
+      "vignetteIntensity": 0.23504449585382026
+    }
   },
   "elements": [
     {
@@ -27,120 +52,53 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "dreamy",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#a78bfa",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765685947/original_frame.png",
-      "target_2d": {
-        "x": 0.24854320843677258,
-        "y": 0.2638536903354386
+      "type": "curve_text",
+      "words": [
+        "going",
+        "bathroom"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -135,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#ffffff",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765685947/generated_clothing.png",
       "target_2d": {
-        "x": 0.4134230605892827,
-        "y": 0.16925884131975394
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -45
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765685947/mask.png",
-      "target_2d": {
-        "x": 0.7023142899363013,
-        "y": 0.3252531677043975
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "shader_plane",
-      "shader": "kineticLiquid",
-      "target_2d": {
-        "x": 0.6814598975335251,
-        "y": 0.2512872099085821
+        "x": 0.85,
+        "y": 0.85
       },
       "depth_range": {
         "min": 6,
-        "max": 15
+        "max": 8
       },
-      "scale": 0.31530451051280417,
-      "opacity": 0.24956611081574265,
-      "color": "#9400D3",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.7124373546062138,
-        "y": 0.1705509280489716
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.32570309703465994,
-      "opacity": 0.29145697633701884,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "chromatic",
-      "target_2d": {
-        "x": 0.8893837072182931,
-        "y": 0.8000750946062699
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.20406119440087223,
-      "opacity": 0.45375787201137796,
-      "color": "#FF69B4",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "noiseField",
-      "target_2d": {
-        "x": 0.14316476080040152,
-        "y": 0.8454668738947776
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.20552910586035594,
-      "opacity": 0.3090470768125725,
-      "color": "#FF4500",
-      "animated": true
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": -15
     }
   ]
 }

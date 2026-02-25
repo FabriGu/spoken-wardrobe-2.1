@@ -1,18 +1,27 @@
 {
   "id": "1765596014",
+  "title": "Red Clown",
   "transcription": "Red clown, red clown, red clown, red clown, red clown, red clown, red clown, red clown,",
-  "keywords": [
+  "words": [
     "red",
     "clown"
   ],
+  "metadata": {
+    "timestamp": 1765596014,
+    "created_date": "2025-12-12 22:20",
+    "transcription": "Red clown, red clown, red clown, red clown, red clown, red clown, red clown, red clown,",
+    "word_count": 2,
+    "has_mesh": true
+  },
+  "palette": "ember",
   "background": {
-    "color": "#9400D3"
+    "color": "#1a0505"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -20,6 +29,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "dreamy",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.6849770839373116,
+      "radius": 0.3702082403408535
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.050534290855708104,
+      "vignetteIntensity": 0.2266915338744382
+    }
   },
   "elements": [
     {
@@ -30,201 +52,38 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f87171",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765596014/original_frame.png",
-      "target_2d": {
-        "x": 0.5562762167260549,
-        "y": 0.11737104181249179
+      "type": "curve_text",
+      "words": [
+        "red",
+        "clown"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": -15,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765596014/generated_clothing.png",
-      "target_2d": {
-        "x": 0.8432218466043508,
-        "y": 0.7538391270804436
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -90
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765596014/mask.png",
-      "target_2d": {
-        "x": 0.8271987912934582,
-        "y": 0.41102051636001224
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "RED",
-      "target_2d": {
-        "x": 0.35920489051455873,
-        "y": 0.13340093396968866
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.11744482834879891,
-      "color": "#9400D3",
-      "rotation": 135
-    },
-    {
-      "type": "text_3d",
-      "text": "CLOWN",
-      "target_2d": {
-        "x": 0.8855522720874037,
-        "y": 0.35431671490539796
-      },
-      "depth_range": {
-        "min": 11,
-        "max": 17
-      },
-      "scale": 0.1334999587845184,
-      "color": "#FFFFFF",
-      "rotation": 135
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.8772286955881976,
-        "y": 0.532449669636901
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.27777894139775294,
-      "opacity": 0.42282552115084715,
-      "color": "#ec4899",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "scanLine",
-      "target_2d": {
-        "x": 0.15808135612137625,
-        "y": 0.4737267513471157
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2734628873283509,
-      "opacity": 0.27516888305240955,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "holographic",
-      "target_2d": {
-        "x": 0.5733994265361375,
-        "y": 0.8119537872703317
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.31077066091491506,
-      "opacity": 0.3808132944169783,
-      "color": "#8b5cf6",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.10791520388528504,
-        "y": 0.7597370573509521
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.19056307790448346,
-      "opacity": 0.20878427892280182,
-      "color": "#8b5cf6",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "voronoi",
-      "target_2d": {
-        "x": 0.881055221218698,
-        "y": 0.35405787366828256
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.24646763049752363,
-      "opacity": 0.4954177656199737,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glow",
-      "target_2d": {
-        "x": 0.22948247054894108,
-        "y": 0.169224911312497
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.1997527718669645,
-      "opacity": 0.20625520749057444,
-      "color": "#00CED1",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.8177250735113593,
-        "y": 0.8414011373279411
-      },
-      "depth_range": {
-        "min": 5,
-        "max": 8
-      },
-      "width": 10,
-      "height": 0.24673003115681186,
-      "scale": 0.8,
-      "opacity": 0.5,
-      "color": "#FF1493",
-      "angle": -45,
-      "rotation": -45
+      "fontSize": 0.1,
+      "textColor": "#fef2f2",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }

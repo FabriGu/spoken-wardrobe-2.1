@@ -1,17 +1,37 @@
 {
   "id": "1765599995",
+  "title": "Literally Finished Month",
   "transcription": "I literally finished a month ago, because I lied to myself saying, oh yeah, I just want to do this cute little thing and I'm not going to",
-  "keywords": [
+  "words": [
+    "literally",
+    "finished",
+    "month",
+    "ago",
+    "because",
+    "lied",
+    "myself",
+    "saying",
+    "yeah",
+    "just",
+    "this",
     "cute"
   ],
+  "metadata": {
+    "timestamp": 1765599995,
+    "created_date": "2025-12-12 23:26",
+    "transcription": "I literally finished a month ago, because I lied to myself saying, oh yeah, I just want to do this cute little thing and I'm not going to",
+    "word_count": 12,
+    "has_mesh": true
+  },
+  "palette": "ember",
   "background": {
-    "color": "#FFD700"
+    "color": "#1a0505"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +39,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "dreamy",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.9959680843204353,
+      "radius": 0.41102490004068676
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.07766513271164192,
+      "vignetteIntensity": 0.2775634345050989
+    }
   },
   "elements": [
     {
@@ -29,135 +62,63 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "ethereal",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f87171",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765599995/original_frame.png",
-      "target_2d": {
-        "x": 0.1828682847519152,
-        "y": 0.7383911329203641
+      "type": "curve_text",
+      "words": [
+        "literally",
+        "finished",
+        "month",
+        "ago",
+        "because",
+        "lied",
+        "myself",
+        "saying",
+        "yeah",
+        "just",
+        "this",
+        "cute"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 0,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#fef2f2",
+      "orbitSpeed": 0.06,
+      "numCurves": 3,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765599995/generated_clothing.png",
       "target_2d": {
-        "x": 0.7162802919332696,
-        "y": 0.8358625124407438
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 180
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765599995/mask.png",
-      "target_2d": {
-        "x": 0.7521030977060651,
-        "y": 0.8464304957199532
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "CUTE",
-      "target_2d": {
-        "x": 0.3459060538458788,
-        "y": 0.7361132448833793
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.13644324057918472,
-      "color": "#32CD32",
-      "rotation": 15
-    },
-    {
-      "type": "shader_plane",
-      "shader": "holographic",
-      "target_2d": {
-        "x": 0.7545481271956148,
-        "y": 0.483555111005754
+        "x": 0.15,
+        "y": 0.15
       },
       "depth_range": {
         "min": 6,
-        "max": 15
+        "max": 8
       },
-      "scale": 0.33095234705597565,
-      "opacity": 0.4000319647609277,
-      "color": "#FF1493",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "scanLine",
-      "target_2d": {
-        "x": 0.815184857886469,
-        "y": 0.6606449470313505
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.3438081204156854,
-      "opacity": 0.4389434041325535,
-      "color": "#8b5cf6",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "particleCloud",
-      "target_2d": {
-        "x": 0.7456438721777213,
-        "y": 0.8168520158685655
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.23537274369087102,
-      "opacity": 0.3265245786340586,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.822088923852647,
-        "y": 0.6051560729522157
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.3004537606659986,
-      "opacity": 0.44666416688169663,
-      "color": "#ec4899",
-      "animated": true
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": -30
     }
   ]
 }

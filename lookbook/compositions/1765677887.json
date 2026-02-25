@@ -1,15 +1,27 @@
 {
   "id": "1765677887",
+  "title": "Thats How",
   "transcription": "That's how it is.",
-  "keywords": [],
+  "words": [
+    "thats",
+    "how"
+  ],
+  "metadata": {
+    "timestamp": 1765677887,
+    "created_date": "2025-12-13 21:04",
+    "transcription": "That's how it is.",
+    "word_count": 2,
+    "has_mesh": true
+  },
+  "palette": "dream",
   "background": {
-    "color": "#9400D3"
+    "color": "#0f0a1a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -17,6 +29,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "clean",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.6566993955927801,
+      "radius": 0.4177209548162186
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.04920962716497425,
+      "vignetteIntensity": 0.3426673149238732
+    }
   },
   "elements": [
     {
@@ -27,123 +52,53 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "ethereal",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#e879f9",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765677887/original_frame.png",
-      "target_2d": {
-        "x": 0.2512970383203479,
-        "y": 0.8380280583420576
+      "type": "curve_text",
+      "words": [
+        "thats",
+        "how"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 30,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#f3e8ff",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765677887/generated_clothing.png",
       "target_2d": {
-        "x": 0.34003204005034016,
-        "y": 0.23013485603179532
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 90
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765677887/mask.png",
-      "target_2d": {
-        "x": 0.8545425309988577,
-        "y": 0.2759869864125948
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "shader_plane",
-      "shader": "dataMosh",
-      "target_2d": {
-        "x": 0.1914683849369212,
-        "y": 0.2661642421987145
+        "x": 0.85,
+        "y": 0.15
       },
       "depth_range": {
         "min": 6,
-        "max": 15
-      },
-      "scale": 0.27727080037554974,
-      "opacity": 0.3574736231205615,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.8989786234923146,
-        "y": 0.2505485158316011
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2318701770668357,
-      "opacity": 0.3336682713249688,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "kineticLiquid",
-      "target_2d": {
-        "x": 0.8047259464263367,
-        "y": 0.2694621917330957
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2982087673970303,
-      "opacity": 0.4488465918486413,
-      "color": "#9400D3",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.735706612572033,
-        "y": 0.7149614405064824
-      },
-      "depth_range": {
-        "min": 5,
         "max": 8
       },
-      "width": 10,
-      "height": 0.3177591941535537,
-      "scale": 0.8,
-      "opacity": 0.5,
-      "color": "#FF6347",
-      "angle": -60,
-      "rotation": -60
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": 30
     }
   ]
 }

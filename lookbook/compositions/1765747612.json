@@ -1,18 +1,27 @@
 {
   "id": "1765747612",
+  "title": "T-shirt Water",
   "transcription": "T-shirt Water, water, water, water, water",
-  "keywords": [
+  "words": [
     "t-shirt",
     "water"
   ],
+  "metadata": {
+    "timestamp": 1765747612,
+    "created_date": "2025-12-14 16:26",
+    "transcription": "T-shirt Water, water, water, water, water",
+    "word_count": 2,
+    "has_mesh": true
+  },
+  "palette": "ocean",
   "background": {
-    "color": "#FF6347"
+    "color": "#0a1a1a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -20,6 +29,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "clean",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.6913535327487892,
+      "radius": 0.31545783893570306
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.05173732197050321,
+      "vignetteIntensity": 0.2501862830118358
+    }
   },
   "elements": [
     {
@@ -30,134 +52,53 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "flow"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#22d3ee",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765747612/original_frame.png",
-      "target_2d": {
-        "x": 0.743094142347385,
-        "y": 0.726742753563492
+      "type": "curve_text",
+      "words": [
+        "t-shirt",
+        "water"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 0,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#ecfeff",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765747612/generated_clothing.png",
       "target_2d": {
-        "x": 0.3816110143914305,
-        "y": 0.7202715770517223
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": -45
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765747612/mask.png",
-      "target_2d": {
-        "x": 0.1697039601996398,
-        "y": 0.8168046467603302
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "T-SHIRT",
-      "target_2d": {
-        "x": 0.8650870340526166,
-        "y": 0.18063712538531754
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.09773573447567716,
-      "color": "#8b5cf6",
-      "rotation": 180
-    },
-    {
-      "type": "text_3d",
-      "text": "WATER",
-      "target_2d": {
-        "x": 0.2588978906336362,
-        "y": 0.19059575295442865
-      },
-      "depth_range": {
-        "min": 11,
-        "max": 17
-      },
-      "scale": 0.14071798383494788,
-      "color": "#FFFFFF",
-      "rotation": 30
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glow",
-      "target_2d": {
-        "x": 0.860957531805493,
-        "y": 0.10611059721274972
+        "x": 0.85,
+        "y": 0.85
       },
       "depth_range": {
         "min": 6,
-        "max": 15
+        "max": 8
       },
-      "scale": 0.19809530977473933,
-      "opacity": 0.4397174437861984,
-      "color": "#00FF7F",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "scanLine",
-      "target_2d": {
-        "x": 0.10229046315516532,
-        "y": 0.822454301067146
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.16036840835407917,
-      "opacity": 0.24735488320300056,
-      "color": "#FF69B4",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "holographic",
-      "target_2d": {
-        "x": 0.7996958518607783,
-        "y": 0.11011052590651459
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2179970072035783,
-      "opacity": 0.40981408376098427,
-      "color": "#FF4500",
-      "animated": true
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": -30
     }
   ]
 }

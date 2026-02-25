@@ -1,17 +1,26 @@
 {
   "id": "1765685356",
+  "title": "Dream: Red",
   "transcription": "Red",
-  "keywords": [
+  "words": [
     "red"
   ],
+  "metadata": {
+    "timestamp": 1765685356,
+    "created_date": "2025-12-13 23:09",
+    "transcription": "Red",
+    "word_count": 1,
+    "has_mesh": true
+  },
+  "palette": "ember",
   "background": {
-    "color": "#32CD32"
+    "color": "#1a0505"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +28,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "raw",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.7638861123254236,
+      "radius": 0.38269677708673433
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.04991790901972501,
+      "vignetteIntensity": 0.27377779540212555
+    }
   },
   "elements": [
     {
@@ -29,119 +51,52 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "aggressive"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#f87171",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765685356/original_frame.png",
-      "target_2d": {
-        "x": 0.10775998051687104,
-        "y": 0.7194532165066378
+      "type": "curve_text",
+      "words": [
+        "red"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 90,
-      "opacity": 0.7
+      "fontSize": 0.1,
+      "textColor": "#fef2f2",
+      "orbitSpeed": 0.06,
+      "numCurves": 2,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     },
     {
       "type": "image_plane",
       "path": "/comfyui_generated_mesh/1765685356/generated_clothing.png",
       "target_2d": {
-        "x": 0.7747558492385335,
-        "y": 0.2191970579288426
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 90
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765685356/mask.png",
-      "target_2d": {
-        "x": 0.8043980977731847,
-        "y": 0.7272970146624056
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "RED",
-      "target_2d": {
-        "x": 0.27552607711117416,
-        "y": 0.12635441459018165
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.12062010519595433,
-      "color": "#FFFFFF",
-      "rotation": -90
-    },
-    {
-      "type": "shader_plane",
-      "shader": "holographic",
-      "target_2d": {
-        "x": 0.5680082521306326,
-        "y": 0.11659954890735197
+        "x": 0.15,
+        "y": 0.85
       },
       "depth_range": {
         "min": 6,
-        "max": 15
+        "max": 8
       },
-      "scale": 0.3125853594217681,
-      "opacity": 0.23570478425656333,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.8702290946561511,
-        "y": 0.16371363589989435
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.31079918818816343,
-      "opacity": 0.4691281928708656,
-      "color": "#9400D3",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.7203995804034874,
-        "y": 0.45801311696101477
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.19294295227565947,
-      "opacity": 0.4867943723189975,
-      "color": "#32CD32",
-      "animated": true
+      "scale": 0.08,
+      "opacity": 0.15,
+      "rotation": 30
     }
   ]
 }

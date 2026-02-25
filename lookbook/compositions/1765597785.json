@@ -1,17 +1,37 @@
 {
   "id": "1765597785",
+  "title": "Long Answer However",
   "transcription": "or a long answer. However, when you tell it to, when you command it and you tell it like, instead of please, please can you make these changes? Fix it.",
-  "keywords": [
-    "tell"
+  "words": [
+    "long",
+    "answer",
+    "however",
+    "when",
+    "you",
+    "tell",
+    "command",
+    "instead",
+    "please",
+    "can",
+    "these",
+    "changes"
   ],
+  "metadata": {
+    "timestamp": 1765597785,
+    "created_date": "2025-12-12 22:49",
+    "transcription": "or a long answer. However, when you tell it to, when you command it and you tell it like, instead of please, please can you make these changes? Fix it.",
+    "word_count": 12,
+    "has_mesh": true
+  },
+  "palette": "sunset",
   "background": {
-    "color": "#FFD700"
+    "color": "#1a0f0a"
   },
   "camera": {
     "position": [
       0,
       0,
-      10
+      8
     ],
     "fov": 50,
     "target": [
@@ -19,6 +39,19 @@
       0,
       0
     ]
+  },
+  "effects": {
+    "postProcessing": "dreamy",
+    "bloom": {
+      "enabled": true,
+      "strength": 0.728496788708504,
+      "radius": 0.41569674303114124
+    },
+    "film": {
+      "enabled": true,
+      "grainIntensity": 0.03693296637046204,
+      "vignetteIntensity": 0.2768362524717839
+    }
   },
   "elements": [
     {
@@ -29,154 +62,48 @@
         "y": 0.5
       },
       "depth_range": {
-        "min": 3,
-        "max": 4
+        "min": 2.5,
+        "max": 3.5
       },
-      "scale": 0.45,
-      "plain": true,
+      "scale": 0.4,
       "animation": true,
-      "animationPreset": "dreamy"
+      "animationPreset": "flow",
+      "pointCloud": {
+        "enabled": true,
+        "particleSize": 0.012,
+        "particleColor": "#fb923c",
+        "scatterRadius": 1.2,
+        "turbulence": 0.25
+      }
     },
     {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765597785/original_frame.png",
-      "target_2d": {
-        "x": 0.2685307512332342,
-        "y": 0.5288916074723965
+      "type": "curve_text",
+      "words": [
+        "long",
+        "answer",
+        "however",
+        "when",
+        "you",
+        "tell",
+        "command",
+        "instead",
+        "please",
+        "can",
+        "these",
+        "changes"
+      ],
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
-      "depth_range": {
-        "min": 10,
-        "max": 18
-      },
-      "scale": 0.15,
-      "rotation": 90,
-      "opacity": 0.7
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765597785/generated_clothing.png",
-      "target_2d": {
-        "x": 0.31299368853238885,
-        "y": 0.1768680253039692
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.2,
-      "rotation": 45
-    },
-    {
-      "type": "image_plane",
-      "path": "/comfyui_generated_mesh/1765597785/mask.png",
-      "target_2d": {
-        "x": 0.3260275668146104,
-        "y": 0.8016280943905871
-      },
-      "depth_range": {
-        "min": 12,
-        "max": 16
-      },
-      "scale": 0.3,
-      "opacity": 0.15
-    },
-    {
-      "type": "text_3d",
-      "text": "TELL",
-      "target_2d": {
-        "x": 0.12770604945130018,
-        "y": 0.6546858021307551
-      },
-      "depth_range": {
-        "min": 8,
-        "max": 14
-      },
-      "scale": 0.14304595376722856,
-      "color": "#FFFFFF",
-      "rotation": 15
-    },
-    {
-      "type": "shader_plane",
-      "shader": "ripple",
-      "target_2d": {
-        "x": 0.17271070271895797,
-        "y": 0.15027995698519492
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.2623309068069906,
-      "opacity": 0.2245971306899852,
-      "color": "#FFD700",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "glitch",
-      "target_2d": {
-        "x": 0.16715695128103203,
-        "y": 0.37114086946949987
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.16763378365922071,
-      "opacity": 0.36943860396622086,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "scanLine",
-      "target_2d": {
-        "x": 0.13057319048109958,
-        "y": 0.2316022228850092
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.228696141671466,
-      "opacity": 0.37404216313324534,
-      "color": "#32CD32",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "particleCloud",
-      "target_2d": {
-        "x": 0.8714120006251289,
-        "y": 0.1796413037050587
-      },
-      "depth_range": {
-        "min": 6,
-        "max": 15
-      },
-      "scale": 0.30205146917625686,
-      "opacity": 0.2980242025180627,
-      "color": "#ec4899",
-      "animated": true
-    },
-    {
-      "type": "shader_plane",
-      "shader": "diagonal",
-      "target_2d": {
-        "x": 0.8235355251699046,
-        "y": 0.18178371936738272
-      },
-      "depth_range": {
-        "min": 5,
-        "max": 8
-      },
-      "width": 10,
-      "height": 0.29714818436278234,
-      "scale": 0.8,
-      "opacity": 0.5,
-      "color": "#32CD32",
-      "angle": 30,
-      "rotation": 30
+      "fontSize": 0.1,
+      "textColor": "#fff7ed",
+      "orbitSpeed": 0.06,
+      "numCurves": 3,
+      "curveRadius": 1.4,
+      "curveHeight": 0.7,
+      "staggerDelay": 0.25
     }
   ]
 }
