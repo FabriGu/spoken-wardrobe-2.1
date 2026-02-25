@@ -369,6 +369,69 @@
             </div>
 
             <div class="panel">
+                <h3>🎥 Webcam Tracking</h3>
+                <p style="font-size: 11px; color: #888; margin-bottom: 10px;">Drive skeleton with real-time pose detection</p>
+                <button id="btn-start-webcam">Start Webcam Tracking</button>
+                <button id="btn-stop-webcam" disabled>Stop Webcam</button>
+                <div class="control-group" style="margin-top: 10px;">
+                    <label>Smoothing: <span id="smoothing-value">0.3</span></label>
+                    <input type="range" id="smoothing-slider" min="0.1" max="0.9" step="0.1" value="0.3" style="width: 100%;">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-show-webcam-preview">
+                    <label for="chk-show-webcam-preview">Show Webcam Preview</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-show-keypoints" checked>
+                    <label for="chk-show-keypoints">Show 3D Keypoints (Purple)</label>
+                    <p style="font-size: 11px; color: #888; margin: 2px 0 0 20px;">Display MediaPipe landmarks in scene</p>
+                </div>
+                <div class="control-group" style="margin-top: 10px;">
+                    <label>Keypoint Y Offset: <span id="keypoint-y-offset-value">-0.25</span></label>
+                    <input type="range" id="keypoint-y-offset-slider" min="-2" max="2" step="0.05" value="-0.25" style="width: 100%;">
+                </div>
+                <div class="control-group">
+                    <label>Keypoint Z Offset: <span id="keypoint-z-offset-value">0.1</span></label>
+                    <input type="range" id="keypoint-z-offset-slider" min="-1" max="1" step="0.05" value="0.1" style="width: 100%;">
+                    <p style="font-size: 10px; color: #666; margin-top: 2px;">+Z = further from camera</p>
+                </div>
+                <div class="control-group">
+                    <label>Keypoint Scale: <span id="keypoint-scale-value">1.0</span></label>
+                    <input type="range" id="keypoint-scale-slider" min="0.5" max="2.0" step="0.05" value="1.0" style="width: 100%;">
+                </div>
+                <div id="webcam-preview" style="display: none; margin-top: 10px;">
+                    <canvas id="webcam-canvas" width="320" height="240" style="width: 100%; border-radius: 4px;"></canvas>
+                </div>
+                <div id="webcam-status" style="font-size: 11px; color: #888; margin-top: 5px;">Status: Not started</div>
+                <div id="webcam-countdown" style="font-size: 18px; color: #e94560; font-weight: bold; margin-top: 5px; display: none;"></div>
+            </div>
+
+            <div class="panel">
+                <h3>🧵 Cloth Simulation</h3>
+                <p style="font-size: 11px; color: #888; margin-bottom: 10px;">Ammo.js soft body physics for clothing</p>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-enable-cloth">
+                    <label for="chk-enable-cloth">Enable Cloth Physics</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-use-actual-mesh" checked>
+                    <label for="chk-use-actual-mesh">Apply to Actual Mesh</label>
+                    <p style="font-size: 10px; color: #666; margin: 2px 0 0 20px;">Unchecked = simplified plane overlay</p>
+                </div>
+                <div class="control-group" style="margin-top: 10px;">
+                    <label>Stiffness: <span id="cloth-stiffness-value">0.9</span></label>
+                    <input type="range" id="cloth-stiffness-slider" min="0.1" max="1.0" step="0.1" value="0.9" style="width: 100%;">
+                </div>
+                <div class="control-group">
+                    <label>Damping: <span id="cloth-damping-value">0.01</span></label>
+                    <input type="range" id="cloth-damping-slider" min="0.001" max="0.1" step="0.001" value="0.01" style="width: 100%;">
+                </div>
+                <button id="btn-apply-wind">Apply Wind Gust</button>
+                <button id="btn-reset-cloth">Reset Cloth</button>
+                <div id="cloth-status" style="font-size: 11px; color: #888; margin-top: 5px;">Status: Not initialized</div>
+            </div>
+
+            <div class="panel">
                 <h3>Settings</h3>
                 <div class="checkbox-group">
                     <input type="checkbox" id="chk-inpainting" checked>
@@ -394,6 +457,11 @@
                 <div class="checkbox-group">
                     <input type="checkbox" id="chk-show-clothing" checked>
                     <label for="chk-show-clothing">Show Clothing Mesh</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chk-show-weight-points" checked>
+                    <label for="chk-show-weight-points">Show Weight Transfer Points</label>
+                    <p style="font-size: 11px; color: #888; margin: 2px 0 0 20px;">Colored dots showing bone weight distribution</p>
                 </div>
             </div>
         </div>
@@ -448,12 +516,18 @@
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { MeshBVH, acceleratedRaycast } from 'https://unpkg.com/three-mesh-bvh@0.7.0/build/index.module.js';
-        import { MeshAligner } from './js/MeshAligner.js';
-        
+        import { MeshAligner } from '/root-static/js/MeshAligner.js';
+        import { ClothSimulator } from '/root-static/js/ClothSimulator.js';
+        import { MediaPipePoseDriver } from '/root-static/js/MediaPipePoseDriver.js';
+
         // Enable BVH acceleration
         if (THREE && THREE.Mesh && acceleratedRaycast) {
             THREE.Mesh.prototype.raycast = acceleratedRaycast;
         }
+
+        // Global instances for cloth simulation and pose tracking
+        let clothSimulator = null;
+        let poseDriver = null;
 
         // Global state
         const state = {
@@ -548,8 +622,21 @@
             state.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         }
 
+        // Track time for physics
+        let lastAnimateTime = performance.now();
+
         function animate() {
             requestAnimationFrame(animate);
+
+            // Calculate delta time for physics
+            const currentTime = performance.now();
+            const deltaTime = (currentTime - lastAnimateTime) / 1000;
+            lastAnimateTime = currentTime;
+
+            // Update cloth simulation if enabled
+            if (clothSimulator && clothSimulator.enabled) {
+                clothSimulator.update(deltaTime);
+            }
 
             // Apply spine rigid transform if enabled
             if (state.spineRigidRotation && state.skinnedClothingMesh) {
@@ -897,6 +984,8 @@
                 );
                 state.scene.add(bodyPoints);
                 state.bodyPoints = bodyPoints;
+                // Respect the visibility checkbox setting
+                bodyPoints.visible = document.getElementById('chk-show-weight-points').checked;
                 log('Added body vertex visualization (colored points)');
 
                 // Diagnostic logging: Analyze body mesh bone distribution
@@ -1601,16 +1690,26 @@
         });
 
         document.getElementById('btn-sample-meshes').addEventListener('click', async () => {
-            log('Loading sample meshes from project...');
+            log('Loading default rigged body mesh...');
             try {
-                // Load body mesh from project
-                const bodyResponse = await fetch('/models/lowpoly_rigged_full_v1.glb');
+                // Load pre-rigged body mesh (primary source)
+                const bodyResponse = await fetch('/prerigged/rigged_full_v1.glb');
                 if (bodyResponse.ok) {
                     const bodyBlob = await bodyResponse.blob();
-                    const bodyFile = new File([bodyBlob], 'lowpoly_rigged_full_v1.glb');
+                    const bodyFile = new File([bodyBlob], 'rigged_full_v1.glb');
                     await loadBodyMesh(bodyFile);
+                    log('Loaded rigged_full_v1.glb from /prerigged/', 'success');
                 } else {
-                    log('Sample body mesh not found at /models/lowpoly_rigged_full_v1.glb', 'error');
+                    // Fallback to models folder
+                    const fallbackResponse = await fetch('/models/lowpoly_rigged_full_v1.glb');
+                    if (fallbackResponse.ok) {
+                        const bodyBlob = await fallbackResponse.blob();
+                        const bodyFile = new File([bodyBlob], 'lowpoly_rigged_full_v1.glb');
+                        await loadBodyMesh(bodyFile);
+                        log('Loaded fallback from /models/', 'warning');
+                    } else {
+                        log('No rigged body mesh found. Check /prerigged/rigged_full_v1.glb', 'error');
+                    }
                 }
             } catch (error) {
                 log(`Failed to load sample meshes: ${error.message}`, 'error');
@@ -2362,9 +2461,306 @@
             }
         });
 
+        // ============================================
+        // WEBCAM TRACKING EVENT HANDLERS
+        // ============================================
+
+        document.getElementById('btn-start-webcam').addEventListener('click', async () => {
+            const statusEl = document.getElementById('webcam-status');
+            statusEl.textContent = 'Status: Initializing...';
+
+            try {
+                if (!poseDriver) {
+                    poseDriver = new MediaPipePoseDriver();
+                }
+
+                const success = await poseDriver.init();
+                if (!success) {
+                    statusEl.textContent = 'Status: Failed to initialize';
+                    log('Failed to initialize webcam tracking', 'error');
+                    return;
+                }
+
+                // Set skeleton if available
+                if (state.skeleton) {
+                    poseDriver.setSkeleton(state.skeleton);
+                }
+
+                // Set the scene for 3D keypoint visualization
+                poseDriver.setScene(state.scene);
+
+                // Calibrate keypoints to body mesh if available
+                if (state.bodyMesh) {
+                    poseDriver.calibrateToBodyMesh(state.bodyMesh);
+                    log('Keypoints calibrated to body mesh', 'success');
+                } else {
+                    log('No body mesh loaded - keypoints using default scale', 'warning');
+                }
+
+                // Set initial keypoint visibility
+                poseDriver.setKeypointsVisible(document.getElementById('chk-show-keypoints').checked);
+
+                // Set up callbacks
+                poseDriver.onPoseDetected = (data) => {
+                    // Update preview canvas if visible
+                    const previewCheck = document.getElementById('chk-show-webcam-preview');
+                    if (previewCheck.checked && data.landmarks) {
+                        const previewCanvas = document.getElementById('webcam-canvas');
+                        const ctx = previewCanvas.getContext('2d');
+
+                        // Draw video frame
+                        ctx.drawImage(poseDriver.video, 0, 0, previewCanvas.width, previewCanvas.height);
+
+                        // Draw landmarks
+                        poseDriver.drawLandmarks(data.landmarks);
+                        ctx.drawImage(poseDriver.canvas, 0, 0, previewCanvas.width, previewCanvas.height);
+                    }
+                };
+
+                // Countdown callback
+                const countdownEl = document.getElementById('webcam-countdown');
+                poseDriver.onCountdown = (remaining) => {
+                    if (remaining > 0) {
+                        countdownEl.style.display = 'block';
+                        countdownEl.textContent = `Skeleton control in: ${remaining}s`;
+                        statusEl.textContent = 'Status: Countdown...';
+                    } else {
+                        countdownEl.style.display = 'none';
+                        statusEl.textContent = 'Status: Running (controlling skeleton)';
+                        log('Skeleton control enabled - move to see mesh follow!', 'success');
+                    }
+                };
+
+                poseDriver.start(true); // true = with countdown
+
+                document.getElementById('btn-start-webcam').disabled = true;
+                document.getElementById('btn-stop-webcam').disabled = false;
+                statusEl.textContent = 'Status: Running';
+                log('Webcam tracking started', 'success');
+
+            } catch (error) {
+                statusEl.textContent = 'Status: Error';
+                log(`Webcam error: ${error.message}`, 'error');
+            }
+        });
+
+        document.getElementById('btn-stop-webcam').addEventListener('click', () => {
+            if (poseDriver) {
+                poseDriver.stop();
+                // Hide keypoints when stopped
+                poseDriver.setKeypointsVisible(false);
+            }
+            document.getElementById('btn-start-webcam').disabled = false;
+            document.getElementById('btn-stop-webcam').disabled = true;
+            document.getElementById('webcam-status').textContent = 'Status: Stopped';
+            document.getElementById('webcam-countdown').style.display = 'none';
+            log('Webcam tracking stopped');
+        });
+
+        document.getElementById('smoothing-slider').addEventListener('input', (e) => {
+            document.getElementById('smoothing-value').textContent = e.target.value;
+            if (poseDriver) {
+                poseDriver.smoothingFactor = parseFloat(e.target.value);
+            }
+        });
+
+        document.getElementById('chk-show-webcam-preview').addEventListener('change', (e) => {
+            document.getElementById('webcam-preview').style.display = e.target.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('chk-show-keypoints').addEventListener('change', (e) => {
+            if (poseDriver) {
+                poseDriver.setKeypointsVisible(e.target.checked);
+            }
+        });
+
+        // Manual keypoint offset controls
+        document.getElementById('keypoint-y-offset-slider').addEventListener('input', (e) => {
+            const offset = parseFloat(e.target.value);
+            document.getElementById('keypoint-y-offset-value').textContent = offset.toFixed(2);
+            if (poseDriver) {
+                poseDriver.manualOffsetY = offset;
+            }
+        });
+
+        document.getElementById('keypoint-z-offset-slider').addEventListener('input', (e) => {
+            const offset = parseFloat(e.target.value);
+            document.getElementById('keypoint-z-offset-value').textContent = offset.toFixed(2);
+            if (poseDriver) {
+                poseDriver.manualOffsetZ = offset;
+            }
+        });
+
+        document.getElementById('keypoint-scale-slider').addEventListener('input', (e) => {
+            const scale = parseFloat(e.target.value);
+            document.getElementById('keypoint-scale-value').textContent = scale.toFixed(2);
+            if (poseDriver) {
+                poseDriver.manualScaleMultiplier = scale;
+            }
+        });
+
+        // ============================================
+        // WEIGHT POINTS VISIBILITY
+        // ============================================
+
+        document.getElementById('chk-show-weight-points').addEventListener('change', (e) => {
+            if (state.bodyPoints) {
+                state.bodyPoints.visible = e.target.checked;
+                log(e.target.checked ? 'Weight transfer points shown' : 'Weight transfer points hidden');
+            }
+        });
+
+        // ============================================
+        // CLOTH SIMULATION EVENT HANDLERS
+        // ============================================
+
+        document.getElementById('chk-enable-cloth').addEventListener('change', async (e) => {
+            const statusEl = document.getElementById('cloth-status');
+
+            if (e.target.checked) {
+                statusEl.textContent = 'Status: Initializing...';
+
+                try {
+                    if (!clothSimulator) {
+                        clothSimulator = new ClothSimulator({
+                            stiffness: parseFloat(document.getElementById('cloth-stiffness-slider').value),
+                            damping: parseFloat(document.getElementById('cloth-damping-slider').value)
+                        });
+                    }
+
+                    const success = await clothSimulator.init();
+                    if (!success) {
+                        statusEl.textContent = 'Status: Failed to initialize';
+                        e.target.checked = false;
+                        log('Failed to initialize cloth simulation', 'error');
+                        return;
+                    }
+
+                    // Set the scene reference for adding visual meshes
+                    clothSimulator.setScene(state.scene);
+
+                    // Add clothing to simulation if available
+                    if (state.skinnedClothingMesh) {
+                        const useActualMesh = document.getElementById('chk-use-actual-mesh').checked;
+                        clothSimulator.createClothFromMesh(state.skinnedClothingMesh, { useActualMesh: useActualMesh });
+                        clothSimulator.fixTopVertices(state.skinnedClothingMesh, -1, 15); // Fix top 15%
+                        log(`Cloth physics applied (${useActualMesh ? 'actual mesh' : 'simplified plane'})`, 'success');
+                    } else {
+                        log('No clothing mesh loaded - load clothing first', 'warning');
+                    }
+
+                    // Add body collider if available
+                    if (state.bodyMesh) {
+                        clothSimulator.addBodyCollider(state.bodyMesh);
+                    }
+
+                    clothSimulator.setEnabled(true);
+                    statusEl.textContent = 'Status: Running';
+                    log('Cloth simulation enabled', 'success');
+
+                } catch (error) {
+                    statusEl.textContent = 'Status: Error';
+                    e.target.checked = false;
+                    log(`Cloth simulation error: ${error.message}`, 'error');
+                }
+            } else {
+                if (clothSimulator) {
+                    clothSimulator.setEnabled(false);
+                }
+                statusEl.textContent = 'Status: Disabled';
+                log('Cloth simulation disabled');
+            }
+        });
+
+        document.getElementById('cloth-stiffness-slider').addEventListener('input', (e) => {
+            document.getElementById('cloth-stiffness-value').textContent = e.target.value;
+            if (clothSimulator) {
+                clothSimulator.stiffness = parseFloat(e.target.value);
+            }
+        });
+
+        document.getElementById('cloth-damping-slider').addEventListener('input', (e) => {
+            document.getElementById('cloth-damping-value').textContent = e.target.value;
+            if (clothSimulator) {
+                clothSimulator.damping = parseFloat(e.target.value);
+            }
+        });
+
+        document.getElementById('btn-apply-wind').addEventListener('click', () => {
+            if (clothSimulator && clothSimulator.enabled) {
+                const windDir = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
+                clothSimulator.applyWind(windDir, 10);
+                log('Wind gust applied');
+            } else {
+                log('Enable cloth simulation first', 'warning');
+            }
+        });
+
+        document.getElementById('btn-reset-cloth').addEventListener('click', () => {
+            if (clothSimulator) {
+                clothSimulator.reset();
+
+                // Re-apply to clothing if available
+                if (state.skinnedClothingMesh && clothSimulator.enabled) {
+                    const useActualMesh = document.getElementById('chk-use-actual-mesh').checked;
+                    clothSimulator.createClothFromMesh(state.skinnedClothingMesh, { useActualMesh: useActualMesh });
+                    clothSimulator.fixTopVertices(state.skinnedClothingMesh, -1, 15);
+                }
+
+                log('Cloth simulation reset');
+            }
+        });
+
+        // ============================================
+        // UPDATE ANIMATION LOOP FOR CLOTH PHYSICS
+        // ============================================
+
+        // Store original animate function and enhance it
+        const originalAnimate = animate;
+        let lastTime = performance.now();
+
+        function enhancedAnimate() {
+            const currentTime = performance.now();
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+
+            // Update cloth simulation
+            if (clothSimulator && clothSimulator.enabled) {
+                clothSimulator.update(deltaTime);
+            }
+
+            // Call original animation logic
+            originalAnimate();
+        }
+
+        // Replace animate with enhanced version in render loop
+        // Note: The original animate() uses requestAnimationFrame internally
+
         // Initialize
         init();
-        log('Diagnostic tool ready. Load meshes or click "Use Sample Meshes" to begin.');
+
+        // Auto-load default body mesh on startup
+        setTimeout(async () => {
+            log('Auto-loading default rigged body mesh...');
+            try {
+                const bodyResponse = await fetch('/prerigged/rigged_full_v1.glb');
+                if (bodyResponse.ok) {
+                    const bodyBlob = await bodyResponse.blob();
+                    const bodyFile = new File([bodyBlob], 'rigged_full_v1.glb');
+                    await loadBodyMesh(bodyFile);
+                    log('Auto-loaded rigged_full_v1.glb', 'success');
+
+                    // Set skeleton for pose driver if available
+                    if (poseDriver && state.skeleton) {
+                        poseDriver.setSkeleton(state.skeleton);
+                    }
+                }
+            } catch (error) {
+                log('Auto-load skipped: ' + error.message, 'warning');
+            }
+        }, 500);
+
+        log('Diagnostic tool ready with Webcam Tracking & Cloth Simulation support.');
     </script>
 </body>
 </html>
