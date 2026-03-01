@@ -15,6 +15,9 @@
     }
     </script>
 
+    <!-- QR Code library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -216,6 +219,58 @@
             z-index: 100;
             font-family: monospace;
         }
+
+        /* QR Code Overlay */
+        #qr-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #qr-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .qr-content {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .qr-content h3 {
+            font-size: 18px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 24px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .qr-content canvas {
+            margin-bottom: 16px;
+            background: black;
+        }
+
+        .qr-content .share-url {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 20px;
+            word-break: break-all;
+            max-width: 250px;
+        }
     </style>
 </head>
 <body>
@@ -232,7 +287,17 @@
     <div id="controls" class="hidden">
         <button class="btn" id="btn-orbit">Free Orbit</button>
         <button class="btn primary" id="btn-snap">Snap to View</button>
-        <button class="btn" id="btn-screenshot">Export Print</button>
+        <button class="btn" id="btn-share">Share</button>
+    </div>
+
+    <!-- QR Code Overlay -->
+    <div id="qr-overlay">
+        <div class="qr-content">
+            <h3>Share This Dream</h3>
+            <canvas id="qr-canvas"></canvas>
+            <p class="share-url" id="share-url"></p>
+            <button class="btn" id="btn-close-qr">Close</button>
+        </div>
     </div>
 
     <!-- LARGE SEMI-TRANSPARENT NAVIGATION ARROWS -->
@@ -397,9 +462,46 @@
             scene.snapToAnamorphicView();
         });
 
-        document.getElementById('btn-screenshot').addEventListener('click', () => {
-            screenshot.captureHighRes(4096, 4096);
+        document.getElementById('btn-share').addEventListener('click', () => {
+            showShareQR();
         });
+
+        document.getElementById('btn-close-qr').addEventListener('click', () => {
+            hideShareQR();
+        });
+
+        // Close QR on click outside
+        document.getElementById('qr-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'qr-overlay') {
+                hideShareQR();
+            }
+        });
+
+        // QR Code / Share functions
+        function showShareQR() {
+            const shareUrl = `${window.location.origin}/share/${compositionId}`;
+            document.getElementById('share-url').textContent = shareUrl;
+
+            // Generate QR code
+            const canvas = document.getElementById('qr-canvas');
+            QRCode.toCanvas(canvas, shareUrl, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#ffffff',
+                    light: '#000000'
+                }
+            }, (error) => {
+                if (error) console.error('QR code error:', error);
+            });
+
+            // Show overlay
+            document.getElementById('qr-overlay').classList.add('visible');
+        }
+
+        function hideShareQR() {
+            document.getElementById('qr-overlay').classList.remove('visible');
+        }
 
         // Browser back/forward handling
         window.addEventListener('popstate', (e) => {

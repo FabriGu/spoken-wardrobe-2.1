@@ -1,6 +1,6 @@
 {
   "id": "1765679772",
-  "title": "Dream: You",
+  "title": "You",
   "transcription": "you",
   "words": [
     "you"
@@ -12,9 +12,9 @@
     "word_count": 1,
     "has_mesh": true
   },
-  "palette": "ocean",
+  "palette": "void",
   "background": {
-    "color": "#0a1a1a"
+    "color": "#050505"
   },
   "camera": {
     "position": [
@@ -33,13 +33,13 @@
     "postProcessing": "dreamy",
     "bloom": {
       "enabled": true,
-      "strength": 0.7774385031280244,
-      "radius": 0.3921160672751629
+      "strength": 0.9328699464989104,
+      "radius": 0.45403675392652154
     },
     "film": {
       "enabled": true,
-      "grainIntensity": 0.06847483975599228,
-      "vignetteIntensity": 0.2615414347800439
+      "grainIntensity": 0.0642634009924366,
+      "vignetteIntensity": 0.21112243390454064
     }
   },
   "elements": [
@@ -56,11 +56,11 @@
       },
       "scale": 0.4,
       "animation": true,
-      "animationPreset": "flow",
+      "animationPreset": "ethereal",
       "pointCloud": {
         "enabled": true,
         "particleSize": 0.012,
-        "particleColor": "#22d3ee",
+        "particleColor": "#d4d4d4",
         "scatterRadius": 1.2,
         "turbulence": 0.25
       }
@@ -76,7 +76,7 @@
         "z": 0
       },
       "fontSize": 0.1,
-      "textColor": "#ecfeff",
+      "textColor": "#e5e5e5",
       "orbitSpeed": 0.06,
       "numCurves": 2,
       "curveRadius": 1.4,
@@ -122,7 +122,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 10,
+      "rotation": 0,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,

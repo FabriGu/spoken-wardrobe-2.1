@@ -1,6 +1,6 @@
 {
   "id": "1765678899",
-  "title": "Untitled Dream",
+  "title": "Untitled",
   "transcription": "I'm",
   "words": [],
   "metadata": {
@@ -10,9 +10,9 @@
     "word_count": 0,
     "has_mesh": true
   },
-  "palette": "void",
+  "palette": "dream",
   "background": {
-    "color": "#050505"
+    "color": "#0f0a1a"
   },
   "camera": {
     "position": [
@@ -28,16 +28,16 @@
     ]
   },
   "effects": {
-    "postProcessing": "raw",
+    "postProcessing": "dreamy",
     "bloom": {
       "enabled": true,
-      "strength": 0.9070122826540666,
-      "radius": 0.41735384516286245
+      "strength": 0.6607027141561633,
+      "radius": 0.4359657201146039
     },
     "film": {
       "enabled": true,
-      "grainIntensity": 0.06100828685045518,
-      "vignetteIntensity": 0.2887771851126472
+      "grainIntensity": 0.033603056276901404,
+      "vignetteIntensity": 0.21692779221187333
     }
   },
   "elements": [
@@ -54,11 +54,11 @@
       },
       "scale": 0.4,
       "animation": true,
-      "animationPreset": "meditative",
+      "animationPreset": "flow",
       "pointCloud": {
         "enabled": true,
         "particleSize": 0.012,
-        "particleColor": "#d4d4d4",
+        "particleColor": "#e879f9",
         "scatterRadius": 1.2,
         "turbulence": 0.25
       }
@@ -76,7 +76,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 0,
+      "rotation": -10,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -102,7 +102,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 10,
+      "rotation": -10,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -128,7 +128,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 0,
+      "rotation": 10,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,

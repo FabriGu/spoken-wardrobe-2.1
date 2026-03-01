@@ -1,6 +1,6 @@
 {
   "id": "1765685356",
-  "title": "Dream: Red",
+  "title": "Red",
   "transcription": "Red",
   "words": [
     "red"
@@ -33,13 +33,13 @@
     "postProcessing": "clean",
     "bloom": {
       "enabled": true,
-      "strength": 0.9164306430774075,
-      "radius": 0.43642106061383357
+      "strength": 0.9300039779152302,
+      "radius": 0.3897201669936506
     },
     "film": {
       "enabled": true,
-      "grainIntensity": 0.05889148714394313,
-      "vignetteIntensity": 0.2993788792937613
+      "grainIntensity": 0.0688604362535568,
+      "vignetteIntensity": 0.28765567017450683
     }
   },
   "elements": [
@@ -56,7 +56,7 @@
       },
       "scale": 0.4,
       "animation": true,
-      "animationPreset": "ethereal",
+      "animationPreset": "dreamy",
       "pointCloud": {
         "enabled": true,
         "particleSize": 0.012,
@@ -96,7 +96,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 10,
+      "rotation": 0,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -122,7 +122,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": -10,
+      "rotation": 10,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -148,7 +148,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": -10,
+      "rotation": 0,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,

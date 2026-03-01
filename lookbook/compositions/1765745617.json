@@ -19,9 +19,9 @@
     "word_count": 8,
     "has_mesh": true
   },
-  "palette": "void",
+  "palette": "ocean",
   "background": {
-    "color": "#050505"
+    "color": "#0a1a1a"
   },
   "camera": {
     "position": [
@@ -37,16 +37,16 @@
     ]
   },
   "effects": {
-    "postProcessing": "raw",
+    "postProcessing": "dreamy",
     "bloom": {
       "enabled": true,
-      "strength": 0.9130916506605137,
-      "radius": 0.33036217809877483
+      "strength": 0.6455267027336596,
+      "radius": 0.46955879340158313
     },
     "film": {
       "enabled": true,
-      "grainIntensity": 0.054563155685354255,
-      "vignetteIntensity": 0.3466125851023619
+      "grainIntensity": 0.06973637063848764,
+      "vignetteIntensity": 0.2652886861414575
     }
   },
   "elements": [
@@ -63,11 +63,11 @@
       },
       "scale": 0.4,
       "animation": true,
-      "animationPreset": "meditative",
+      "animationPreset": "flow",
       "pointCloud": {
         "enabled": true,
         "particleSize": 0.012,
-        "particleColor": "#d4d4d4",
+        "particleColor": "#22d3ee",
         "scatterRadius": 1.2,
         "turbulence": 0.25
       }
@@ -90,7 +90,7 @@
         "z": 0
       },
       "fontSize": 0.1,
-      "textColor": "#e5e5e5",
+      "textColor": "#ecfeff",
       "orbitSpeed": 0.06,
       "numCurves": 2,
       "curveRadius": 1.4,
@@ -110,7 +110,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": -10,
+      "rotation": 0,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -162,7 +162,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 0,
+      "rotation": -10,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,

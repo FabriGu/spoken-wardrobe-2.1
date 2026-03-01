@@ -41,16 +41,16 @@
     ]
   },
   "effects": {
-    "postProcessing": "dreamy",
+    "postProcessing": "clean",
     "bloom": {
       "enabled": true,
-      "strength": 0.8801850365926973,
-      "radius": 0.48755520078491577
+      "strength": 0.6091753141194948,
+      "radius": 0.4489655246053138
     },
     "film": {
       "enabled": true,
-      "grainIntensity": 0.04131993979077425,
-      "vignetteIntensity": 0.32128808205360093
+      "grainIntensity": 0.030500318644310152,
+      "vignetteIntensity": 0.23074001656043205
     }
   },
   "elements": [
@@ -67,7 +67,7 @@
       },
       "scale": 0.4,
       "animation": true,
-      "animationPreset": "meditative",
+      "animationPreset": "dreamy",
       "pointCloud": {
         "enabled": true,
         "particleSize": 0.012,
@@ -118,7 +118,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 0,
+      "rotation": 10,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -144,7 +144,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": -10,
+      "rotation": 0,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -170,7 +170,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": -10,
+      "rotation": 0,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,

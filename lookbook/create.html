@@ -15,6 +15,12 @@
     }
     </script>
 
+    <!-- QR Code library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+    <!-- MediaPipe for segmentation -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+
     <style>
         * {
             margin: 0;
@@ -314,6 +320,146 @@
             right: 20px;
             z-index: 100;
         }
+
+        /* QR Code Overlay */
+        #qr-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #qr-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .qr-content {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .qr-content h3 {
+            font-size: 18px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 24px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .qr-content canvas {
+            margin-bottom: 16px;
+            background: black;
+        }
+
+        .qr-content .share-url {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 20px;
+            word-break: break-all;
+            max-width: 250px;
+        }
+
+        /* Webcam Preview */
+        #webcam-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            display: none;
+        }
+
+        #webcam-container.visible {
+            display: block;
+        }
+
+        #webcam-video {
+            width: 640px;
+            max-width: 90vw;
+            height: auto;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            transform: scaleX(-1); /* Mirror for selfie view */
+        }
+
+        #webcam-canvas {
+            display: none; /* Hidden canvas for capture */
+        }
+
+        #mask-canvas {
+            display: none; /* Hidden canvas for segmentation mask */
+        }
+
+        /* A-pose guide overlay */
+        #pose-guide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #pose-guide svg {
+            width: 300px;
+            height: 400px;
+            opacity: 0.3;
+        }
+
+        /* Countdown overlay */
+        #capture-countdown {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            font-weight: 300;
+            color: white;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+            z-index: 60;
+            display: none;
+        }
+
+        #capture-countdown.visible {
+            display: block;
+            animation: countdownPulse 1s ease-out;
+        }
+
+        @keyframes countdownPulse {
+            0% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* Camera status */
+        #camera-status {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            z-index: 100;
+        }
+
+        #camera-status.hidden { display: none; }
     </style>
 </head>
 <body>
@@ -337,6 +483,34 @@
     </button>
 
     <button id="back-btn" class="btn" onclick="window.location.href='/'">Back</button>
+
+    <!-- Webcam Container -->
+    <div id="webcam-container">
+        <video id="webcam-video" autoplay playsinline></video>
+        <canvas id="webcam-canvas" width="640" height="480"></canvas>
+        <canvas id="mask-canvas" width="640" height="480"></canvas>
+        <div id="pose-guide">
+            <!-- Simple A-pose silhouette guide -->
+            <svg viewBox="0 0 100 140" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2">
+                <!-- Head -->
+                <circle cx="50" cy="15" r="10" />
+                <!-- Body -->
+                <line x1="50" y1="25" x2="50" y2="70" />
+                <!-- Arms extended -->
+                <line x1="50" y1="35" x2="15" y2="55" />
+                <line x1="50" y1="35" x2="85" y2="55" />
+                <!-- Legs -->
+                <line x1="50" y1="70" x2="35" y2="120" />
+                <line x1="50" y1="70" x2="65" y2="120" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Capture Countdown -->
+    <div id="capture-countdown"></div>
+
+    <!-- Camera Status -->
+    <div id="camera-status" class="hidden"></div>
 
     <!-- Instructions -->
     <div id="instruction-pose" class="instruction hidden">
@@ -373,7 +547,17 @@
     <div id="controls" class="hidden">
         <button class="btn" id="btn-orbit">Free Orbit</button>
         <button class="btn selected" id="btn-snap">Snap to View</button>
-        <button class="btn" id="btn-screenshot">Export Print</button>
+        <button class="btn" id="btn-share">Share</button>
+    </div>
+
+    <!-- QR Code Overlay -->
+    <div id="qr-overlay">
+        <div class="qr-content">
+            <h3>Take Your Dream</h3>
+            <canvas id="qr-canvas"></canvas>
+            <p class="share-url" id="share-url"></p>
+            <button class="btn" id="btn-close-qr">Close</button>
+        </div>
     </div>
 
     <script type="module">
@@ -397,6 +581,212 @@
         let isRecording = false;
         let prompt = '';
         let generatedTitle = '';
+
+        // Webcam & Segmentation
+        let webcamStream = null;
+        let selfieSegmentation = null;
+        let latestSegmentationMask = null;
+        let capturedFrameBase64 = null;
+        let segmentationMaskBase64 = null;
+
+        // ==========================================
+        // WEBCAM & SEGMENTATION
+        // ==========================================
+        async function initWebcam() {
+            const video = document.getElementById('webcam-video');
+            const statusEl = document.getElementById('camera-status');
+
+            statusEl.textContent = 'Initializing camera...';
+            statusEl.classList.remove('hidden');
+
+            try {
+                // Request camera - prefer built-in camera over Continuity Camera
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(d => d.kind === 'videoinput');
+
+                console.log('Available cameras:', videoDevices.map(d => d.label));
+
+                // Find built-in camera (usually contains "FaceTime" or "Built-in" on Mac)
+                let preferredDevice = videoDevices.find(d =>
+                    d.label.toLowerCase().includes('facetime') ||
+                    d.label.toLowerCase().includes('built-in') ||
+                    d.label.toLowerCase().includes('isight')
+                );
+
+                // If not found, use the first camera that's NOT iPhone/Continuity
+                if (!preferredDevice) {
+                    preferredDevice = videoDevices.find(d =>
+                        !d.label.toLowerCase().includes('iphone') &&
+                        !d.label.toLowerCase().includes('continuity')
+                    ) || videoDevices[0];
+                }
+
+                const constraints = {
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    }
+                };
+
+                if (preferredDevice) {
+                    constraints.video.deviceId = { exact: preferredDevice.deviceId };
+                    console.log('Using camera:', preferredDevice.label);
+                }
+
+                webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = webcamStream;
+                await video.play();
+
+                statusEl.textContent = 'Camera ready';
+
+                // Initialize segmentation
+                await initSegmentation();
+
+                return true;
+            } catch (error) {
+                console.error('Camera error:', error);
+                statusEl.textContent = `Camera error: ${error.message}`;
+                return false;
+            }
+        }
+
+        async function initSegmentation() {
+            const statusEl = document.getElementById('camera-status');
+            statusEl.textContent = 'Loading segmentation model...';
+
+            try {
+                selfieSegmentation = new SelfieSegmentation({
+                    locateFile: (file) => {
+                        return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+                    }
+                });
+
+                selfieSegmentation.setOptions({
+                    modelSelection: 1,  // 1 = landscape model (better for full body)
+                    selfieMode: true
+                });
+
+                selfieSegmentation.onResults(onSegmentationResults);
+
+                // Start processing frames
+                processWebcamFrame();
+
+                statusEl.textContent = 'Ready - Press SPACE to capture';
+                console.log('Segmentation initialized');
+            } catch (error) {
+                console.error('Segmentation error:', error);
+                statusEl.textContent = 'Segmentation unavailable';
+            }
+        }
+
+        function onSegmentationResults(results) {
+            // Store the latest segmentation mask
+            if (results.segmentationMask) {
+                const maskCanvas = document.getElementById('mask-canvas');
+                const ctx = maskCanvas.getContext('2d');
+
+                // Draw the segmentation mask (white = person, black = background)
+                ctx.drawImage(results.segmentationMask, 0, 0, maskCanvas.width, maskCanvas.height);
+
+                // Store reference
+                latestSegmentationMask = results.segmentationMask;
+            }
+        }
+
+        async function processWebcamFrame() {
+            if (!selfieSegmentation || !webcamStream) return;
+
+            const video = document.getElementById('webcam-video');
+
+            if (video.readyState >= 2) {
+                try {
+                    await selfieSegmentation.send({ image: video });
+                } catch (e) {
+                    // Ignore errors during frame processing
+                }
+            }
+
+            // Continue processing if webcam is active
+            if (webcamStream) {
+                requestAnimationFrame(processWebcamFrame);
+            }
+        }
+
+        function stopWebcam() {
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(track => track.stop());
+                webcamStream = null;
+            }
+
+            document.getElementById('webcam-container').classList.remove('visible');
+            document.getElementById('camera-status').classList.add('hidden');
+        }
+
+        async function captureFrameAndMask() {
+            const video = document.getElementById('webcam-video');
+            const frameCanvas = document.getElementById('webcam-canvas');
+            const maskCanvas = document.getElementById('mask-canvas');
+
+            // Capture frame (flip horizontally to match mirrored preview)
+            const frameCtx = frameCanvas.getContext('2d');
+            frameCtx.save();
+            frameCtx.scale(-1, 1);
+            frameCtx.drawImage(video, -frameCanvas.width, 0, frameCanvas.width, frameCanvas.height);
+            frameCtx.restore();
+
+            // Get frame as base64 (remove data URL prefix)
+            capturedFrameBase64 = frameCanvas.toDataURL('image/png').split(',')[1];
+
+            // Get mask as base64
+            // The mask from selfie segmentation has person in white
+            // But we need to convert it to grayscale where body = 255
+            const maskCtx = maskCanvas.getContext('2d');
+
+            // If we have a segmentation mask, use it
+            if (latestSegmentationMask) {
+                // Flip mask horizontally to match
+                maskCtx.save();
+                maskCtx.scale(-1, 1);
+                maskCtx.drawImage(latestSegmentationMask, -maskCanvas.width, 0, maskCanvas.width, maskCanvas.height);
+                maskCtx.restore();
+
+                // Convert to proper grayscale mask
+                const imageData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+                const data = imageData.data;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    // Alpha channel contains the segmentation
+                    // We want white (255) where person is
+                    const alpha = data[i + 3];
+                    const value = alpha > 128 ? 255 : 0;
+                    data[i] = value;     // R
+                    data[i + 1] = value; // G
+                    data[i + 2] = value; // B
+                    data[i + 3] = 255;   // A
+                }
+
+                maskCtx.putImageData(imageData, 0, 0);
+            } else {
+                // Fallback: create a simple center mask
+                maskCtx.fillStyle = 'black';
+                maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+                maskCtx.fillStyle = 'white';
+                maskCtx.fillRect(
+                    maskCanvas.width * 0.2,
+                    maskCanvas.height * 0.1,
+                    maskCanvas.width * 0.6,
+                    maskCanvas.height * 0.8
+                );
+            }
+
+            segmentationMaskBase64 = maskCanvas.toDataURL('image/png').split(',')[1];
+
+            console.log('Frame captured:', capturedFrameBase64.length, 'bytes');
+            console.log('Mask captured:', segmentationMaskBase64.length, 'bytes');
+
+            return { frame: capturedFrameBase64, mask: segmentationMaskBase64 };
+        }
 
         // ==========================================
         // INITIALIZATION
@@ -511,28 +901,42 @@
                     document.getElementById('prompt-input').disabled = true;
                     document.getElementById('mic-btn').style.display = 'none';
                     document.getElementById('instruction-pose').classList.remove('hidden');
+                    // Show webcam and initialize camera
+                    document.getElementById('webcam-container').classList.add('visible');
+                    initWebcam().then(success => {
+                        if (!success) {
+                            // Camera failed, show instruction to proceed without camera
+                            document.getElementById('camera-status').textContent =
+                                'Camera unavailable - will use default image';
+                        }
+                    });
                     break;
 
                 case STATES.CAPTURE:
                     document.getElementById('instruction-pose').classList.add('hidden');
-                    setProgress('Capturing...');
-                    // Simulate capture delay
-                    setTimeout(() => setState(STATES.GENERATE_2D), 1500);
+                    // Start capture countdown
+                    startCaptureCountdown();
                     break;
 
                 case STATES.GENERATE_2D:
                     document.getElementById('instruction-generating').classList.remove('hidden');
                     setProgress('Generating 2D clothing...');
-                    // TODO: Call actual ComfyUI API
-                    simulateGeneration2D();
+                    // Call ComfyUI API (falls back to simulation if unavailable)
+                    generate2D().catch(e => {
+                        console.error('2D generation failed:', e);
+                        simulateGeneration2D();
+                    });
                     break;
 
                 case STATES.GENERATE_3D:
                     document.getElementById('instruction-generating').classList.add('hidden');
                     document.getElementById('instruction-mesh').classList.remove('hidden');
                     setProgress('Creating 3D mesh...');
-                    // TODO: Call actual Rodin API
-                    simulateGeneration3D();
+                    // Call Rodin API (falls back to simulation if unavailable)
+                    generate3D().catch(e => {
+                        console.error('3D generation failed:', e);
+                        simulateGeneration3D();
+                    });
                     break;
 
                 case STATES.COMPLETE:
@@ -550,6 +954,30 @@
         function setProgress(text) {
             document.getElementById('progress').textContent = text;
             document.getElementById('progress').classList.remove('hidden');
+        }
+
+        async function startCaptureCountdown() {
+            const countdownEl = document.getElementById('capture-countdown');
+
+            // 3-2-1 countdown
+            for (let i = 3; i > 0; i--) {
+                countdownEl.textContent = i;
+                countdownEl.classList.add('visible');
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
+            // Hide countdown
+            countdownEl.classList.remove('visible');
+
+            // Capture!
+            setProgress('Capturing...');
+            await captureFrameAndMask();
+
+            // Hide webcam
+            stopWebcam();
+
+            // Move to generation
+            setState(STATES.GENERATE_2D);
         }
 
         // ==========================================
@@ -574,35 +1002,198 @@
         }
 
         // ==========================================
-        // SIMULATION (Replace with actual API calls)
+        // GENERATED DATA STORAGE
+        // ==========================================
+        let generatedImage = null;  // Base64 encoded PNG
+        let generatedMesh = null;   // Base64 encoded GLB
+        let currentCompositionId = null;
+
+        // ==========================================
+        // API CALLS
+        // ==========================================
+        async function generate2D() {
+            setProgress('Generating 2D clothing...');
+
+            try {
+                // Build request body with captured frame and mask if available
+                const requestBody = {
+                    prompt: prompt
+                };
+
+                if (capturedFrameBase64) {
+                    requestBody.image = capturedFrameBase64;
+                    console.log('Using captured frame');
+                }
+
+                if (segmentationMaskBase64) {
+                    requestBody.mask = segmentationMaskBase64;
+                    console.log('Using segmentation mask');
+                }
+
+                const response = await fetch('/api/generate-2d', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    generatedImage = result.image;
+
+                    // Show preview image in center
+                    const previewImg = document.getElementById('preview-image');
+                    previewImg.src = `data:image/png;base64,${result.image}`;
+                    previewImg.classList.add('visible');
+
+                    // Wait a moment, then move to side
+                    await new Promise(r => setTimeout(r, 2000));
+                    previewImg.classList.add('aside');
+
+                    // Move to 3D generation
+                    setState(STATES.GENERATE_3D);
+                } else {
+                    throw new Error(result.error || '2D generation failed');
+                }
+            } catch (error) {
+                console.error('2D generation error:', error);
+                setProgress(`Error: ${error.message}`);
+                // Allow retry by going back to pose state after delay
+                await new Promise(r => setTimeout(r, 3000));
+                setState(STATES.POSE);
+            }
+        }
+
+        async function generate3D() {
+            setProgress('Creating 3D mesh...');
+
+            if (!generatedImage) {
+                console.error('No generated image available');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/generate-3d', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: generatedImage
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    generatedMesh = result.mesh;
+
+                    // Load mesh into scene
+                    setProgress('Loading 3D mesh...');
+
+                    // Convert base64 to blob URL for loading
+                    const meshBlob = base64ToBlob(result.mesh, 'model/gltf-binary');
+                    const meshUrl = URL.createObjectURL(meshBlob);
+
+                    // Load composition with mesh
+                    const config = {
+                        id: 'preview',
+                        title: generatedTitle,
+                        transcription: prompt,
+                        background: { color: '#0a0a1a' },
+                        camera: { position: [0, 0, 8], fov: 50, target: [0, 0, 0] },
+                        effects: {
+                            postProcessing: 'dreamy',
+                            bloom: { enabled: true, strength: 0.8, radius: 0.4 },
+                            film: { enabled: true, grainIntensity: 0.05, scanlineIntensity: 0 }
+                        },
+                        elements: [
+                            {
+                                type: 'glb_mesh',
+                                path: meshUrl,
+                                target_2d: { x: 0.5, y: 0.5 },
+                                depth_range: { min: 2.5, max: 3.5 },
+                                scale: 0.4,
+                                animation: true,
+                                animationPreset: 'dreamy'
+                            }
+                        ]
+                    };
+
+                    await scene.loadComposition(config);
+
+                    // Save the composition
+                    await saveComposition();
+
+                    // Complete
+                    setState(STATES.COMPLETE);
+                } else {
+                    throw new Error(result.error || '3D generation failed');
+                }
+            } catch (error) {
+                console.error('3D generation error:', error);
+                setProgress(`Error: ${error.message}`);
+                // Still allow completion to see 2D result
+                await new Promise(r => setTimeout(r, 3000));
+                await saveComposition(); // Save even without 3D
+                setState(STATES.COMPLETE);
+            }
+        }
+
+        async function saveComposition() {
+            setProgress('Saving composition...');
+
+            try {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        title: generatedTitle,
+                        generated_clothing: generatedImage,
+                        mesh: generatedMesh,
+                        original_frame: capturedFrameBase64,
+                        mask: segmentationMaskBase64
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentCompositionId = result.id;
+                    console.log(`Composition saved: ${result.id}`);
+                    console.log(`URL: ${result.url}`);
+                } else {
+                    console.error('Save failed:', result.error);
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+            }
+        }
+
+        // Helper function to convert base64 to Blob
+        function base64ToBlob(base64, mimeType) {
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], { type: mimeType });
+        }
+
+        // ==========================================
+        // FALLBACK SIMULATION (for testing without APIs)
         // ==========================================
         async function simulateGeneration2D() {
-            // Simulate 2D generation delay
+            console.warn('Using 2D simulation mode');
+            setProgress('Simulating 2D generation...');
             await new Promise(r => setTimeout(r, 3000));
-
-            // TODO: Replace with actual ComfyUI call
-            // For now, show a placeholder or skip
-
-            // Show preview image (would be the generated image)
-            // document.getElementById('preview-image').src = generatedImageUrl;
-            // document.getElementById('preview-image').classList.add('visible');
-
-            // After showing center, move to side
-            // await new Promise(r => setTimeout(r, 2000));
-            // document.getElementById('preview-image').classList.add('aside');
-
-            // Move to 3D generation
             setState(STATES.GENERATE_3D);
         }
 
         async function simulateGeneration3D() {
-            // Simulate 3D generation delay
+            console.warn('Using 3D simulation mode');
+            setProgress('Simulating 3D generation...');
             await new Promise(r => setTimeout(r, 3000));
-
-            // TODO: Replace with actual Rodin API call
-            // Then load the mesh and trigger reformation
-
-            // For now, just complete
             setState(STATES.COMPLETE);
         }
 
@@ -627,11 +1218,17 @@
 
         // Navigation arrows (when complete)
         document.getElementById('arrow-prev').addEventListener('click', () => {
-            window.location.href = '/composition.html';
+            // Go to gallery
+            window.location.href = '/index.html';
         });
 
         document.getElementById('arrow-next').addEventListener('click', () => {
-            window.location.href = '/composition.html';
+            // Go to the saved composition
+            if (currentCompositionId) {
+                window.location.href = `/composition.html?id=${currentCompositionId}`;
+            } else {
+                window.location.href = '/index.html';
+            }
         });
 
         // Control buttons
@@ -647,10 +1244,53 @@
             document.getElementById('btn-orbit').classList.remove('selected');
         });
 
-        document.getElementById('btn-screenshot').addEventListener('click', () => {
-            // TODO: Implement screenshot
-            console.log('Screenshot not implemented yet');
+        document.getElementById('btn-share').addEventListener('click', () => {
+            showShareQR();
         });
+
+        document.getElementById('btn-close-qr').addEventListener('click', () => {
+            hideShareQR();
+        });
+
+        // Close QR on click outside
+        document.getElementById('qr-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'qr-overlay') {
+                hideShareQR();
+            }
+        });
+
+        // ==========================================
+        // QR CODE / SHARE FUNCTIONS
+        // ==========================================
+        function showShareQR() {
+            if (!currentCompositionId) {
+                console.warn('No composition to share');
+                return;
+            }
+
+            const shareUrl = `${window.location.origin}/share/${currentCompositionId}`;
+            document.getElementById('share-url').textContent = shareUrl;
+
+            // Generate QR code
+            const canvas = document.getElementById('qr-canvas');
+            QRCode.toCanvas(canvas, shareUrl, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#ffffff',
+                    light: '#000000'
+                }
+            }, (error) => {
+                if (error) console.error('QR code error:', error);
+            });
+
+            // Show overlay
+            document.getElementById('qr-overlay').classList.add('visible');
+        }
+
+        function hideShareQR() {
+            document.getElementById('qr-overlay').classList.remove('visible');
+        }
 
         // ==========================================
         // INITIALIZE

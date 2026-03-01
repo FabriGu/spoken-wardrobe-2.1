@@ -1,6 +1,6 @@
 {
   "id": "1765598154",
-  "title": "Untitled Dream",
+  "title": "Untitled",
   "transcription": "I'm",
   "words": [],
   "metadata": {
@@ -28,16 +28,16 @@
     ]
   },
   "effects": {
-    "postProcessing": "dreamy",
+    "postProcessing": "clean",
     "bloom": {
       "enabled": true,
-      "strength": 0.6744456552793044,
-      "radius": 0.48241328451626425
+      "strength": 0.8641361314340097,
+      "radius": 0.40931788514680234
     },
     "film": {
       "enabled": true,
-      "grainIntensity": 0.07215621254287818,
-      "vignetteIntensity": 0.211554884554283
+      "grainIntensity": 0.07406048230196002,
+      "vignetteIntensity": 0.20719952043755233
     }
   },
   "elements": [
@@ -54,7 +54,7 @@
       },
       "scale": 0.4,
       "animation": true,
-      "animationPreset": "dreamy",
+      "animationPreset": "flow",
       "pointCloud": {
         "enabled": true,
         "particleSize": 0.012,
@@ -76,7 +76,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 0,
+      "rotation": -10,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -102,7 +102,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": -10,
+      "rotation": 0,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
@@ -128,7 +128,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": 10,
+      "rotation": 0,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,

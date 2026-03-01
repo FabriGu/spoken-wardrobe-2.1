@@ -1,6 +1,6 @@
 {
   "id": "1765269511",
-  "title": "Dream: Hmm",
+  "title": "Hmm",
   "transcription": "Hmm.",
   "words": [
     "hmm"
@@ -12,9 +12,9 @@
     "word_count": 1,
     "has_mesh": true
   },
-  "palette": "dawn",
+  "palette": "dream",
   "background": {
-    "color": "#1a0a0a"
+    "color": "#0f0a1a"
   },
   "camera": {
     "position": [
@@ -30,16 +30,16 @@
     ]
   },
   "effects": {
-    "postProcessing": "clean",
+    "postProcessing": "raw",
     "bloom": {
       "enabled": true,
-      "strength": 0.8591088148919634,
-      "radius": 0.33303252585559584
+      "strength": 0.8085488242385455,
+      "radius": 0.4924858631943859
     },
     "film": {
       "enabled": true,
-      "grainIntensity": 0.05844341655902739,
-      "vignetteIntensity": 0.23724397128624455
+      "grainIntensity": 0.057676274619550966,
+      "vignetteIntensity": 0.30738034243039447
     }
   },
   "elements": [
@@ -56,11 +56,11 @@
       },
       "scale": 0.4,
       "animation": true,
-      "animationPreset": "flow",
+      "animationPreset": "ethereal",
       "pointCloud": {
         "enabled": true,
         "particleSize": 0.012,
-        "particleColor": "#f472b6",
+        "particleColor": "#e879f9",
         "scatterRadius": 1.2,
         "turbulence": 0.25
       }
@@ -76,7 +76,7 @@
         "z": 0
       },
       "fontSize": 0.1,
-      "textColor": "#fce7f3",
+      "textColor": "#f3e8ff",
       "orbitSpeed": 0.06,
       "numCurves": 2,
       "curveRadius": 1.4,
@@ -122,7 +122,7 @@
       },
       "scale": 0.12,
       "opacity": 0.35,
-      "rotation": -10,
+      "rotation": 10,
       "spotlight": {
         "enabled": true,
         "intensity": 0.4,
