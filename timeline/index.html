@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream to Reality</title>
+
+    <!-- Three.js from CDN -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- OpenCV.js (async load) -->
+    <script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="onOpenCVReady()"></script>
+
+    <!-- TensorFlow.js & BodyPix -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0/dist/body-pix.min.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/timeline.css">
+</head>
+<body>
+    <!-- Hidden video element for camera capture -->
+    <video id="camera-source" autoplay playsinline muted></video>
+
+    <!-- Main container -->
+    <div id="app">
+        <!-- ACT 1: The Dream - Runway Scene -->
+        <div id="act-dream" class="act-container hidden">
+            <canvas id="runway-canvas"></canvas>
+            <div id="dream-ui">
+                <div class="dream-prompt">
+                    <h1>Imagine Your Dream</h1>
+                    <p class="instruction">You are a fashion designer at your first major show.</p>
+                    <p class="instruction highlight">What would you want to see yourself wearing?</p>
+                    <div class="speech-indicator">
+                        <div class="mic-pulse"></div>
+                        <span class="status-text">DESCRIBE YOUR VISION</span>
+                    </div>
+                    <div class="timer-ring">
+                        <span class="timer-text">10</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACT 2: The Journey - Grid Experience -->
+        <div id="act-journey" class="act-container hidden">
+            <div id="era-grid">
+                <!-- Grid cells are dynamically created -->
+            </div>
+            <!-- Era label overlay -->
+            <div id="era-label" class="hidden">
+                <span class="era-year"></span>
+                <span class="era-name"></span>
+            </div>
+        </div>
+
+        <!-- ACT 3: The Reality - Final Runway -->
+        <div id="act-reality" class="act-container hidden">
+            <canvas id="reality-canvas"></canvas>
+            <div id="reality-ui">
+                <div class="reality-badge">
+                    <span class="badge-text">YOUR DREAM REALIZED</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlays -->
+        <div id="fps-counter" class="hidden">FPS: <span>0</span></div>
+        <div id="loading-overlay">
+            <div class="loader"></div>
+            <span class="loading-text">INITIALIZING</span>
+        </div>
+    </div>
+
+    <!-- Main application -->
+    <script type="module" src="js/app.js"></script>
+    <script>
+        function onOpenCVReady() {
+            console.log('[Timeline] OpenCV.js loaded');
+            window.dispatchEvent(new Event('opencv-ready'));
+        }
+    </script>
+</body>
+</html>

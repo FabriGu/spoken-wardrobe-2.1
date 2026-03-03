@@ -1,0 +1,379 @@
+/**
+ * Timeline Grid Installation Styles
+ * "Dream to Reality" - Museum Installation
+ *
+ * DESIGN: Brutalist / Minimal
+ * - Black background (#000)
+ * - White text (#fff)
+ * - Purple accent (#9b59b6) - sparingly
+ * - NO gradients, NO rounded corners, NO shadows
+ */
+
+/* === Reset & Base === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #000;
+    --fg: #fff;
+    --fg-dim: #888;
+    --accent: #9b59b6;
+    --border: #333;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--fg);
+}
+
+/* === Hidden Elements === */
+#camera-source {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* === Main Container === */
+#app {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.act-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+}
+
+/* === ACT 1: The Dream (Wireframe Runway) === */
+#act-dream {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#runway-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: var(--bg);
+}
+
+#dream-ui {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+#dream-ui.active {
+    opacity: 1;
+}
+
+.dream-prompt {
+    text-align: center;
+    max-width: 600px;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid var(--border);
+}
+
+.dream-prompt h1 {
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--fg);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+.dream-prompt .instruction {
+    font-size: 1rem;
+    color: var(--fg-dim);
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.dream-prompt .instruction.highlight {
+    color: var(--fg);
+}
+
+.speech-indicator {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.mic-pulse {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+}
+
+.mic-pulse.active {
+    animation: blink 0.5s step-end infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+.status-text {
+    font-size: 0.875rem;
+    color: var(--fg-dim);
+    font-family: monospace;
+}
+
+.timer-ring {
+    margin-top: 2rem;
+    width: 80px;
+    height: 80px;
+    position: relative;
+    border: 1px solid var(--border);
+}
+
+.timer-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-family: monospace;
+    color: var(--fg);
+}
+
+/* === ACT 2: The Journey (Grid) === */
+#act-journey {
+    background: var(--bg);
+}
+
+#era-grid {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    gap: 0;
+}
+
+/* Grid layouts - edge to edge, no gaps */
+#era-grid.grid-1x1 {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+}
+
+#era-grid.grid-2x2 {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+}
+
+#era-grid.grid-3x3 {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+#era-grid.grid-4x3 {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+/* Grid cell */
+.era-cell {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.era-cell canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: var(--bg);
+}
+
+/* Era label inside cell */
+.era-cell .cell-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.era-cell.show-label .cell-label {
+    opacity: 1;
+}
+
+.cell-label .era-year {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+    font-family: monospace;
+}
+
+.cell-label .era-name {
+    font-size: 0.75rem;
+    color: var(--fg);
+    display: block;
+}
+
+/* Global era label (large, centered) */
+#era-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 100;
+    background: var(--bg);
+    padding: 2rem;
+    border: 1px solid var(--border);
+}
+
+#era-label .era-year {
+    font-size: 3rem;
+    font-weight: 400;
+    color: var(--accent);
+    display: block;
+    font-family: monospace;
+}
+
+#era-label .era-name {
+    font-size: 1rem;
+    color: var(--fg-dim);
+    margin-top: 0.5rem;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* === ACT 3: The Reality === */
+#act-reality {
+    background: var(--bg);
+}
+
+#reality-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: var(--bg);
+}
+
+#reality-ui {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 2rem;
+    pointer-events: none;
+}
+
+.reality-badge {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    padding: 0.75rem 1.5rem;
+}
+
+.badge-text {
+    font-size: 0.875rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+}
+
+/* === Overlays === */
+#fps-counter {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.25rem 0.5rem;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--fg-dim);
+    z-index: 1000;
+}
+
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 1001;
+}
+
+.loader {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 0.875rem;
+    color: var(--fg-dim);
+    font-family: monospace;
+}
+
+/* === Generating state for AI cells === */
+.era-cell.generating::before {
+    content: 'GENERATING';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    font-family: monospace;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    z-index: 10;
+}
+
+.era-cell.generating::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    opacity: 0.7;
+}
