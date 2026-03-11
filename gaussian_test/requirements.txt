@@ -1,0 +1,15 @@
+# Gaussian Splat Test Dependencies
+
+# Web server
+aiohttp>=3.9.0
+
+# Image processing
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# PyTorch (for MPS/CUDA detection and future model integration)
+torch>=2.1.0
+
+# Optional: For actual Gaussian Splat generation (when models are available)
+# transformers>=4.36.0
+# diffusers>=0.25.0

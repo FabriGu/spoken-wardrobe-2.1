@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal GaussianSplats3D Test</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-family: monospace;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+        }
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+            "@mkkellogg/gaussian-splats-3d": "https://unpkg.com/@mkkellogg/gaussian-splats-3d@0.4.7/build/gaussian-splats-3d.module.js"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div id="info">
+        <h3>Minimal GaussianSplats3D Test</h3>
+        <div>Status: <span id="status">Loading...</span></div>
+        <div>Splats: <span id="splats">-</span></div>
+    </div>
+
+    <script type="module">
+        import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
+
+        const statusEl = document.getElementById('status');
+        const splatsEl = document.getElementById('splats');
+
+        // Use the SIMPLEST possible configuration - let the library handle everything
+        try {
+            statusEl.textContent = 'Creating viewer...';
+
+            const viewer = new GaussianSplats3D.Viewer({
+                // Let the library create and manage everything
+                selfDrivenMode: true,
+                useBuiltInControls: true,
+                cameraUp: [0, 1, 0],
+                initialCameraPosition: [0, 0, 5],
+                initialCameraLookAt: [0, 0, 0],
+                sharedMemoryForWorkers: false
+            });
+
+            statusEl.textContent = 'Loading splat file...';
+
+            // Load the sample splat file
+            viewer.addSplatScene('/output/test_sample.splat', {
+                showLoadingUI: true,
+                progressiveLoad: true
+            })
+            .then(() => {
+                statusEl.textContent = 'Splat loaded! Starting viewer...';
+                viewer.start();
+                splatsEl.textContent = 'Loaded successfully';
+            })
+            .catch(error => {
+                statusEl.textContent = 'ERROR: ' + error.message;
+                console.error('Failed to load splat:', error);
+            });
+
+        } catch (error) {
+            statusEl.textContent = 'VIEWER ERROR: ' + error.message;
+            console.error('Failed to create viewer:', error);
+        }
+    </script>
+</body>
+</html>

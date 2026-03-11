@@ -1,0 +1,311 @@
+/**
+ * Gaussian Splat Debug Viewer Styles
+ * Dark theme, brutalist aesthetic
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #0a0a0a;
+    --bg-panel: #111;
+    --bg-section: #1a1a1a;
+    --fg: #fff;
+    --fg-dim: #888;
+    --accent: #9b59b6;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --error: #e74c3c;
+    --border: #333;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+    color: var(--fg);
+}
+
+#app {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* Viewer */
+#viewer-container {
+    flex: 1;
+    position: relative;
+    background: var(--bg);
+}
+
+#viewer-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: var(--accent);
+    font-size: 1rem;
+}
+
+.loader {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Debug Panel */
+#debug-panel {
+    width: 320px;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+#debug-panel h2 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+#debug-panel section {
+    background: var(--bg-section);
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+}
+
+#debug-panel h3 {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+/* Status */
+#status-indicator {
+    font-family: monospace;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    display: inline-block;
+    margin-bottom: 0.25rem;
+}
+
+.status-ready {
+    background: var(--success);
+    color: var(--bg);
+}
+
+.status-generating {
+    background: var(--warning);
+    color: var(--bg);
+    animation: blink 0.5s step-end infinite;
+}
+
+.status-error {
+    background: var(--error);
+    color: var(--fg);
+}
+
+.status-loading {
+    background: var(--accent);
+    color: var(--fg);
+}
+
+@keyframes blink {
+    50% { opacity: 0.5; }
+}
+
+#connection-status {
+    font-size: 0.75rem;
+    color: var(--fg-dim);
+}
+
+#connection-status.connected {
+    color: var(--success);
+}
+
+/* Form Elements */
+select, button {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    font-family: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+select:hover, button:hover {
+    border-color: var(--accent);
+}
+
+select:focus, button:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+button {
+    background: var(--accent);
+    color: var(--fg);
+    font-weight: 500;
+    transition: opacity 0.1s;
+}
+
+button:active {
+    opacity: 0.8;
+}
+
+button.secondary {
+    background: var(--bg-section);
+    color: var(--fg-dim);
+}
+
+button.secondary:hover {
+    color: var(--fg);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    font-size: 0.75rem;
+    font-family: monospace;
+}
+
+td {
+    padding: 0.125rem 0;
+}
+
+td:first-child {
+    color: var(--fg-dim);
+}
+
+td:last-child {
+    text-align: right;
+    color: var(--fg);
+}
+
+/* Controls */
+label {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+label:hover {
+    color: var(--accent);
+}
+
+input[type="checkbox"] {
+    margin-right: 0.5rem;
+    accent-color: var(--accent);
+}
+
+/* Log */
+#log-container {
+    height: 150px;
+    overflow-y: auto;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+    font-family: monospace;
+    font-size: 0.625rem;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+}
+
+.log-entry {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-time {
+    color: var(--fg-dim);
+}
+
+.log-info { color: var(--fg); }
+.log-warn { color: var(--warning); }
+.log-error { color: var(--error); }
+.log-debug { color: var(--accent); }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--fg-dim);
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+    #app {
+        flex-direction: column;
+    }
+
+    #debug-panel {
+        width: 100%;
+        height: 50%;
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+
+    #viewer-container {
+        height: 50%;
+    }
+}

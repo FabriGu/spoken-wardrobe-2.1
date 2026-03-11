@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaussian Splat Test Viewer</title>
+
+    <!-- Three.js and GaussianSplats3D -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+            "@mkkellogg/gaussian-splats-3d": "https://unpkg.com/@mkkellogg/gaussian-splats-3d@0.4.7/build/gaussian-splats-3d.module.js"
+        }
+    }
+    </script>
+
+    <link rel="stylesheet" href="/static/css/debug.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 3D Viewer -->
+        <div id="viewer-container">
+            <canvas id="viewer-canvas"></canvas>
+            <div id="loading-indicator" class="hidden">
+                <div class="loader"></div>
+                <span>Loading...</span>
+            </div>
+        </div>
+
+        <!-- Debug Panel (Right Side) -->
+        <div id="debug-panel">
+            <h2>GAUSSIAN SPLAT DEBUG</h2>
+
+            <!-- Status -->
+            <section id="status-section">
+                <h3>Status</h3>
+                <div id="status-indicator" class="status-ready">READY</div>
+                <div id="connection-status">WS: Disconnected</div>
+            </section>
+
+            <!-- Generation Controls -->
+            <section id="generation-section">
+                <h3>Generate</h3>
+                <select id="image-select">
+                    <option value="">-- Select Image --</option>
+                </select>
+                <button id="btn-generate">Generate Splat</button>
+                <button id="btn-refresh-images" class="secondary">Refresh Images</button>
+            </section>
+
+            <!-- Load Existing -->
+            <section id="load-section">
+                <h3>Load Existing</h3>
+                <select id="output-select">
+                    <option value="">-- Select PLY --</option>
+                </select>
+                <button id="btn-load">Load Splat</button>
+                <button id="btn-refresh-outputs" class="secondary">Refresh Outputs</button>
+            </section>
+
+            <!-- Timing Stats -->
+            <section id="timing-section">
+                <h3>Timings</h3>
+                <table id="timing-table">
+                    <tr><td>Preprocess:</td><td id="time-preprocess">--</td></tr>
+                    <tr><td>Generation:</td><td id="time-generation">--</td></tr>
+                    <tr><td>Save:</td><td id="time-save">--</td></tr>
+                    <tr><td>Total:</td><td id="time-total">--</td></tr>
+                </table>
+            </section>
+
+            <!-- Splat Stats -->
+            <section id="stats-section">
+                <h3>Splat Stats</h3>
+                <table id="stats-table">
+                    <tr><td>Splats:</td><td id="stat-splats">--</td></tr>
+                    <tr><td>File Size:</td><td id="stat-filesize">--</td></tr>
+                    <tr><td>Backend:</td><td id="stat-backend">--</td></tr>
+                    <tr><td>Device:</td><td id="stat-device">--</td></tr>
+                </table>
+            </section>
+
+            <!-- Render Stats -->
+            <section id="render-section">
+                <h3>Render</h3>
+                <table id="render-table">
+                    <tr><td>FPS:</td><td id="render-fps">--</td></tr>
+                    <tr><td>Draw Calls:</td><td id="render-calls">--</td></tr>
+                    <tr><td>Triangles:</td><td id="render-tris">--</td></tr>
+                </table>
+            </section>
+
+            <!-- Controls -->
+            <section id="controls-section">
+                <h3>View Controls</h3>
+                <label>
+                    <input type="checkbox" id="ctrl-rotate" checked>
+                    Auto Rotate
+                </label>
+                <label>
+                    <input type="checkbox" id="ctrl-grid">
+                    Show Grid
+                </label>
+                <label>
+                    <input type="checkbox" id="ctrl-axes">
+                    Show Axes
+                </label>
+                <button id="btn-reset-camera" class="secondary">Reset Camera</button>
+            </section>
+
+            <!-- Logs -->
+            <section id="log-section">
+                <h3>Log</h3>
+                <div id="log-container"></div>
+                <button id="btn-clear-log" class="secondary">Clear Log</button>
+            </section>
+        </div>
+    </div>
+
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>
